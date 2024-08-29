@@ -29,18 +29,18 @@ func get_state_by_method(method):
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta: float) -> void:
-    var train = $Train
-    var train_state = train.get_mover_state()
-    var bv = train_state.get("battery_voltage")
-
     _t += delta
+
     if(_t>0.1):
         _t = 0
+
+        var train = $Train
+        var train_state = train.get_mover_state()
+        var bv = train_state.get("battery_voltage")
 
         $%BatteryProgressBar.value = bv
         $%BatteryValue.text = "%.2f V" % [bv]
 
-        var mainswitch_state = get_state_by_path("Guziki/TrainMainSwitch")
         var security_state = get_state_by_method("security_system")
         var brake_state = get_state_by_method("brake")
         var engine_state = get_state_by_method("engine")

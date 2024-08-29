@@ -1,0 +1,49 @@
+[gd_scene format=3 uid="uid://c5hi8nsm1d2hb"]
+
+[node name="SM42v1" type="TrainController"]
+parts/engine = NodePath("StonkaDieselEngine")
+parts/brake = NodePath("Brake")
+parts/security_system = NodePath("TrainSecuritySystem")
+type_name = "6d"
+dimensions/mass = 74000.0
+nominal_battery_voltage = 110.0
+
+[node name="Brake" type="TrainBrake" parent="."]
+valve/type = 20
+friction_elements_per_axle = 4
+brake_force/max = 85.0
+max_pressures/cylinder = 4.0
+max_pressures/antislip = 1.8
+cylinders/count = 4
+cylinders/radius = 0.114
+cylinders/distance = 0.05
+tank/volume_main = 0.8
+tank/volume_aux = 200.0
+compressor/pressure_min = 7.0
+compressor/pressure_max = 8.0
+compressor/speed = 0.057
+compressor/power = 3
+rig_effectivnes = 0.85
+
+[node name="StonkaDieselEngine" type="TrainDieselEngine" parent="."]
+oil_pump/pressure_minimum = 0.15
+
+[node name="TestowySilnikElektryczny" type="TrainElectricSeriesEngine" parent="."]
+nominal_voltage = 11000.0
+winding_resistance = 200.0
+
+[node name="TrainSecuritySystem" type="TrainSecuritySystem" parent="."]
+aware_system/active = true
+aware_delay = 60.0
+emergency_brake_delay = 2.5
+sound_signal_delay = 2.5
+shp_magnet_distance = 3.0
+ca_max_hold_time = 1.0
+
+[node name="Guziki" type="Node" parent="."]
+
+[node name="TrainMainSwitch" type="TrainMainSwitch" parent="Guziki"]
+
+[node name="TrainConverterSwitch" type="TrainConverterSwitch" parent="Guziki"]
+
+[node name="TrainCompressorSwitch" type="TrainCompressorSwitch" parent="Guziki"]

@@ -15,7 +15,7 @@ var _dirty = false
         title = x
 
 
-func _process(delta):
+func _process(_delta):
     if _dirty:
         _dirty = false
         $Title.text = title

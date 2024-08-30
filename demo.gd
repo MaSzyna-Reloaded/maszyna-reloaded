@@ -1,10 +1,12 @@
-extends Node2D
+extends Control
 
 var _t:float = 0.0
 
+@onready var train = $SM42_V1
+
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
-    pass
+    $%TrainName.text = "%s (type: %s)" % [train.name, train.type_name]
 
 func draw_dictionary(dict: Dictionary, target: DebugPanel):
     var lines = []
@@ -14,16 +16,16 @@ func draw_dictionary(dict: Dictionary, target: DebugPanel):
 
 
 func get_state_by_path(path):
-    var _p = $Train.get_node(path) as TrainPart
+    var _p = train.get_node(path) as TrainPart
     if _p:
-        return _p.get_mover_state($Train)
+        return _p.get_mover_state(train)
     else:
         return {}
 
 func get_state_by_method(method):
-    var _p = Callable($Train, "get_%s" % method).call() as TrainPart
+    var _p = Callable(train, "get_%s" % method).call() as TrainPart
     if _p:
-        return _p.get_mover_state($Train)
+        return _p.get_mover_state(train)
     else:
         return {}
 
@@ -34,7 +36,6 @@ func _process(delta: float) -> void:
     if(_t>0.1):
         _t = 0
 
-        var train = $Train
         var train_state = train.get_mover_state()
         var bv = train_state.get("battery_voltage")
 
@@ -45,23 +46,7 @@ func _process(delta: float) -> void:
         var brake_state = get_state_by_method("brake")
         var engine_state = get_state_by_method("engine")
 
-        draw_dictionary(engine_state, $DebugEngine)
-        draw_dictionary(train_state, $DebugTrain)
-        draw_dictionary(brake_state, $DebugBrake)
-        draw_dictionary(security_state, $DebugSecurity)
-
-
-func _on_oil_pump_toggled(toggled_on):
-    $Train.set("switches/oil_pump_enabled", toggled_on)
-
-
-func _on_main_switch_toggled(toggled_on):
-    $Train/Guziki/TrainMainSwitch.pushed = toggled_on
-
-
-func _on_fuel_pump_toggled(toggled_on):
-    $Train.set("switches/fuel_pump_enabled", toggled_on)
-
-
-func _on_battery_switch_toggled(toggled_on):
-    $Train.set("switches/battery_enabled", toggled_on)
+        draw_dictionary(engine_state, $%DebugEngine)
+        draw_dictionary(train_state, $%DebugTrain)
+        draw_dictionary(brake_state, $%DebugBrake)
+        draw_dictionary(security_state, $%DebugSecurity)

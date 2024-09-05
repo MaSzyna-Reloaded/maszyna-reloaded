@@ -6,6 +6,9 @@ parts/brake = NodePath("Brake")
 parts/security_system = NodePath("TrainSecuritySystem")
 type_name = "6d"
 dimensions/mass = 74000.0
+power = 590.0
+max_velocity = 90.0
+axle_arrangement = "Bo'Bo'"
 nominal_battery_voltage = 110.0
 
 [node name="Brake" type="TrainBrake" parent="."]

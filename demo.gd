@@ -50,3 +50,9 @@ func _process(delta: float) -> void:
         draw_dictionary(train_state, $%DebugTrain)
         draw_dictionary(brake_state, $%DebugBrake)
         draw_dictionary(security_state, $%DebugSecurity)
+
+
+func _on_brake_level_value_changed(value):
+    var b = train.get_brake() as TrainBrake
+    if b:
+        b.brake_level = value

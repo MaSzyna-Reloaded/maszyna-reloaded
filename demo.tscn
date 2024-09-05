@@ -165,7 +165,26 @@ type = 0
 node = NodePath("../../../../SM42_V1/TestowySilnikElektryczny")
 property = "switches/main"
 
+[node name="Brakes" type="HFlowContainer" parent="UI/MoverSwitches"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="UI/MoverSwitches/Brakes"]
+layout_mode = 2
+text = "Brakes"
+
+[node name="BrakeLevel" type="SpinBox" parent="UI/MoverSwitches/Brakes"]
+layout_mode = 2
+
+[node name="Releaser" parent="UI/MoverSwitches/Brakes" instance=ExtResource("4_xvhus")]
+layout_mode = 2
+label = "Releaser"
+type = 0
+node = NodePath("../../../../SM42_V1/Brake")
+property = "switches/releaser"
+
 [node name="SM42_V1" parent="." instance=ExtResource("2_t8uqe")]
 switches/battery_enabled = true
+
+[connection signal="value_changed" from="UI/MoverSwitches/Brakes/BrakeLevel" to="." method="_on_brake_level_value_changed"]
 
 [editable path="SM42_V1"]

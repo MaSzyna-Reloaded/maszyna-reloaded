@@ -3,6 +3,10 @@ extends Control
 var _t:float = 0.0
 
 @onready var train = $SM42_V1
+@onready var brake = $SM42_V1/Brake
+@onready var engine = $SM42_V1/StonkaDieselEngine
+@onready var security = $SM42_V1/TrainSecuritySystem
+
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
@@ -18,14 +22,7 @@ func draw_dictionary(dict: Dictionary, target: DebugPanel):
 func get_state_by_path(path):
     var _p = train.get_node(path) as TrainPart
     if _p:
-        return _p.get_mover_state(train)
-    else:
-        return {}
-
-func get_state_by_method(method):
-    var _p = Callable(train, "get_%s" % method).call() as TrainPart
-    if _p:
-        return _p.get_mover_state(train)
+        return _p.get_mover_state()
     else:
         return {}
 
@@ -39,14 +36,14 @@ func _process(delta: float) -> void:
         var train_state = train.get_mover_state()
         var bv = train_state.get("battery_voltage")
 
-
+        $%CustomTrainPartCount.text = "%s" % train.state.get("custom_train_part_calls")
 
         $%BatteryProgressBar.value = bv
         $%BatteryValue.text = "%.2f V" % [bv]
 
-        var security_state = get_state_by_method("security_system")
-        var brake_state = get_state_by_method("brake")
-        var engine_state = get_state_by_method("engine")
+        var security_state = security.get_mover_state()
+        var brake_state = brake.get_mover_state()
+        var engine_state = engine.get_mover_state()
 
         draw_dictionary(engine_state, $%DebugEngine)
         draw_dictionary(train_state, $%DebugTrain)
@@ -59,9 +56,7 @@ func _process(delta: float) -> void:
 
 
 func _on_brake_level_value_changed(value):
-    var b = train.get_brake() as TrainBrake
-    if b:
-        b.brake_level = value
+    brake.brake_level = value
 
 
 func _on_main_decrease_button_up():

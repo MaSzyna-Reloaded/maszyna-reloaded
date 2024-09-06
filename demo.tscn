@@ -13,6 +13,8 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
 script = ExtResource("1_76ghk")
 
 [node name="EngineRPM" parent="." instance=ExtResource("3_dosfj")]
@@ -99,6 +101,16 @@ title = "Train"
 
 [node name="HBoxContainer" type="HBoxContainer" parent="UI"]
 layout_mode = 2
+size_flags_vertical = 0
+
+[node name="Label" type="Label" parent="UI/HBoxContainer"]
+layout_mode = 2
+text = "Custom train part calls count:"
+
+[node name="CustomTrainPartCount" type="Label" parent="UI/HBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "0"
 
 [node name="MoverSwitches" type="HBoxContainer" parent="UI"]
 layout_mode = 2

@@ -1,9 +1,8 @@
-[gd_scene format=3 uid="uid://c5hi8nsm1d2hb"]
+[gd_scene load_steps=2 format=3 uid="uid://c5hi8nsm1d2hb"]
+
+[ext_resource type="Script" path="res://custom_train_part.gd" id="1_2wure"]
 
 [node name="SM42v1" type="TrainController"]
-parts/engine = NodePath("StonkaDieselEngine")
-parts/brake = NodePath("Brake")
-parts/security_system = NodePath("TrainSecuritySystem")
 type_name = "6d"
 dimensions/mass = 74000.0
 power = 590.0
@@ -43,3 +42,6 @@ emergency_brake_delay = 2.5
 sound_signal_delay = 2.5
 shp_magnet_distance = 3.0
 ca_max_hold_time = 1.0
+
+[node name="CustomTrainPart" type="GenericTrainPart" parent="."]
+script = ExtResource("1_2wure")

@@ -391,9 +391,6 @@ command = "doors_permit_step"
 [node name="SM42" parent="." instance=ExtResource("2_t8uqe")]
 train_id = "sm42"
 
-[node name="TestowySilnikElektryczny" parent="SM42" index="1"]
-enabled = false
-
 [connection signal="button_up" from="UI/MoverSwitches/General/HBoxContainer2/Forward" to="." method="_on_forward_button_up"]
 [connection signal="button_up" from="UI/MoverSwitches/General/HBoxContainer2/Reverse" to="." method="_on_reverse_button_up"]
 [connection signal="button_up" from="UI/MoverSwitches/General/HBoxContainer/MainIncrease" to="." method="_on_main_increase_button_up"]

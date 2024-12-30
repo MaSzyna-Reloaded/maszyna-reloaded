@@ -6,13 +6,11 @@ class_name DebugButton
 var _dirty = false
 var _controller:TrainController
 
-
-
 @export_node_path("TrainController") var controller:NodePath:
     set(x):
         _dirty = true
+        _controller = null
         controller = x
-
 
 @export var command:String
 @export var command_argument:String
@@ -39,7 +37,6 @@ func _process(delta):
                 disabled = false
             else:
                 disabled = true
-
 
 func _on_pressed():
     if _controller and command:

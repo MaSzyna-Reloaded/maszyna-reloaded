@@ -30,6 +30,7 @@ var _controller:TrainController
 @export_node_path("TrainController") var controller:NodePath:
     set(x):
         _dirty = true
+        _controller = null
         controller = x
 
 @export var state_property:String:

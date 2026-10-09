@@ -1,0 +1,25 @@
+# Godot
+/.godot/
+# libmaszyna, built into this project from vendor/libmaszyna (make compile-debug)
+/bin/
+# stamped by make build-number, never by a build
+/build_number.txt
+/test_results.xml
+# make libmaszyna-local
+/.libmaszyna-local
+
+# CI: the containers' builds and the extension API they bind against
+/build/
+/build-*/
+/installer/
+/setup/
+release.keystore
+
+# Documentation site
+/docs/_site/
+/docs/vendor/
+
+.env
+__pycache__/
+# GIMP writes a sidecar next to an edited image; it is not project data
+.comments/

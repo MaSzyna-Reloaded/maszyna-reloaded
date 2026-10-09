@@ -1,4 +1,4 @@
-.PHONY: libmaszyna-local libmaszyna-submodule compile-debug compile-release compile-profiling compile-release-symbols compile-release-linux compile-windows-release compile-android-release build-number release release-linux release-linux-symbols release-windows release-android release-clear-godot-cache windows-installer-image run-tests check-staged-uids install-git-hooks
+.PHONY: libmaszyna-local libmaszyna-submodule compile-debug compile-release compile-profiling compile-release-symbols compile-release-linux compile-windows-release compile-android-release build-number release release-linux release-linux-symbols release-windows release-android release-clear-godot-cache windows-installer-image windows-installer-image-push run-tests check-staged-uids install-git-hooks
 .DEFAULT_GOAL = compile-debug
 
 # libmaszyna is the vendor/libmaszyna submodule; its make builds the library into this project
@@ -29,7 +29,9 @@ LINUX_TEMPLATE:=$(GODOT_BIN)/godot.linuxbsd.template_release.double.x86_64
 LINUX_TEMPLATE_INSTALLED:=$(HOME)/.local/share/godot/export_templates/$(GODOT_VERSION).stable.double/linux_release.x86_64
 # The Windows installer is made by NSIS in ci/docker/windows-installer; the checkout is mounted at
 # its own path and the build runs as the host user
-WINDOWS_INSTALLER_IMAGE:=maszyna-windows-installer
+# Published on ghcr.io and tagged by its Dockerfile, as libmaszyna's Linux SDK: the CI pulls it, a
+# changed Dockerfile is a new tag, built here and published with make windows-installer-image-push
+WINDOWS_INSTALLER_IMAGE:=ghcr.io/maszyna-reloaded/windows-installer:$(shell sha256sum ci/docker/windows-installer/Dockerfile | cut -c1-12)
 WINDOWS_INSTALLER_RUN=docker run --rm --user $(shell id -u):$(shell id -g) -v $(CURDIR):$(CURDIR) -w $(CURDIR) $(WINDOWS_INSTALLER_IMAGE)
 
 
@@ -79,7 +81,12 @@ $(LINUX_TEMPLATE_INSTALLED):
 
 
 windows-installer-image:
-	docker build -q -t $(WINDOWS_INSTALLER_IMAGE) ci/docker/windows-installer
+	docker image inspect $(WINDOWS_INSTALLER_IMAGE) > /dev/null 2>&1 || docker pull -q $(WINDOWS_INSTALLER_IMAGE) \
+	    || docker build -q -t $(WINDOWS_INSTALLER_IMAGE) ci/docker/windows-installer
+
+
+windows-installer-image-push: windows-installer-image
+	docker push $(WINDOWS_INSTALLER_IMAGE)
 
 
 # The export is run by the editor, which loads the debug library (libmaszyna.gdextension, the

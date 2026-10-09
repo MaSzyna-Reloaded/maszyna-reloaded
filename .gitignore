@@ -8,13 +8,6 @@
 # make libmaszyna-local
 /.libmaszyna-local
 
-# CI: the containers' builds and the extension API they bind against
-/build/
-/build-*/
-/installer/
-/setup/
-release.keystore
-
 # Documentation site
 /docs/_site/
 /docs/vendor/

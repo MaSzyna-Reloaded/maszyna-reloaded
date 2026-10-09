@@ -11,8 +11,9 @@ Unicode true
 
 !define PRODUCT_NAME "MaSzyna Reloaded"
 !define UNINSTALL_KEY "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_NAME}"
-; the starts for diagnosing a crash: another renderer, no Python cab screens
-; (PythonScreenServer::ARG_NO_PYTHON), Godot's verbose log
+; the starts for diagnosing a crash: no Python cab screens (PythonScreenServer::ARG_NO_PYTHON),
+; Godot's verbose log. No D3D12 start: the Windows template is built without it (d3d12=no,
+; libmaszyna's Makefile); the uninstaller still removes the one an earlier installer made
 !define SHORTCUT_D3D12 "${PRODUCT_NAME} (D3D12)"
 !define SHORTCUT_NO_PYTHON "${PRODUCT_NAME} (no Python)"
 !define SHORTCUT_VERBOSE "${PRODUCT_NAME} (verbose)"
@@ -72,7 +73,6 @@ Section "!$(SECTION_GAME)" SectionGame
     WriteUninstaller "$INSTDIR\uninstall.exe"
 
     CreateShortcut "$SMPROGRAMS\${PRODUCT_NAME}.lnk" "$INSTDIR\reloaded.exe"
-    CreateShortcut "$SMPROGRAMS\${SHORTCUT_D3D12}.lnk" "$INSTDIR\reloaded.exe" "--rendering-driver d3d12"
     CreateShortcut "$SMPROGRAMS\${SHORTCUT_NO_PYTHON}.lnk" "$INSTDIR\reloaded.exe" "--no-python"
     CreateShortcut "$SMPROGRAMS\${SHORTCUT_VERBOSE}.lnk" "$INSTDIR\reloaded.exe" "--verbose"
 
@@ -87,7 +87,6 @@ SectionEnd
 
 Section "$(SECTION_DESKTOP)" SectionDesktop
     CreateShortcut "$DESKTOP\${PRODUCT_NAME}.lnk" "$INSTDIR\reloaded.exe"
-    CreateShortcut "$DESKTOP\${SHORTCUT_D3D12}.lnk" "$INSTDIR\reloaded.exe" "--rendering-driver d3d12"
     CreateShortcut "$DESKTOP\${SHORTCUT_NO_PYTHON}.lnk" "$INSTDIR\reloaded.exe" "--no-python"
     CreateShortcut "$DESKTOP\${SHORTCUT_VERBOSE}.lnk" "$INSTDIR\reloaded.exe" "--verbose"
 SectionEnd

@@ -73,7 +73,7 @@
   SignPath Foundation (free for open source, signs in GitHub Actions), Certum Open Source Code
   Signing (cloud key, awkward in CI), Azure Trusted Signing (eligibility for individuals limited).
 * The game is a new repository: the workflow (`.github/workflows/build.yaml`) and the build
-  through the submodule (`ci/docker/entrypoint.sh`, `make release-*`) have not run yet.
+  through the submodule (`make release-*`) have not run yet.
 * `tests/fixtures/` is a copy of libmaszyna's fixtures as they were at the split - only what the
   game's tests need should stay.
 

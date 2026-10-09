@@ -2074,3 +2074,9 @@ msgstr "Scénář: klávesa 8"
 
 msgid "Scenario Keyctrl 9"
 msgstr "Scénář: klávesa 9"
+
+msgid "Cab screens unavailable"
+msgstr "Obrazovky kabiny nejsou k dispozici"
+
+msgid "The cab screens drawn by Python scripts could not be started and stay blank. The game goes on without them."
+msgstr "Obrazovky kabiny kreslené skripty Pythonu se nepodařilo spustit a zůstanou prázdné. Hra pokračuje bez nich."

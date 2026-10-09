@@ -93,10 +93,12 @@ func _enter_tree() -> void:
 
 func _exit_tree() -> void:
     DriverServer.implementation_unregister(SceneryInstancer.DRIVER_IMPLEMENTATION)
+    PythonScreenServer.python_runtime_failed.disconnect(_on_python_runtime_failed)
 
 
 func _ready() -> void:
     UserSettings.config_changed.connect(_apply_music_settings)
+    PythonScreenServer.python_runtime_failed.connect(_on_python_runtime_failed)
     _apply_music_settings()
     var exported: bool = OS.has_feature("template")
     var args: PackedStringArray = OS.get_cmdline_user_args()
@@ -221,6 +223,17 @@ func _build_surroundings() -> void:
         await get_tree().process_frame
     $LoadingScreen.set_progress(1.0, MaszynaIncludeNode.LoadStage.SURROUNDINGS, "")
     print("[SceneryLoad] SURROUNDINGS %.1f s" % ((Time.get_ticks_msec() - started_msec) / 1000.0))
+
+
+## The Python runtime of the cab screens has ended (PythonScreenServer, once): the screens stay
+## blank and the game goes on. The player is told so, with the reason that is in the log as well.
+func _on_python_runtime_failed(reason: String) -> void:
+    %PythonRuntimeProblem.message = "%s\n\n%s" % [
+        tr("The cab screens drawn by Python scripts could not be started and stay blank. "
+            + "The game goes on without them."),
+        reason,
+    ]
+    %PythonRuntimeProblem.ask()
 
 
 ## Escape in the scenario selector: fade the screen to black and the music out, then quit

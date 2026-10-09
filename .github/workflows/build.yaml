@@ -157,7 +157,7 @@ jobs:
             ${{ matrix.platform }}_${{ matrix.arch }}
 
       # the installer of the exported game (ci/windows/maszyna-reloaded.nsi), made as release-windows
-      # makes it: the export's exe, its library beside it
+      # makes it: the export's exe, its library and the Python host beside it
       - name: Windows installer
         if: matrix.platform == 'windows'
         run: |
@@ -165,6 +165,7 @@ jobs:
           mkdir -p installer setup
           cp build/windows/reloaded.exe installer/
           cp build/windows/libmaszyna.64.dll installer/
+          cp build/windows/maszyna-python-host.64.exe installer/
           make windows-installer-image
           docker run --rm -v "$PWD:$PWD" -w "$PWD" maszyna-windows-installer \
             makensis -V2 -DSOURCE_DIR="$PWD/installer" -DBUILD_NUMBER="$(cat build_number.txt)" \
@@ -243,6 +244,10 @@ jobs:
             if ls "$dir"/*.apk > /dev/null 2>&1; then
               cp "$dir"/*.apk "$file.apk"
             else
+              # an artifact keeps no file mode: the Linux game's programs are made executable again
+              if [ -f "$dir/reloaded" ]; then
+                chmod +x "$dir/reloaded" "$dir"/maszyna-python-host.*
+              fi
               (cd "$dir" && zip -qr "$file.zip" .)
             fi
           done

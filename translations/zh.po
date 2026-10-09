@@ -2074,3 +2074,9 @@ msgstr "场景：按键 8"
 
 msgid "Scenario Keyctrl 9"
 msgstr "场景：按键 9"
+
+msgid "Cab screens unavailable"
+msgstr "驾驶室屏幕不可用"
+
+msgid "The cab screens drawn by Python scripts could not be started and stay blank. The game goes on without them."
+msgstr "由 Python 脚本绘制的驾驶室屏幕无法启动，将保持空白。游戏将在没有它们的情况下继续。"

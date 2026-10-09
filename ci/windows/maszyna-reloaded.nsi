@@ -1,7 +1,7 @@
 ; Windows installer of the exported game: one file to download instead of a zip, whose exe run
 ; from inside the archive starts without libmaszyna.64.dll. Built by `make release-windows` in
 ; ci/docker/windows-installer with:
-;   SOURCE_DIR   - the unpacked export (reloaded.exe, libmaszyna.64.dll)
+;   SOURCE_DIR   - the unpacked export (reloaded.exe, libmaszyna.64.dll, maszyna-python-host.64.exe)
 ;   BUILD_NUMBER - demo/build_number.txt
 ;   OUTFILE      - the installer to write
 ; Installed per user, so it needs no administrator rights.
@@ -67,6 +67,8 @@ Section "!$(SECTION_GAME)" SectionGame
     SetOutPath "$INSTDIR"
     File "${SOURCE_DIR}/reloaded.exe"
     File "${SOURCE_DIR}/libmaszyna.64.dll"
+    ; the process the cab screens' Python runs in (libmaszyna's PythonScreenServer)
+    File "${SOURCE_DIR}/maszyna-python-host.64.exe"
     WriteUninstaller "$INSTDIR\uninstall.exe"
 
     CreateShortcut "$SMPROGRAMS\${PRODUCT_NAME}.lnk" "$INSTDIR\reloaded.exe"
@@ -95,6 +97,7 @@ Section "Uninstall"
     Delete "$INSTDIR\reloaded.exe"
     Delete "$INSTDIR\reloaded.console.exe"
     Delete "$INSTDIR\libmaszyna.64.dll"
+    Delete "$INSTDIR\maszyna-python-host.64.exe"
     Delete "$INSTDIR\uninstall.exe"
     RMDir "$INSTDIR"
     Delete "$SMPROGRAMS\${PRODUCT_NAME}.lnk"

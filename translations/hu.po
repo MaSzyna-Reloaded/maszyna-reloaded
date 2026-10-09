@@ -2074,3 +2074,9 @@ msgstr "Forgatókönyv: 8. billentyű"
 
 msgid "Scenario Keyctrl 9"
 msgstr "Forgatókönyv: 9. billentyű"
+
+msgid "Cab screens unavailable"
+msgstr "A vezetőfülke kijelzői nem érhetők el"
+
+msgid "The cab screens drawn by Python scripts could not be started and stay blank. The game goes on without them."
+msgstr "A Python-szkriptek által rajzolt vezetőfülke-kijelzők nem indíthatók el, üresek maradnak. A játék nélkülük folytatódik."

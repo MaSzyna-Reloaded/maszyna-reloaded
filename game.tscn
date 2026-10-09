@@ -35,6 +35,11 @@ confirm_text = "Exit to menu"
 back_text = "Back"
 confirm_intent = 3
 
+[node name="PythonRuntimeProblem" parent="." unique_id=630513142 instance=ExtResource("ui_dialog_scene")]
+unique_name_in_owner = true
+title = "Cab screens unavailable"
+confirm_text = "OK"
+
 [node name="BugReport" parent="." unique_id=997687145 instance=ExtResource("bug_report_scene")]
 
 [node name="GamePlayLogRecorder" type="Node" parent="." unique_id=124300691]

@@ -907,20 +907,21 @@ static func is_done(situation:MaszynaLegacyDriverTraction.Situation, hint:Hint, 
         Hint.PANTOGRAPHS_VALVE_ON, Hint.PANTOGRAPHS_VALVE_OFF:
             var power_source:RailVehicleEnginePowerSource = _power_source(unit)
             return power_source == null or power_source.get_collector_valve_active() == (hint == Hint.PANTOGRAPHS_VALVE_ON)
-        # a pantograph to raise no longer matters past the speed the hint was given
-        # (driverhints.cpp:277, 300)
+        # a pantograph is the pantograph unit's own valve of it, which a vehicle without that
+        # pantograph has as well - the unit's other car raises it (driverhints.cpp:269-310); one to
+        # raise no longer matters past the speed the hint was given (driverhints.cpp:277, 300)
         Hint.FRONT_PANTOGRAPH_VALVE_ON, Hint.REAR_PANTOGRAPH_VALVE_ON:
             var power_source:RailVehicleEnginePowerSource = _power_source(unit)
             if power_source == null or (parameter > 0.0 and VehicleServer.vehicle_get_speed(vehicle) > parameter):
                 return true
-            return power_source.get_collector_pantograph_first_active() if hint == Hint.FRONT_PANTOGRAPH_VALVE_ON \
-                    else power_source.get_collector_pantograph_second_active()
+            return power_source.get_collector_pantograph_first_valve_active() if hint == Hint.FRONT_PANTOGRAPH_VALVE_ON \
+                    else power_source.get_collector_pantograph_second_valve_active()
         Hint.FRONT_PANTOGRAPH_VALVE_OFF:
             var power_source:RailVehicleEnginePowerSource = _power_source(unit)
-            return power_source == null or not power_source.get_collector_pantograph_first_active()
+            return power_source == null or not power_source.get_collector_pantograph_first_valve_active()
         Hint.REAR_PANTOGRAPH_VALVE_OFF:
             var power_source:RailVehicleEnginePowerSource = _power_source(unit)
-            return power_source == null or not power_source.get_collector_pantograph_second_active()
+            return power_source == null or not power_source.get_collector_pantograph_second_valve_active()
         Hint.CONVERTER_ON, Hint.CONVERTER_OFF:
             var power_supply:RailVehiclePowerSupply = _power_supply(controlling)
             return power_supply == null or power_supply.get_converter_enabled() == (hint == Hint.CONVERTER_ON)

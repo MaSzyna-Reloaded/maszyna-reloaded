@@ -23,18 +23,12 @@ const MAIN_FEEDING_PRESSURE:float = 4.3
 ## Moving faster than this [km/h] the front pantograph comes down and the suggested setup is used,
 ## and the second pantograph's hint of the start no longer matters (Driver.cpp:2812-2813, 6280, 6311)
 const SETUP_SPEED:float = 5.0
-## Pantograph A in the collector's PhysicalLayout - and B, the bit after it (Mover.cpp:2317); the
-## pantographs a vehicle has are these bits, not CollectorsNo, which a layout of B alone makes 2
-## (Mover.cpp:11636-11637)
-const LAYOUT_FRONT:int = 1 << RailVehicleEnginePowerSource.PANTOGRAPH_FIRST
-const LAYOUT_REAR:int = 1 << RailVehicleEnginePowerSource.PANTOGRAPH_SECOND
-const LAYOUT_BOTH:int = LAYOUT_FRONT | LAYOUT_REAR
 
 
 ## PrepareEngine()'s pantographs (Driver.cpp:2782-2811): the small compressor while the tank is
 ## short of air - its three-way valve turned to it first, unless it turns by itself - and off once
-## the tank has enough or the main reservoir feeds it; both raised, the one at the back of the way
-## it drives hinted only until it moves off
+## the tank has enough or the main reservoir feeds it; both raised - whichever cars of the unit
+## have them - the one at the back of the way it drives hinted only until it moves off
 static func prepare(situation:MaszynaLegacyDriverTraction.Situation, emu:bool) -> void:
     var unit:RID = situation.trainset.pantograph_unit
     if not unit.is_valid():
@@ -54,14 +48,6 @@ static func prepare(situation:MaszynaLegacyDriverTraction.Situation, emu:bool) -
             or tank <= (brake.get_compressor_pressure() if brake else 0.0):
         MaszynaLegacyDriverHints.cue(situation, MaszynaLegacyDriverHints.Hint.PANTOGRAPH_COMPRESSOR_OFF)
     MaszynaLegacyDriverHints.cue(situation, MaszynaLegacyDriverHints.Hint.PANTOGRAPHS_VALVE_ON)
-    # QUIRK of the original: a vehicle with one pantograph is asked for the one it has, A or B by
-    # its layout, raised whichever way; the original asks for both (MASZYNA_ORIGINAL_QUIRKS.md,
-    # "Pantograph B of a vehicle with one")
-    var layout:int = power_source.current_collector_physical_layout & LAYOUT_BOTH
-    if not layout == LAYOUT_BOTH:
-        MaszynaLegacyDriverHints.cue(situation, MaszynaLegacyDriverHints.Hint.FRONT_PANTOGRAPH_VALVE_ON
-                if layout & LAYOUT_FRONT else MaszynaLegacyDriverHints.Hint.REAR_PANTOGRAPH_VALVE_ON)
-        return
     var forward:bool = situation.state.direction >= 0
     MaszynaLegacyDriverHints.cue(situation, MaszynaLegacyDriverHints.Hint.FRONT_PANTOGRAPH_VALVE_ON,
             SETUP_SPEED if forward else 0.0)
@@ -90,11 +76,8 @@ static func control(situation:MaszynaLegacyDriverTraction.Situation, emu:bool, w
     var hints:RailVehicleAIHints = RailVehicleServer.vehicle_component_get(
             vehicle, RailVehicleComponentType.COMPONENT_AI_HINTS) as RailVehicleAIHints
     var setup:RailVehicleAIHints.PantographState = hints.pantograph_state if hints else RailVehicleAIHints.PANTOGRAPH_STATE_AUTOMATIC
-    # the setup's two pantographs are a vehicle's with two (MASZYNA_ORIGINAL_QUIRKS.md, "Pantograph
-    # B of a vehicle with one")
-    var both:bool = power_source.current_collector_physical_layout & LAYOUT_BOTH == LAYOUT_BOTH
     if not setup == RailVehicleAIHints.PANTOGRAPH_STATE_AUTOMATIC:
-        if speed > SETUP_SPEED and both:
+        if speed > SETUP_SPEED:
             MaszynaLegacyDriverHints.cue(situation, MaszynaLegacyDriverHints.Hint.FRONT_PANTOGRAPH_VALVE_ON
                     if setup & RailVehicleAIHints.PANTOGRAPH_STATE_FRONT else MaszynaLegacyDriverHints.Hint.FRONT_PANTOGRAPH_VALVE_OFF)
             MaszynaLegacyDriverHints.cue(situation, MaszynaLegacyDriverHints.Hint.REAR_PANTOGRAPH_VALVE_ON
@@ -110,10 +93,8 @@ static func control(situation:MaszynaLegacyDriverTraction.Situation, emu:bool, w
     var front_voltage:float = power_source.get_collector_pantograph_first_voltage()
     var rear_voltage:float = power_source.get_collector_pantograph_second_voltage()
     var on_rear:bool = situation.state.direction >= 0 and regular
-    # one pantograph: the one it has, whichever way it drives (MASZYNA_ORIGINAL_QUIRKS.md,
-    # "Pantograph B of a vehicle with one")
-    if not both:
-        on_rear = not power_source.current_collector_physical_layout & LAYOUT_FRONT
+    # more than one by CollectorsNo, which a layout of B alone makes 2 (Mover.cpp:11636-11637)
+    var both:bool = power_source.current_collector_number_of_collectors > 1
     # the one at the rear up, unless another one works and it is the only one
     var raised_voltage:float = rear_voltage if on_rear else front_voltage
     if raised_voltage == 0.0 and (voltage == 0.0 or both):

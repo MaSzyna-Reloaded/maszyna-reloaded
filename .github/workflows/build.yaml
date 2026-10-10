@@ -1,0 +1,279 @@
+name: build
+
+# The game's tests and its release of each platform, with the double precision Godot fetched from
+# libmaszyna's release godot-<version>-double (vendor/libmaszyna/ci/fetch-godot.sh). libmaszyna
+# (the vendor/libmaszyna submodule) is built into this project by the Makefile's own rules: the
+# tests' and the exporting editor's library (compile-debug) once, by build-host, and handed to the
+# other jobs; the Windows and Android release libraries cross-compiled on the runner, the Linux one
+# in libmaszyna's ci/docker/linux-sdk for an old glibc. The games are published as a GitHub release: a pull request keeps one
+# prerelease per branch (maszyna-reloaded-<branch>), a pushed tag on main gets a release of its own
+# (maszyna-reloaded-<tag>). The maszyna-reloaded-* tags are both kinds' and made by CI itself.
+on:
+  pull_request:
+  push:
+    tags:
+      - '**'
+      - '!maszyna-reloaded-*'
+  workflow_dispatch:
+
+env:
+  CMAKE_CXX_COMPILER_LAUNCHER: ccache
+  # the directory ccache-action keeps; libmaszyna's Makefile mounts it into the Linux SDK container
+  CCACHE_DIR: ${{ github.workspace }}/.ccache
+
+jobs:
+  # the build number of the whole run and the host library (template_debug), each made once: every
+  # platform's game and the installer carry the same number, the tests and every export's editor
+  # load the same library
+  build-host:
+    runs-on: ubuntu-24.04
+    outputs:
+      build_number: ${{ steps.build-number.outputs.value }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          submodules: recursive
+
+      # cmake/write_build_number.cmake
+      - name: Build number
+        id: build-number
+        run: |
+          make build-number
+          echo "value=$(cat build_number.txt)" >> "$GITHUB_OUTPUT"
+
+      - name: Fetch the double precision Godot
+        run: |
+          vendor/libmaszyna/ci/fetch-godot.sh godot.linuxbsd.editor.double.x86_64
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+
+      - uses: hendrikmuhs/ccache-action@v1.2
+        with:
+          key: host
+
+      # the empty overrides leave out the clang-tidy database compile-debug prepares for the IDE
+      - name: Build the host library
+        run: make compile-debug CLANG_TIDY_COMPILE_COMMANDS_FILE= CLANG_TIDY_BINDINGS_FILE=
+
+      # and maszyna-python-host, the process PythonScreenServer runs CPython in
+      - uses: actions/upload-artifact@v7
+        with:
+          name: host-library
+          path: |
+            bin/libmaszyna/linux/libmaszyna.debug.64.so
+            bin/libmaszyna/linux/maszyna-python-host.64
+          if-no-files-found: error
+
+  run-tests:
+    needs: build-host
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Check out the code
+        uses: actions/checkout@v7
+        with:
+          submodules: recursive
+
+      - name: Fetch the double precision Godot
+        run: |
+          vendor/libmaszyna/ci/fetch-godot.sh godot.linuxbsd.editor.double.x86_64
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+
+      - uses: actions/download-artifact@v8
+        with:
+          name: host-library
+          path: bin/libmaszyna/linux
+
+      # an artifact does not keep the executable bit
+      - name: Make the Python host executable
+        run: chmod +x bin/libmaszyna/linux/maszyna-python-host.64
+
+      - name: Import the project
+        run: godot-double --headless --path . --import
+
+      # GUT skips a test script that does not parse with only a warning and does not count it, so
+      # the run fails on the engine's own message for it; pipefail keeps GUT's own exit code, which
+      # tee would otherwise replace with its own success
+      - name: Run the tests
+        run: |
+          set -o pipefail
+          godot-double --headless --path . -s addons/gut/gut_cmdln.gd \
+            -gdir=res://tests/ -gexit -gjunit_xml_file=res://test_results.xml 2>&1 | tee gut.log
+          ! grep "Failed to load script" gut.log
+
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: gut-test-results
+          path: test_results.xml
+
+  build:
+    needs: build-host
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: linux
+            arch: x86_64
+            templates: godot.linuxbsd.template_release.double.x86_64
+            output: bin/linux/maszyna-reloaded-linux64.zip
+          - platform: windows
+            arch: x86_64
+            templates: godot.windows.template_release.double.x86_64.exe
+            # the zip and the installer beside it
+            output: bin/windows/maszyna-reloaded-win64*
+          - platform: android
+            arch: arm64
+            templates: android_release.apk
+            output: bin/android/maszyna-reloaded-android-arm64.apk
+    runs-on: ubuntu-24.04
+    steps:
+      # a pull request is built from its branch's own commit, not from GitHub's merge with main
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          submodules: recursive
+
+      # the build number the game shows and the installer carries, the one build-host stamped
+      - name: Build number
+        env:
+          BUILD_NUMBER: ${{ needs.build-host.outputs.build_number }}
+        run: printf '%s' "$BUILD_NUMBER" > build_number.txt
+
+      - uses: actions/download-artifact@v8
+        with:
+          name: host-library
+          path: bin/libmaszyna/linux
+
+      # an artifact does not keep the executable bit
+      - name: Make the Python host executable
+        run: chmod +x bin/libmaszyna/linux/maszyna-python-host.64
+
+      - name: Fetch the double precision Godot
+        run: |
+          vendor/libmaszyna/ci/fetch-godot.sh godot.linuxbsd.editor.double.x86_64 ${{ matrix.templates }}
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+
+      - name: Install MinGW
+        if: matrix.platform == 'windows'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends g++-mingw-w64-x86-64
+          sudo update-alternatives --set x86_64-w64-mingw32-gcc /usr/bin/x86_64-w64-mingw32-gcc-posix
+          sudo update-alternatives --set x86_64-w64-mingw32-g++ /usr/bin/x86_64-w64-mingw32-g++-posix
+
+      - uses: actions/setup-java@v6
+        if: matrix.platform == 'android'
+        with:
+          distribution: temurin
+          java-version: 17
+
+      # a throwaway key: a release APK has to be signed, and this build is for testing - a published
+      # APK is signed elsewhere
+      - name: Create the release keystore
+        if: matrix.platform == 'android'
+        run: |
+          keytool -genkeypair -keystore "$RUNNER_TEMP/release.keystore" -alias maszyna \
+            -storepass maszyna -keypass maszyna -keyalg RSA -validity 1 -dname CN=maszyna
+          {
+            echo "GODOT_ANDROID_KEYSTORE_RELEASE_PATH=$RUNNER_TEMP/release.keystore"
+            echo "GODOT_ANDROID_KEYSTORE_RELEASE_USER=maszyna"
+            echo "GODOT_ANDROID_KEYSTORE_RELEASE_PASSWORD=maszyna"
+          } >> "$GITHUB_ENV"
+
+      - uses: hendrikmuhs/ccache-action@v1.2
+        with:
+          key: ${{ matrix.platform }}
+
+      # the exporting editor loads build-host's library: -o keeps make from building it again
+      - name: Build and export ${{ matrix.platform }}
+        run: make -o compile-debug release-${{ matrix.platform }}
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: game-${{ matrix.platform }}-template_release-${{ matrix.arch }}
+          path: ${{ matrix.output }}
+          if-no-files-found: error
+
+  # The games the builds exported (game-<platform>-<target>-<arch>), named with the branch or the
+  # tag and the build number; nothing is built again here. A pull request publishes them as the
+  # branch's prerelease (maszyna-reloaded-<branch>, "/" as "-") on its own commit, whose files every
+  # push replaces; a tag pushed on main as its release (maszyna-reloaded-<tag>, files without the
+  # build number). A pull request from a fork has a read-only token and keeps only the artifacts.
+  publish:
+    needs: [build-host, build]
+    if: >
+      github.event_name == 'push' ||
+      (github.event_name == 'pull_request' &&
+       github.event.pull_request.head.repo.full_name == github.repository)
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+    concurrency:
+      group: publish-${{ github.ref }}
+    steps:
+      - uses: actions/download-artifact@v8
+        with:
+          pattern: game-*
+          path: artifacts
+
+      # each game as maszyna-reloaded-<branch>-<build>-<platform>-<target>-<arch>.zip or .apk, the
+      # Windows installer as maszyna-reloaded-<branch>-<build>-windows-setup.exe
+      - name: Name the files
+        env:
+          NAME: ${{ github.head_ref || github.ref_name }}
+          BUILD_NUMBER: ${{ needs.build-host.outputs.build_number }}
+        run: |
+          mkdir release
+          # a tag's release is the tag's name alone; a branch's prerelease carries the build number
+          prefix="maszyna-reloaded-${NAME//\//-}"
+          if [ "$GITHUB_EVENT_NAME" = pull_request ]; then
+            prefix="$prefix-$BUILD_NUMBER"
+          fi
+          for dir in artifacts/game-*; do
+            for file in "$dir"/*; do
+              case "$file" in
+                *-setup.exe) cp "$file" "release/$prefix-windows-setup.exe" ;;
+                *) cp "$file" "release/$prefix-${dir#artifacts/game-}.${file##*.}" ;;
+              esac
+            done
+          done
+          test -f "release/$prefix-windows-setup.exe"
+          ls -l release
+
+      - name: Publish the branch prerelease
+        if: github.event_name == 'pull_request'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          BRANCH: ${{ github.head_ref }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          BUILD_NUMBER: ${{ needs.build-host.outputs.build_number }}
+        run: |
+          tag="maszyna-reloaded-${BRANCH//\//-}"
+          # the tag is moved to the commit just built: the old release goes with its tag
+          gh release delete "$tag" --cleanup-tag --yes || true
+          gh release create "$tag" release/* --prerelease --target "$HEAD_SHA" \
+            --title "$tag" --notes "Build $BUILD_NUMBER of $HEAD_SHA (#${{ github.event.number }})"
+
+      - name: Publish the tag release
+        if: github.event_name == 'push'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          TAG: ${{ github.ref_name }}
+          BUILD_NUMBER: ${{ needs.build-host.outputs.build_number }}
+        run: |
+          # only a tag on main is released: main has to contain the tagged commit
+          status=$(gh api "repos/$GH_REPO/compare/main...$GITHUB_SHA" --jq .status)
+          if [ "$status" != identical ] && [ "$status" != behind ]; then
+            echo "::error::$TAG is not on main" >&2
+            exit 1
+          fi
+          # released as maszyna-reloaded-<tag>, a tag of CI's own on the same commit (the trigger leaves
+          # maszyna-reloaded-* out); a rerun finds the release already there and only replaces its files
+          release="maszyna-reloaded-$TAG"
+          gh release create "$release" --target "$GITHUB_SHA" --title "$release" \
+            --notes "Build $BUILD_NUMBER of $GITHUB_SHA, tag $TAG" --generate-notes \
+            || gh release view "$release" > /dev/null
+          gh release upload "$release" release/* --clobber

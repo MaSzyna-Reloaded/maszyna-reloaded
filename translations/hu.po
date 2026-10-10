@@ -236,6 +236,9 @@ msgstr "Tiltás"
 msgid "Release rod"
 msgstr "Oldórúd"
 
+msgid "Not applicable to this vehicle"
+msgstr "Erre a járműre nem vonatkozik"
+
 msgid "Enabled"
 msgstr "Engedélyezve"
 

@@ -920,11 +920,14 @@ func _is_standalone(situation:MaszynaLegacyDriverTraction.Situation) -> bool:
 
 
 ## apply_independent_brake_only() (Driver.cpp:8178-8189): the local brake on if the train brake
-## runs, otherwise the train brake to running first; not with a manual brake, nor in shunting mode
+## runs, otherwise the train brake to running first; not with a manual brake, nor in shunting mode.
+## Nor without a local brake at all - the original lets that through (only ManualBrake is refused)
+## and hints a brake an EN57's motor car does not have, a hint never done after
 func apply_independent_brake_only(situation:MaszynaLegacyDriverTraction.Situation) -> void:
     var vehicle:RID = situation.vehicle
     var brake:RailVehicleBrake = _brake(vehicle)
-    if brake == null or brake.cntrl_local_brake_type == RailVehicleBrake.LOCAL_BRAKE_TYPE_MANUAL:
+    if brake == null or brake.cntrl_local_brake_type in [RailVehicleBrake.LOCAL_BRAKE_TYPE_MANUAL,
+            RailVehicleBrake.LOCAL_BRAKE_TYPE_NONE]:
         return
     var running:float = brake.get_handle_position(RailVehicleBrake.HANDLE_POSITION_DRIVE)
     if absf(brake.get_controller_position() - running) <= HANDLE_TOLERANCE:

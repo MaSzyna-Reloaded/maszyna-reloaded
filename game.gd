@@ -80,7 +80,8 @@ var _music_tween: Tween
 var _music_volume_db: float = MUSIC_MENU_VOLUME_DB
 ## The world of the scenery being played, null in the menu
 var _world: SceneryWorld = null
-## The handlers of the running scenery's log files, by file name (GAME_LOG_FILES)
+## The handlers of the running scenery's log files, by file name (GAME_LOG_FILES) - registered with
+## GameLog under that name
 var _log_handlers: Dictionary[String, GameLogFileHandler] = {}
 
 
@@ -169,8 +170,9 @@ func start_scenery(filename: String, train_id: String, trainset: Array[MaszynaDy
             if not handler:
                 continue
             handler.min_level = GAME_LOG_LEVELS[log_file]
+            GameLog.register_handler(log_file, handler)
             for logger_id: String in GAME_LOG_FILES[log_file]:
-                GameLog.create_handler(logger_id, handler)
+                GameLog.assign_handler(logger_id, log_file)
             _log_handlers[log_file] = handler
             log_files.append(handler.get_path())
     $GamePlayLogRecorder.start()
@@ -271,7 +273,8 @@ func _exit_to_menu(game_dir: String = "") -> void:
     $GamePlayLogRecorder.stop()
     for log_file: String in _log_handlers:
         for logger_id: String in GAME_LOG_FILES[log_file]:
-            GameLog.remove_handler(logger_id, _log_handlers[log_file])
+            GameLog.unassign_handler(logger_id, log_file)
+        GameLog.unregister_handler(log_file)
     _log_handlers.clear()
     $BugReport.attach_world(null, PackedStringArray())
     await _world.unload_scenery()

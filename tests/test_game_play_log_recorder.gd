@@ -3,6 +3,7 @@ extends MaszynaGutTest
 ## The gameplay log, written through a file handler of the "gameplay" logger
 const LOG_PATH: String = "user://test_game_play_log/gameplay.log"
 const GAMEPLAY_LOGGER: String = "gameplay"
+const LOG_HANDLER: String = "test_game_play_log"
 ## A gameplay log line's fields: time, simulation time, kind, subject, details
 const COLUMN_KIND: int = 2
 const COLUMN_DETAILS: int = 4
@@ -15,13 +16,15 @@ var _recorder: GamePlayLogRecorder = null
 
 func before_each() -> void:
     _handler = GameLogFileHandler.open(LOG_PATH)
-    GameLog.create_handler(GAMEPLAY_LOGGER, _handler)
+    GameLog.register_handler(LOG_HANDLER, _handler)
+    GameLog.assign_handler(GAMEPLAY_LOGGER, LOG_HANDLER)
     _recorder = add_child_autofree(GamePlayLogRecorder.new())
     _recorder.start()
 
 
 func after_each() -> void:
-    GameLog.remove_handler(GAMEPLAY_LOGGER, _handler)
+    GameLog.unassign_handler(GAMEPLAY_LOGGER, LOG_HANDLER)
+    GameLog.unregister_handler(LOG_HANDLER)
     _handler = null
     DirAccess.remove_absolute(LOG_PATH)
     DirAccess.remove_absolute(LOG_PATH.get_base_dir())

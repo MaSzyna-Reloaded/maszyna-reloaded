@@ -527,6 +527,9 @@ const SECURITY_RESET:StringName = &"security_reset_bt"
 const CABSIGNAL_RESET:StringName = &"shp_reset_bt"
 const RELEASER:StringName = &"releaser_bt"
 const TRAIN_BRAKE:StringName = &"brakectrl"
+## Releasing an EP brake: the handle down to its EP releasing position, below the driving one,
+## which only holds the EP brake applied (TFVel6 bh_EPN = bh_RP, hamulce.cpp:34)
+const EP_BRAKE_RELEASE_CONTROL:Array = [TRAIN_BRAKE, CabinLogic.Gesture.DECREASE]
 const INDEPENDENT_BRAKE:StringName = &"localbrake"
 
 ## ManualBrakePosNo (MOVER.h:111): the hand brake's wheel turned all the way
@@ -833,13 +836,16 @@ static func get_list(situation:MaszynaLegacyDriverTraction.Situation) -> Array[D
         var shown:Hint = queued.hint
         if rear_cab and shown in REVERSER_SIDES:
             shown = REVERSER_SIDES[shown]
+        var control:Array = CONTROLS[shown] if CONTROLS.has(shown) else [&"", CabinLogic.Gesture.PRESS]
+        if shown == Hint.BRAKING_FORCE_SET_ZERO and _released_by_ep(situation.vehicle):
+            control = EP_BRAKE_RELEASE_CONTROL
         listed.append({
             "hint": queued.hint,
             "text": TEXTS[shown],
             "parameter": queued.parameter,
             "done": is_done(situation, queued.hint, queued.parameter),
-            "control": CONTROLS[shown][0] if CONTROLS.has(shown) else &"",
-            "gesture": CONTROLS[shown][1] if CONTROLS.has(shown) else CabinLogic.Gesture.PRESS,
+            "control": control[0],
+            "gesture": control[1],
         })
     return listed
 
@@ -1137,11 +1143,16 @@ static func is_done(situation:MaszynaLegacyDriverTraction.Situation, hint:Hint, 
             var brake:RailVehicleBrake = _brake(vehicle)
             return absf(_braking_force(controlling)) > parameter or brake == null or absf(brake.get_controller_position()
                     - brake.get_handle_position(RailVehicleBrake.HANDLE_POSITION_EMERGENCY)) <= HANDLE_TOLERANCE
+        # the handle where the driver's own release leaves it: the original checks the driving
+        # position (driverhints.cpp:868), which an EP brake released at its EP releasing position
+        # (DecBrake(), Driver.cpp:3321-3325) never shows
         Hint.BRAKING_FORCE_SET_ZERO:
             var brake:RailVehicleBrake = _brake(vehicle)
+            var released:RailVehicleBrake.HandlePosition = RailVehicleBrake.HANDLE_POSITION_EP_RELEASE \
+                    if _released_by_ep(vehicle) else RailVehicleBrake.HANDLE_POSITION_DRIVE
             return situation.trainset.ready and situation.trainset.brake_pressure_max < RELEASED_BRAKE_PRESSURE \
                     and (brake == null or absf(brake.get_controller_position()
-                        - brake.get_handle_position(RailVehicleBrake.HANDLE_POSITION_DRIVE)) <= HANDLE_TOLERANCE)
+                        - brake.get_handle_position(released)) <= HANDLE_TOLERANCE)
         Hint.INDEPENDENT_BRAKE_APPLY:
             var brake:RailVehicleBrake = _brake(vehicle)
             return brake == null or brake.get_local_position_normalized() >= parameter
@@ -1205,6 +1216,15 @@ static func _slipping(vehicle:RID) -> bool:
     var wheels:RailVehicleWheels = VehicleServer.vehicle_component_get(
             vehicle, VehicleComponentType.COMPONENT_WHEELS) as RailVehicleWheels
     return wheels != null and wheels.get_slipping()
+
+
+## The train brake is released at its EP releasing position: an EP brake, but an induction motor's,
+## which its handle releases at the driving position (DecBrake(), Driver.cpp:3300-3325)
+static func _released_by_ep(vehicle:RID) -> bool:
+    var brake:RailVehicleBrake = _brake(vehicle)
+    var engine:RailVehicleEngine = _engine(vehicle)
+    return brake and brake.cntrl_brake_system == RailVehicleBrake.BRAKE_SYSTEM_ELECTRO_PNEUMATIC \
+            and not (engine and engine.get_type() == RailVehicleEngine.ELECTRIC_INDUCTION_MOTOR)
 
 
 static func _engine(vehicle:RID) -> RailVehicleEngine:

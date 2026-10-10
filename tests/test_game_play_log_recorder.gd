@@ -6,6 +6,8 @@ const GAMEPLAY_LOGGER: String = "gameplay"
 ## A gameplay log line's fields: time, simulation time, kind, subject, details
 const COLUMN_KIND: int = 2
 const COLUMN_DETAILS: int = 4
+## An EN57's motor car: its main switch and its pantographs, and cabs the player can sit in
+const MOTOR_CAR_PATH: String = "res://tests/fixtures/dynamic/pkp/en57-2000_v1/6bs.fiz"
 
 var _handler: GameLogFileHandler = null
 var _recorder: GamePlayLogRecorder = null
@@ -91,6 +93,40 @@ func test_a_line_below_the_handlers_level_is_left_out() -> void:
     var lines: PackedStringArray = _read_lines()
     assert_eq(lines[-1], "a warning line", "the warning should reach the file, not what came after it")
     assert_does_not_have(lines, "an info line", "the info line should be left out")
+
+
+## reports#16: a main switch that tripped and the pantograph that lost the wire before it left
+## nothing in the log - in the player's trainset both go to the gameplay log
+func test_a_main_switch_opening_and_a_pantograph_loss_are_logged() -> void:
+    var description: VehicleController = FizVehicleBuilder.build_description_at(MOTOR_CAR_PATH)
+    var vehicle: RID = build_vehicle("RecorderMotorCar", description, 0.0,
+            MaszynaDynamicData.DriverType.DRIVER_HEAD).get_rid()
+    PlayerServer.player_take_over_vehicle(vehicle)
+    var engine: RailVehicleEngine = VehicleServer.vehicle_component_get(
+            vehicle, VehicleComponentType.COMPONENT_ENGINE) as RailVehicleEngine
+
+    engine.engine_stop.emit()
+    RailVehicleServer.vehicle_pantograph_contact_lost.emit(
+            vehicle, RailVehicleEnginePowerSource.PANTOGRAPH_SECOND, RailVehicleServer.PANTOGRAPH_CONTACT_LOSS_NOT_REACHING)
+    PlayerServer.player_leave_vehicle()
+    _recorder.stop()
+
+    var main_switch: PackedStringArray = _line_of("main_switch")
+    assert_eq(Array(main_switch.slice(COLUMN_KIND, COLUMN_DETAILS + 1)),
+            ["main_switch", "RecorderMotorCar#%d" % vehicle.get_id(), "opened"], "the main switch opening: %s" % main_switch)
+    assert_true(main_switch[-1].begins_with("cause="), "with its cause: %s" % main_switch)
+    assert_eq(Array(_line_of("pantograph").slice(COLUMN_KIND, COLUMN_DETAILS + 3)),
+            ["pantograph", "RecorderMotorCar#%d" % vehicle.get_id(), "lost", "index=1", "cause=not_reaching"],
+            "the pantograph's loss with its cause")
+
+
+## The fields of the line of `kind`; empty when there is none
+func _line_of(kind: String) -> PackedStringArray:
+    for line: String in _read_lines():
+        var fields: PackedStringArray = _fields(line)
+        if fields.size() > COLUMN_KIND and fields[COLUMN_KIND] == kind:
+            return fields
+    return PackedStringArray()
 
 
 func _read_lines() -> PackedStringArray:

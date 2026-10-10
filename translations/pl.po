@@ -236,6 +236,9 @@ msgstr "Odłącz"
 msgid "Release rod"
 msgstr "Cięgło odluźniacza"
 
+msgid "Not applicable to this vehicle"
+msgstr "Nie dotyczy tego pojazdu"
+
 msgid "Enabled"
 msgstr "Włączony"
 

@@ -236,6 +236,9 @@ msgstr ""
 msgid "Release rod"
 msgstr ""
 
+msgid "Not applicable to this vehicle"
+msgstr ""
+
 msgid "Enabled"
 msgstr ""
 

@@ -236,6 +236,9 @@ msgstr "停用"
 msgid "Release rod"
 msgstr "缓解拉杆"
 
+msgid "Not applicable to this vehicle"
+msgstr "不适用于此车辆"
+
 msgid "Enabled"
 msgstr "已启用"
 

@@ -236,6 +236,9 @@ msgstr "Zakázat"
 msgid "Release rod"
 msgstr "Odbrzďovací táhlo"
 
+msgid "Not applicable to this vehicle"
+msgstr "Netýká se tohoto vozidla"
+
 msgid "Enabled"
 msgstr "Povoleno"
 

@@ -4,8 +4,10 @@ extends Node
 ## The gameplay's log, from start() to stop() (a scenery, game.gd), to GameLog's
 ## loggers: "gameplay" - the commands the player's vehicle received (the player's and the
 ## scenario's - a command carries no sender), the persons made and freed, where they sit and in
-## what role, the vehicles made and freed and the trainsets they form; "ai" - the commands the
-## other vehicles received; "scenario" - the scenario's events that ran. They go to the loggers'
+## what role, the vehicles made and freed and the trainsets they form, and the main switches opening
+## and the pantographs losing their voltage in the player's trainset; "ai" - the commands the other
+## vehicles received and their main switches and pantographs; "scenario" - the scenario's events
+## that ran. They go to the loggers'
 ## handlers as they come, not into memory (the log files, game.gd), so a session of
 ## any length goes with a problem report. A command repeated without a pause - a lever dragged with
 ## the mouse, a key held - is one line: the first one, its count and the last one's time and
@@ -16,6 +18,7 @@ const REPEAT_GAP_MSEC: int = 1000
 ## What a role's and a cabin kind's constant name starts with, left out of the log
 const ROLE_PREFIX: String = "VEHICLE_PERSON_ROLE_"
 const CABIN_PREFIX: String = "RAIL_VEHICLE_CABIN_"
+const CONTACT_LOSS_PREFIX: String = "PANTOGRAPH_CONTACT_LOSS_"
 
 ## Lines: "<time> <simulation time> <kind> <subject> <details>", the subject a name and
 ## its RID ("SN61-02#2"), the details key=value:
@@ -24,6 +27,8 @@ const CABIN_PREFIX: String = "RAIL_VEHICLE_CABIN_"
 ##       |left vehicle= cab=|moved vehicle= cab= from_vehicle= from_cab=|role=<role> vehicle= cab=
 ##   vehicle <name#rid> created|freed;  trainset <first#rid> vehicles=<name#rid>,...
 ##   command <name#rid> <command> p1=<p1> p2=<p2> [repeats=<n> until=<simulation time> last=<p1>,<p2>]
+##   main_switch <name#rid> opened cause=<no_voltage|overvoltage|ground_fault|overload|switched_off>
+##   pantograph <name#rid> lost index=<0|1> cause=<not_reaching|no_wire|dead_wire> track=<name> along=<m>
 ##   event <event> [activator=<name>];  scenery left;  game closed
 var _gameplay_log: GameLogger = GameLog.get_logger("gameplay")
 var _scenario_log: GameLogger = GameLog.get_logger("scenario")
@@ -38,6 +43,10 @@ var _last_trainset: String = ""
 ## without its prefix ("driver", "rear")
 var _role_names: Dictionary[int, String] = {}
 var _cabin_kind_names: Dictionary[int, String] = {}
+var _contact_loss_names: Dictionary[int, String] = {}
+## The engines whose main switch is logged, by vehicle - connected when the vehicle is logged as
+## created, disconnected when it is freed
+var _engines: Dictionary[RID, RailVehicleEngine] = {}
 ## The last command, not written yet while it may repeat: its line, the logger it goes to, what
 ## tells a repeat (vehicle and command), how many times it came, the last one's time and values and
 ## when it came
@@ -63,6 +72,9 @@ func _ready() -> void:
     for constant: String in ClassDB.class_get_enum_constants(&"RailVehicleCabinKind", &"Kind"):
         _cabin_kind_names[ClassDB.class_get_integer_constant(&"RailVehicleCabinKind", constant)] = \
                 constant.trim_prefix(CABIN_PREFIX).to_lower()
+    for constant: String in ClassDB.class_get_enum_constants(&"RailVehicleServer", &"PantographContactLoss"):
+        _contact_loss_names[ClassDB.class_get_integer_constant(&"RailVehicleServer", constant)] = \
+                constant.trim_prefix(CONTACT_LOSS_PREFIX).to_lower()
 
 
 ## For a scenery being started
@@ -81,6 +93,7 @@ func start() -> void:
     VehicleServer.vehicle_configured.connect(_on_vehicle_configured)
     VehicleServer.vehicle_freed.connect(_on_vehicle_freed)
     RailVehicleServer.vehicle_trainset_changed.connect(_on_vehicle_trainset_changed)
+    RailVehicleServer.vehicle_pantograph_contact_lost.connect(_on_vehicle_pantograph_contact_lost)
     # the player is made with the game, before any scenery
     _write_person(PlayerServer.player_get_person(), "present")
 
@@ -111,6 +124,11 @@ func _close(subject: String, what: String) -> void:
     VehicleServer.vehicle_configured.disconnect(_on_vehicle_configured)
     VehicleServer.vehicle_freed.disconnect(_on_vehicle_freed)
     RailVehicleServer.vehicle_trainset_changed.disconnect(_on_vehicle_trainset_changed)
+    RailVehicleServer.vehicle_pantograph_contact_lost.disconnect(_on_vehicle_pantograph_contact_lost)
+    for vehicle: RID in _engines:
+        if is_instance_valid(_engines[vehicle]):
+            _engines[vehicle].engine_stop.disconnect(_on_engine_stop.bind(vehicle))
+    _engines.clear()
     _vehicle_names.clear()
     _last_trainset = ""
     _repeat_timer.stop()
@@ -182,6 +200,11 @@ func _on_vehicle_configured(vehicle: RID) -> void:
     _vehicle_names[vehicle] = VehicleServer.vehicle_get_name(vehicle)
     _write_repeated()
     _gameplay_log.info(_entry("vehicle", _named(vehicle, _vehicle_names[vehicle]), "created"))
+    var engine: RailVehicleEngine = VehicleServer.vehicle_component_get(
+            vehicle, VehicleComponentType.COMPONENT_ENGINE) as RailVehicleEngine
+    if engine:
+        _engines[vehicle] = engine
+        engine.engine_stop.connect(_on_engine_stop.bind(vehicle))
 
 
 func _on_vehicle_freed(vehicle: RID) -> void:
@@ -190,6 +213,49 @@ func _on_vehicle_freed(vehicle: RID) -> void:
     _write_repeated()
     _gameplay_log.info(_entry("vehicle", _named(vehicle, _vehicle_names[vehicle]), "freed"))
     _vehicle_names.erase(vehicle)
+    if _engines.has(vehicle) and is_instance_valid(_engines[vehicle]):
+        _engines[vehicle].engine_stop.disconnect(_on_engine_stop.bind(vehicle))
+    _engines.erase(vehicle)
+
+
+## The main switch opened - by the driver, or by the relay that tripped it, as the engine shows it
+## in the same step (MainSwitch(false) on NoVoltRelay, OvervoltageRelay, GroundRelay, FuseOff,
+## Mover.cpp:5686-5696, 5835)
+func _on_engine_stop(vehicle: RID) -> void:
+    var engine: RailVehicleEngine = _engines[vehicle]
+    var electric: RailVehicleElectricEngine = engine as RailVehicleElectricEngine
+    var cause: String = "switched_off"
+    if not engine.get_relay_novolt():
+        cause = "no_voltage"
+    elif not engine.get_relay_overvoltage():
+        cause = "overvoltage"
+    elif not engine.get_relay_ground():
+        cause = "ground_fault"
+    elif electric and electric.get_fuse_active():
+        cause = "overload"
+    _write_repeated()
+    _trainset_log(vehicle).info(_entry("main_switch", _named(vehicle, VehicleServer.vehicle_get_name(vehicle)),
+            "opened cause=%s" % cause))
+
+
+func _on_vehicle_pantograph_contact_lost(vehicle: RID, pantograph: int,
+        cause: RailVehicleServer.PantographContactLoss) -> void:
+    var position: Dictionary = RailVehicleServer.vehicle_get_track_position(vehicle)
+    var track: RID = position.get("track_rid", RID())
+    _write_repeated()
+    _trainset_log(vehicle).info(_entry("pantograph", _named(vehicle, VehicleServer.vehicle_get_name(vehicle)),
+            "lost index=%d cause=%s track=%s along=%.2f" % [pantograph, _contact_loss_names.get(cause, str(cause)),
+                TrackServer.track_get_name(track) if track.is_valid() else "-", float(position.get("along", 0.0))]))
+
+
+## The player's trainset's log, gameplay; ai for the others - a unit's main switch and pantographs
+## are on its motor car, not on the cab car the player sits in
+func _trainset_log(vehicle: RID) -> GameLogger:
+    var player_vehicle: RID = PlayerServer.player_get_vehicle()
+    if player_vehicle.is_valid() and RailVehicleServer.vehicle_get_coupled(
+            player_vehicle, RailVehicleController.COUPLER_END_FRONT, RailVehicleController.COUPLING_FLAG_COUPLER).has(vehicle):
+        return _gameplay_log
+    return _ai_log
 
 
 func _on_vehicle_trainset_changed(vehicle: RID) -> void:

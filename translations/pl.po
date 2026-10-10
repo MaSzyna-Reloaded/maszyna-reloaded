@@ -2080,3 +2080,6 @@ msgstr "Ekrany kabiny niedostępne"
 
 msgid "The cab screens drawn by Python scripts could not be started and stay blank. The game goes on without them."
 msgstr "Nie udało się uruchomić ekranów kabiny rysowanych przez skrypty Pythona - pozostaną puste. Gra działa dalej bez nich."
+
+msgid "Lazy loading (experimental)"
+msgstr "Leniwe ładowanie (eksperymentalne)"

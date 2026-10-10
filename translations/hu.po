@@ -2080,3 +2080,6 @@ msgstr "A vezetőfülke kijelzői nem érhetők el"
 
 msgid "The cab screens drawn by Python scripts could not be started and stay blank. The game goes on without them."
 msgstr "A Python-szkriptek által rajzolt vezetőfülke-kijelzők nem indíthatók el, üresek maradnak. A játék nélkülük folytatódik."
+
+msgid "Lazy loading (experimental)"
+msgstr "Késleltetett betöltés (kísérleti)"

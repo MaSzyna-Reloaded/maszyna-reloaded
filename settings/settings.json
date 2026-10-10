@@ -295,6 +295,14 @@
                     "advanced": true
                 },
                 {
+                    "title": "Lazy loading (experimental)",
+                    "store": "project",
+                    "key": "maszyna/resources/lazy_loading",
+                    "type": "bool",
+                    "default": false,
+                    "restart_required": true
+                },
+                {
                     "title": "Improved railway lights visibility",
                     "store": "project",
                     "key": "maszyna/scenery/railway_lights_visibility_improved",

@@ -2080,3 +2080,6 @@ msgstr ""
 
 msgid "The cab screens drawn by Python scripts could not be started and stay blank. The game goes on without them."
 msgstr ""
+
+msgid "Lazy loading (experimental)"
+msgstr ""

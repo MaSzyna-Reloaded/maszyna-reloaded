@@ -268,10 +268,11 @@ func spawn_maszyna_vehicle(data_path:String, file_name:String, skin:String, vehi
 func wait_detailed(vehicle:MaszynaRailVehicle3D) -> bool:
     var has_camera:bool = SceneryStreamingServer.streaming_has_camera()
     if not has_camera:
-        SceneryStreamingServer.streaming_set_camera(add_child_autoqfree(Camera3D.new()))
+        var camera:Camera3D = add_child_autoqfree(Camera3D.new())
+        SceneryStreamingServer.streaming_set_camera(camera.get_instance_id())
     var detailed:bool = await wait_simulated_until(
             RailVehicleRenderingServer.vehicle_is_detailed.bind(vehicle.get_rid()), DETAIL_TIMEOUT,
             "%s drawn in detail" % vehicle.vehicle_id)
     if not has_camera:
-        SceneryStreamingServer.streaming_set_camera(null)
+        SceneryStreamingServer.streaming_set_camera(0)
     return detailed

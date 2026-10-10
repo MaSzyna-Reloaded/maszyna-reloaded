@@ -96,7 +96,7 @@ func test_exported_streamer_configuration_is_applied_on_ready() -> void:
 
 func test_inactive_streamer_clears_an_existing_streaming_camera_on_ready() -> void:
     var camera:Camera3D = add_child_autofree(Camera3D.new())
-    SceneryStreamingServer.streaming_set_camera(camera)
+    SceneryStreamingServer.streaming_set_camera(camera.get_instance_id())
     assert_true(SceneryStreamingServer.streaming_has_camera())
     var streamer:Node = STREAMER_SCRIPT.new()
     add_child(streamer)

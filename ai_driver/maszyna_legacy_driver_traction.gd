@@ -371,6 +371,16 @@ static func set_main_controller(situation:Situation, position:int) -> bool:
     return not current == start
 
 
+## The master controller put at `position` at once, as the original's driver sets an EIM
+## controller's MainCtrlPos (Driver.cpp:3226-3239, 3387-3399, 3771-3816, 4284-4290): stepped through
+## the cab it would restart the relay time on every update, and an Elf's power would never rise past
+## its first step (CheckEIMIC(), Mover.cpp); true when it moved
+static func put_main_controller(situation:Situation, position:int) -> bool:
+    var before:int = main_controller_position(situation)
+    MaszynaLegacyDriverHints.send(situation.controlling, "main_controller_set_position", position)
+    return not main_controller_position(situation) == before
+
+
 ## The second controller stepped to `position`, as far as it goes (DecScndCtrl(2) to 0); true when
 ## it moved
 static func set_second_controller(situation:Situation, position:int) -> bool:
@@ -410,10 +420,10 @@ func increase_eim(situation:Situation) -> bool:
             return step_main(situation, 1)
         RailVehicleEngine.EIM_CONTROL_TYPE_1:
             if main < TRAXX_DRIVING_POSITION:
-                return set_main_controller(situation, TRAXX_DRIVING_POSITION)
+                return put_main_controller(situation, TRAXX_DRIVING_POSITION)
         RailVehicleEngine.EIM_CONTROL_TYPE_2:
             if main < ELF_DRIVING_POSITION:
-                return set_main_controller(situation, ELF_DRIVING_POSITION)
+                return put_main_controller(situation, ELF_DRIVING_POSITION)
     return false
 
 
@@ -426,7 +436,7 @@ func decrease_eim(situation:Situation) -> bool:
             return step_main(situation, -1)
         RailVehicleEngine.EIM_CONTROL_TYPE_1:
             if main > TRAXX_NEUTRAL_POSITION:
-                return set_main_controller(situation, TRAXX_NEUTRAL_POSITION)
+                return put_main_controller(situation, TRAXX_NEUTRAL_POSITION)
         RailVehicleEngine.EIM_CONTROL_TYPE_2:
             var control:RailVehicleSpeedControl = RailVehicleServer.vehicle_component_get(
                     situation.controlling, RailVehicleComponentType.COMPONENT_SPEED_CONTROL) as RailVehicleSpeedControl
@@ -434,7 +444,7 @@ func decrease_eim(situation:Situation) -> bool:
                     and control.power_step > 0.0 and control.get_desired_power() > control.min_power:
                 MaszynaLegacyDriverHints.send(situation.vehicle, "speed_control_power_decrease")
             elif main > ELF_NEUTRAL_POSITION:
-                return set_main_controller(situation, ELF_NEUTRAL_POSITION)
+                return put_main_controller(situation, ELF_NEUTRAL_POSITION)
     return false
 
 

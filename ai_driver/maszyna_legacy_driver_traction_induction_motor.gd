@@ -47,17 +47,17 @@ func check_time_controllers(situation:MaszynaLegacyDriverTraction.Situation) -> 
     match eim_control_type(situation):
         RailVehicleEngine.EIM_CONTROL_TYPE_1:
             if main > TRAXX_NEUTRAL:
-                set_main_controller(situation, TRAXX_DRIVING_HOLD)
+                put_main_controller(situation, TRAXX_DRIVING_HOLD)
             elif main < TRAXX_NEUTRAL:
-                set_main_controller(situation, TRAXX_BRAKING_HOLD)
+                put_main_controller(situation, TRAXX_BRAKING_HOLD)
         RailVehicleEngine.EIM_CONTROL_TYPE_2:
             var engine:RailVehicleEngine = VehicleServer.vehicle_component_get(
                     situation.vehicle, VehicleComponentType.COMPONENT_ENGINE) as RailVehicleEngine
             var asked:float = engine.get_eimic_real() if engine else 0.0
             if asked > 0.0:
-                set_main_controller(situation, ELF_DRIVING_HOLD)
+                put_main_controller(situation, ELF_DRIVING_HOLD)
             elif asked < 0.0:
-                set_main_controller(situation, ELF_BRAKING_HOLD)
+                put_main_controller(situation, ELF_BRAKING_HOLD)
     if _impulse_lever(situation):
         set_second_controller(situation, IMPULSE_LEVER_MIDDLE)
 

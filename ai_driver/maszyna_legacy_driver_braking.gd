@@ -801,15 +801,15 @@ func _increase_eim(situation:MaszynaLegacyDriverTraction.Situation) -> bool:
             return _set_local_brake(vehicle, situation.cabin, most * clampf(maxf(limit, hinted), 0.0, 1.0))
         RailVehicleEngine.EIM_CONTROL_TYPE_1:
             if main > 0:
-                return MaszynaLegacyDriverTraction.set_main_controller(situation, 0)
+                return MaszynaLegacyDriverTraction.put_main_controller(situation, 0)
         RailVehicleEngine.EIM_CONTROL_TYPE_2:
             if main > 1:
-                return MaszynaLegacyDriverTraction.set_main_controller(situation, 1)
+                return MaszynaLegacyDriverTraction.put_main_controller(situation, 1)
         RailVehicleEngine.EIM_CONTROL_TYPE_3:
             var controller:RailVehicleUniversalController = RailVehicleServer.vehicle_component_get(
                     vehicle, RailVehicleComponentType.COMPONENT_UNIVERSAL_CONTROLLER) as RailVehicleUniversalController
             if controller and controller.integrated_local_brake:
-                return main > 0 and MaszynaLegacyDriverTraction.set_main_controller(situation, 0)
+                return main > 0 and MaszynaLegacyDriverTraction.put_main_controller(situation, 0)
             return _step_local_brake(vehicle, situation.cabin, 1)
     return false
 
@@ -829,16 +829,16 @@ func _decrease_eim(situation:MaszynaLegacyDriverTraction.Situation) -> bool:
                     -_local_brake_factor(vehicle) * acceleration / _med_max_deceleration(vehicle), 0.0, 1.0))
         RailVehicleEngine.EIM_CONTROL_TYPE_1:
             if main < EIM_TRAXX_BRAKE_OFF:
-                return MaszynaLegacyDriverTraction.set_main_controller(situation, EIM_TRAXX_BRAKE_OFF)
+                return MaszynaLegacyDriverTraction.put_main_controller(situation, EIM_TRAXX_BRAKE_OFF)
         RailVehicleEngine.EIM_CONTROL_TYPE_2:
             if main < EIM_ELF_BRAKE_OFF:
-                return MaszynaLegacyDriverTraction.set_main_controller(situation, EIM_ELF_BRAKE_OFF)
+                return MaszynaLegacyDriverTraction.put_main_controller(situation, EIM_ELF_BRAKE_OFF)
         RailVehicleEngine.EIM_CONTROL_TYPE_3:
             var master_controller:RailVehicleMasterController = RailVehicleServer.vehicle_component_get(
                     situation.controlling, RailVehicleComponentType.COMPONENT_MASTER_CONTROLLER) as RailVehicleMasterController
             var neutral:int = master_controller.direction_change_max_position if master_controller else 0
             if main < neutral:
-                return MaszynaLegacyDriverTraction.set_main_controller(situation, neutral)
+                return MaszynaLegacyDriverTraction.put_main_controller(situation, neutral)
     return false
 
 

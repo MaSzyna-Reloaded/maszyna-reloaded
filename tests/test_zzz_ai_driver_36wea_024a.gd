@@ -3,8 +3,7 @@ extends MaszynaStartupTest
 ## 36WEa-024A (PKP/IMPULS_V1, fixtures/scenery/startup_36wea-024a.scn - l053_poranek.scn's unit, its
 ## pantographs by individual switches) started from its cab with the keyboard; the original's driver
 ## walking through the gangways to the rear cab of the C car to drive back (report
-## 2026-10-06: the driving aid asked to deactivate the cab just activated, and to raise pantograph
-## A, which the C car has not got)
+## 2026-10-06: the driving aid asked to deactivate the cab just activated)
 
 ## Simulated seconds the driver is given to update after a step
 const DRIVER_UPDATE_SECONDS:float = 5.0
@@ -33,9 +32,10 @@ func test_the_driver_walks_to_the_rear_cab_with_the_player() -> void:
             "no hint to deactivate the cab just activated: %s" % [_hints()])
 
 
-## The C car's one pantograph is B (PhysicalLayout=2): from its cab the driving aid asks for B, which
-## its switch raises (MASZYNA_ORIGINAL_QUIRKS.md, "Pantograph B of a vehicle with one")
-func test_the_c_car_is_asked_for_its_own_pantograph() -> void:
+## The C car's one pantograph is B (PhysicalLayout=2), the A car's A: from the C car's cab the
+## driving aid asks for both, as the original does (Driver.cpp:2811-2813) - its switches raise them
+## for the unit (OperatePantographValve(), range_t::consist)
+func test_the_c_car_is_asked_for_both_pantographs_of_the_unit() -> void:
     await _walk_to_the_rear_cab_of_c()
     # the unit's pantographs down: the A car's A and the C car's B
     VehicleServer.vehicle_send_command(occupied, "pantograph_valve_operate",
@@ -44,10 +44,10 @@ func test_the_c_car_is_asked_for_its_own_pantograph() -> void:
             RailVehicleEnginePowerSource.PANTOGRAPH_SECOND, RailVehicleEnginePowerSource.VALVE_OPERATION_DISABLE)
     await step(ticks(DRIVER_UPDATE_SECONDS))
     var hints:Array[String] = _hints()
-    assert_false(MaszynaLegacyDriverHints.TEXTS[MaszynaLegacyDriverHints.Hint.FRONT_PANTOGRAPH_VALVE_ON] in hints,
-            "no hint to raise pantograph A, which the C car has not got: %s" % [hints])
+    assert_true(MaszynaLegacyDriverHints.TEXTS[MaszynaLegacyDriverHints.Hint.FRONT_PANTOGRAPH_VALVE_ON] in hints,
+            "a hint to raise pantograph A, the A car's: %s" % [hints])
     assert_true(MaszynaLegacyDriverHints.TEXTS[MaszynaLegacyDriverHints.Hint.REAR_PANTOGRAPH_VALVE_ON] in hints,
-            "a hint to raise its pantograph B: %s" % [hints])
+            "a hint to raise pantograph B, the C car's: %s" % [hints])
 
 
 ## Started in the A car's front cab, stopped, the reverser at neutral; then the cab changes towards

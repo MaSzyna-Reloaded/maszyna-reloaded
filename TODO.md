@@ -97,6 +97,13 @@
   sa134-014 and WMB10-819 report their line breaker open after being prepared.
   `PrepareEngine()`'s readiness compares the main reservoir, the original the feed pipe
   (`ScndPipePress`, Driver.cpp:2843-2851).
+* **An EN76 from cold stands at "Reduce braking force"** (fixture `startup_en76-001-a.scn` with
+  starting velocity 0.0, 2026-10-10): prepared and told to go, its brake pipe stays at 0.01 bar for
+  30 s and the hint on `brakectrl` never ends. The scenery's EN76 starts at 0.1 km/h (pipe charged),
+  so Wrzosy does not show it. Measure the pipe's charging against the original's.
+* **An EN76 through Wolica's switches at 104 km/h** (Wrzosy, IC EIE8310, ROJ43411, 2026-10-10
+  probe): `woa_zwr105` and the switches after it are given 40-60 km/h by their events; check
+  what the driver reads there before calling it a fault.
 * **Orders**: `engine_active` lost on a breakdown while driving; the trainset's timetable and
   velocity from the `.scn` (`OrdersInit`); a push-pull set turning only at `@` (`movePushPull`);
   `OrderCheck()`'s doors; lights - lamp inventory (`iInventory`), the far end put out on

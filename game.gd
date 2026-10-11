@@ -83,12 +83,16 @@ var _world: SceneryWorld = null
 ## The handlers of the running scenery's log files, by file name (GAME_LOG_FILES) - registered with
 ## GameLog under that name
 var _log_handlers: Dictionary[String, GameLogFileHandler] = {}
+## While the surroundings are built (_build_surroundings()): the streaming's chunks around the
+## camera are...
+var _surroundings_area_ready: bool = false
+## ...and so are the vehicles within the draw distance
+var _surroundings_vehicles_built: bool = false
 
 
-## Before _ready(): the children must not read a cache left by another build; and the original's
-## driver thinks for the drivers a scenery declares (SceneryInstancer) before any scenery is loaded
+## Before _ready(): the original's driver thinks for the drivers a scenery declares
+## (SceneryInstancer) before any scenery is loaded
 func _enter_tree() -> void:
-    GameDataServer.build_check_version()
     DriverServer.implementation_register(SceneryInstancer.DRIVER_IMPLEMENTATION, MaszynaLegacyAIDriver.new())
 
 
@@ -211,20 +215,36 @@ func _build_surroundings() -> void:
     var deadline: float = started_msec + STREAMING_WAIT_TIME * 1000.0
     var most_pending: int = 0
     var progress: float = SURROUNDINGS_STREAMING_PROGRESS
-    while SceneryStreamingServer.streaming_has_camera() and Time.get_ticks_msec() < deadline:
+    _surroundings_area_ready = false
+    _surroundings_vehicles_built = RailVehicleRenderingServer.builds_get_pending_count() == 0
+    SceneryStreamingServer.area_ready.connect(_on_surroundings_area_ready)
+    RailVehicleRenderingServer.builds_finished.connect(_on_surroundings_vehicles_built)
+    SceneryStreamingServer.area_watch(SURROUNDINGS_CHUNK_RADIUS)
+    # every frame only for the bar: the end comes from the signals
+    while not (_surroundings_area_ready and _surroundings_vehicles_built) \
+            and SceneryStreamingServer.streaming_has_camera() and Time.get_ticks_msec() < deadline:
         var pending: int = SceneryStreamingServer.area_get_pending_count(SURROUNDINGS_CHUNK_RADIUS) \
                 + RailVehicleRenderingServer.builds_get_pending_count()
-        if SceneryStreamingServer.area_is_ready(SURROUNDINGS_CHUNK_RADIUS) \
-                and RailVehicleRenderingServer.builds_get_pending_count() == 0:
-            break
         most_pending = maxi(most_pending, pending)
         var built: float = 1.0 - float(pending) / most_pending if most_pending > 0 else 0.0
         progress = maxf(progress, lerpf(SURROUNDINGS_STREAMING_PROGRESS, 0.99, built))
         $LoadingScreen.set_progress(
                 progress, MaszynaIncludeNode.LoadStage.SURROUNDINGS, "")
         await get_tree().process_frame
+    SceneryStreamingServer.area_unwatch(SURROUNDINGS_CHUNK_RADIUS)
+    SceneryStreamingServer.area_ready.disconnect(_on_surroundings_area_ready)
+    RailVehicleRenderingServer.builds_finished.disconnect(_on_surroundings_vehicles_built)
     $LoadingScreen.set_progress(1.0, MaszynaIncludeNode.LoadStage.SURROUNDINGS, "")
     print("[SceneryLoad] SURROUNDINGS %.1f s" % ((Time.get_ticks_msec() - started_msec) / 1000.0))
+
+
+func _on_surroundings_area_ready(chunk_radius: int) -> void:
+    if chunk_radius == SURROUNDINGS_CHUNK_RADIUS:
+        _surroundings_area_ready = true
+
+
+func _on_surroundings_vehicles_built() -> void:
+    _surroundings_vehicles_built = true
 
 
 ## The Python runtime of the cab screens has ended (PythonScreenServer, once): the screens stay

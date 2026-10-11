@@ -9,7 +9,8 @@ extends MaszynaGutTest
 ## EP07-424 of td.scn on a cut of its line, with the EP07's own .fiz and .mmd (demo/tests/fixtures)
 const FIXTURES_GAME_DIR:String = "res://tests/fixtures"
 const SCENERY:String = "ep07.scn"
-const VEHICLE:String = "EP07-424"
+## A scenery node's name, read in lower case (cParser::getTokens())
+const VEHICLE:String = "ep07-424"
 ## Simulated seconds the driver takes to get the cold EP07 ready (engine_active): the converter on
 ## its fifth update, PREPARE_TIME apart, then the compressor filling the main reservoir past
 ## MIN_MAIN_RESERVOIR_PRESSURE from the 4.1 bar it spawns with while the brake pipe charges from it,

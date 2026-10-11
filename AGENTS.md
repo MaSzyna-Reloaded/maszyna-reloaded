@@ -33,6 +33,10 @@ Where the game is not libmaszyna:
   fixtures (`tests/fixtures/`); libmaszyna's tests stay in libmaszyna. Run as libmaszyna's rules
   say, with `--path .`
 * a headless run's game log files go to `logs/headless/` (`game.gd`, `HEADLESS_LOG_DIRECTORY`)
+* `--check-only -s` checks nearly nothing here: almost every game script reaches an autoload
+  (libmaszyna's `CabinSystem`, `SceneryInstancer`, ..., or the game's own), and without them it
+  only reports `Identifier not found` - a game script is checked by `--import` and by its tests'
+  GUT run, as libmaszyna's rules say
 * releases are cut here: `make build-number`, `make release-linux` / `release-windows` /
   `release-android`; the CI workflow builds libmaszyna from the submodule, exports and publishes
   the branch's prerelease

@@ -23,6 +23,9 @@ const LEVEL_COLORS: Dictionary[GameLog.LogLevel, Color] = {
 
 ## A logger's tab
 const LOG_LINES_SCENE: PackedScene = preload("log_lines.tscn")
+## The panel's handler, registered with GameLog under this name and assigned to every logger it has
+## a tab for
+const LOGS_HANDLER: String = "hud_logs_panel"
 
 
 ## The engine's messages, handed to the "App" tab. The engine logs from any thread, so a line
@@ -45,36 +48,60 @@ class AppLogger extends Logger:
         _lines.add_line.call_deferred(text, WARNING_COLOR if error_type == ERROR_TYPE_WARNING else ERROR_COLOR)
 
 
+## The lines of the loggers the panel has tabs for, handed to the tab of their logger
+class LogsHandler extends GameLogHandler:
+    var _add_line: Callable
+
+
+    func _init(add_line: Callable) -> void:
+        _add_line = add_line
+
+
+    func _handle(logger_id: String, level: GameLog.LogLevel, line: String) -> void:
+        _add_line.call(logger_id, level, line)
+
+
 var _app_logger: AppLogger = null
 ## The tabs of GameLog's loggers, by logger id
 var _logger_tabs: Dictionary[String, LogLines] = {}
 
 
 func _ready() -> void:
+    GameLog.register_handler(LOGS_HANDLER, LogsHandler.new(_add_line))
     for logger_id: String in GameLog.get_loggers():
         _on_logger_created(logger_id)
     GameLog.logger_created.connect(_on_logger_created)
-    GameLog.message_logged.connect(_on_message_logged)
+    GameLog.logger_removing.connect(_on_logger_removing)
     _app_logger = AppLogger.new(%App)
     OS.add_logger(_app_logger)
 
 
 func _exit_tree() -> void:
     GameLog.logger_created.disconnect(_on_logger_created)
-    GameLog.message_logged.disconnect(_on_message_logged)
+    GameLog.logger_removing.disconnect(_on_logger_removing)
+    for logger_id: String in _logger_tabs:
+        GameLog.unassign_handler(logger_id, LOGS_HANDLER)
+    GameLog.unregister_handler(LOGS_HANDLER)
     OS.remove_logger(_app_logger)
 
 
-## A logger's tab, before the engine's one
+## A logger's tab, before the engine's one, in the order the loggers come
 func _on_logger_created(logger_id: String) -> void:
     var tab: LogLines = LOG_LINES_SCENE.instantiate()
     tab.name = logger_id
     %Tabs.add_child(tab)
     %Tabs.move_child(tab, %App.get_index())
     _logger_tabs[logger_id] = tab
+    GameLog.assign_handler(logger_id, LOGS_HANDLER)
 
 
-func _on_message_logged(logger_id: String, level: GameLog.LogLevel, line: String) -> void:
+func _on_logger_removing(logger_id: String) -> void:
+    GameLog.unassign_handler(logger_id, LOGS_HANDLER)
+    _logger_tabs[logger_id].queue_free()
+    _logger_tabs.erase(logger_id)
+
+
+func _add_line(logger_id: String, level: GameLog.LogLevel, line: String) -> void:
     _logger_tabs[logger_id].add_line(line, LEVEL_COLORS[level])
 
 

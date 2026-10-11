@@ -29,7 +29,7 @@ const STOPPED_SPEED:float = 0.5
 const STATE_SHOWN:Array[String] = [
     "battery_enabled", "power24_available", "cabin", "direction", "direction_absolute",
     "controller_main_position", "main_switch_enabled", "diesel_startup", "engine_rpm_count",
-    "diesel_fill", "diesel_clutch_desired", "diesel_clutch_engagement", "Ft", "speed",
+    "diesel_fill", "diesel_clutch_desired", "diesel_clutch_engagement", "tractive_force", "speed",
     "oil_pump_active", "fuel_pump_active", "oil_pump_pressure", "brake_local_position_normalized",
     "brake_loco_pressure", "brake_air_pressure", "brake_force", "pipe_pressure", "feed_pipe_pressure",
     "compressor_pressure",

@@ -81,7 +81,7 @@ func test_a_switch_thrown_ahead_is_traced_again_from() -> void:
     _track(Vector3(SWITCH_LENGTH, 0.0, 0.0), Vector3(LINE_LENGTH, 0.0, 0.0), null, LINE_VELOCITY, "")
     _track(Vector3(SWITCH_LENGTH, 0.0, DIVERGING_OFFSET), Vector3(LINE_LENGTH, 0.0, LINE_LENGTH), null,
             DIVERGING_VELOCITY, "")
-    TrackServer.switch_set_active_track(switch_track, TrackServer.TRACK_COMMON)
+    TrackServer.switch_set_active_track(TrackServer.track_get_switch(switch_track), TrackServer.TRACK_COMMON)
     TrackServer.topology_rebuild()
     var vehicle:RID = await _place("approach", APPROACH_LENGTH / 2.0)
     # the way that leads over the switch
@@ -94,7 +94,7 @@ func test_a_switch_thrown_ahead_is_traced_again_from() -> void:
 
     _update(route, vehicle, trainset, 0.0)
     assert_eq(route.velocity_next, LINE_VELOCITY, "set straight, the line's speed")
-    TrackServer.switch_set_active_track(switch_track, TrackServer.TRACK_DIVERGING)
+    TrackServer.switch_set_active_track(TrackServer.track_get_switch(switch_track), TrackServer.TRACK_DIVERGING)
     _update(route, vehicle, trainset, 0.0)
 
     assert_eq(route.velocity_next, DIVERGING_VELOCITY, "thrown, the diverging track's limit is read")
@@ -241,7 +241,7 @@ func _curve(from:Vector3, to:Vector3) -> TrackCurve:
 
 
 func _track(from:Vector3, to:Vector3, diverging:TrackCurve, velocity:float, name:String,
-        type:int = TrackServer.TRACK_NORMAL) -> RID:
+        type:TrackServer.TrackType = TrackServer.TRACK_NORMAL) -> RID:
     var track:RID = TrackServer.track_create()
     _tracks.append(track)
     TrackServer.track_update_curves(track, _curve(from, to), diverging)

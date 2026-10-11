@@ -178,6 +178,8 @@ class DriverState:
     var guard_transcript:Transcript = null
     var guard_radio:int = 0
     var guard_signal_due:bool = false
+    ## The guard's handheld radio (RadioServer), a transmitter only, in the vehicle the driver is in
+    var guard_handheld:RID
     ## m_lighthints - the light pattern asked for at the front and the rear, -1 for none
     var light_hints:Vector2i = Vector2i(-1, -1)
     ## fWarningDuration and the horn to sound
@@ -261,11 +263,15 @@ func _driver_attached(driver:RID) -> void:
     # that for the way it drives
     state.direction_order = state.direction
     state.timetable.changed.connect(DriverServer.driver_report_timetable_changed.bind(driver))
+    state.guard_handheld = RadioServer.radio_create()
     _drivers[driver] = state
     DriverServer.driver_schedule_update(driver, 0.0)
 
 
 func _driver_detached(driver:RID) -> void:
+    var state:DriverState = _drivers.get(driver)
+    if state:
+        RadioServer.radio_free(state.guard_handheld)
     _drivers.erase(driver)
 
 
@@ -681,8 +687,9 @@ func _update(driver:RID) -> void:
     if state.guard_signal_due and state.orders[state.order_position] == Order.OBEY_TRAIN \
             and state.speed.velocity_desired > 0.0:
         state.guard_signal_due = false
-        CabinSystem.send_radio_message(state.guard_signal, state.guard_transcript, state.guard_radio,
-                RailVehicleServer.vehicle_get_transform(vehicle).origin, GUARD_RADIO_RANGE)
+        RadioServer.radio_set_vehicle(state.guard_handheld, vehicle)
+        RadioServer.radio_transmit(state.guard_handheld, state.guard_radio, GUARD_RADIO_RANGE, RadioServer.KIND_MESSAGE,
+                {"sound": state.guard_signal, "transcript": state.guard_transcript})
         state.traction.hold(GUARD_HOLD_TIME)
     # gone from the stop, its dispatch is over (Driver.cpp:7449-7452)
     if absf(directional_speed) > DISPATCH_MAX_SPEED:

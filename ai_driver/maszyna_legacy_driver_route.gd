@@ -557,7 +557,8 @@ func _update_table(reach:float, trainset:MaszynaLegacyDriverTrainset) -> void:
     for index:int in _segments.size():
         var segment:TrackRouteSegment = _segments[index]
         if segment.branch_from_setting and segment.distance > front_along \
-                and not TrackServer.switch_get_active_track(segment.track_rid) == segment.branch:
+                and not TrackServer.switch_get_active_track(TrackServer.track_get_switch(segment.track_rid)) \
+                    == segment.branch:
             _forget_segments(_segments.slice(index))
             break
     var left:Array[TrackRouteSegment] = []

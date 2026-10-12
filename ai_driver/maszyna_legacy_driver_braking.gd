@@ -426,6 +426,12 @@ func _set_brake_delays(vehicle:RID, trainset:MaszynaLegacyDriverTrainset, in_con
 ## (control_braking_force(), Driver.cpp:8065-8177)
 func control(situation:MaszynaLegacyDriverTraction.Situation, elapsed:float) -> void:
     delay -= elapsed
+    # differs from the original, which takes its level from the handle only while preparing the
+    # engine (PrepareEngine(), Driver.cpp:2867-2878): a player's handle moved from cutoff to running
+    # after that left the level lapped, and an EN57 told to move off was never told to reduce the
+    # braking force (MASZYNA_ORIGINAL_QUIRKS.md) - the player's handle is the level on every decision
+    if not DriverServer.vehicle_is_control_active(situation.vehicle):
+        take_handle_position(situation.vehicle)
     # the train brake is never left locked (Driver.cpp:7950-7952)
     if position == POSITION_LAP:
         MaszynaLegacyDriverHints.cue(situation, MaszynaLegacyDriverHints.Hint.TRAIN_BRAKE_RELEASE, 0.0, release_train_brake)

@@ -12,7 +12,7 @@ const DRIVER_UPDATE_SECONDS:float = 5.0
 
 
 func test_a_unit_moved_off_is_ready_for_its_driver() -> void:
-    await run_startup("startup_36wea-014a.scn", "36WEa-014A", Kind.ELECTRIC_MULTIPLE_UNIT, Pantographs.SELECTOR)
+    await run_startup("startup_36wea-014a.scn", "36wea-014a", Kind.ELECTRIC_MULTIPLE_UNIT, Pantographs.SELECTOR)
     var driver:RID = DriverServer.vehicle_get_driver(occupied)
     assert_true(driver.is_valid(), "the scenery's driver is seated in the unit")
     if not driver.is_valid():

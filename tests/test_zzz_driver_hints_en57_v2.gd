@@ -23,7 +23,7 @@ const HANDLE_TOLERANCE:float = 0.001
 
 
 func test_an_ep_brake_released_at_ep_releasing_is_not_hinted_back_to_driving() -> void:
-    await run_startup("startup_en57-636ra.scn", "EN57-636ra", Kind.ELECTRIC_MULTIPLE_UNIT)
+    await run_startup("startup_en57-636ra.scn", "en57-636ra", Kind.ELECTRIC_MULTIPLE_UNIT)
     var driver:RID = DriverServer.vehicle_get_driver(occupied)
     assert_true(driver.is_valid(), "the scenery's driver is seated in the unit")
     if not driver.is_valid():

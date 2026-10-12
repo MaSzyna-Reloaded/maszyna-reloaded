@@ -53,19 +53,19 @@ func test_the_c_car_is_asked_for_both_pantographs_of_the_unit() -> void:
 ## Started in the A car's front cab, stopped, the reverser at neutral; then the cab changes towards
 ## the back until the player sits in the C car's rear cab
 func _walk_to_the_rear_cab_of_c() -> void:
-    await run_startup("startup_36wea-024a.scn", "36WEa-024a", Kind.ELECTRIC_MULTIPLE_UNIT)
+    await run_startup("startup_36wea-024a.scn", "36wea-024a", Kind.ELECTRIC_MULTIPLE_UNIT)
     while _master(occupied).get_main_position() > 0:
         await key_tap(&"main_controller_decrease")
     await key_tap(&"direction_decrease")
     for _change:int in MAX_CAB_CHANGES:
         var vehicle:RID = PlayerServer.player_get_vehicle()
-        if VehicleServer.vehicle_get_name(vehicle) == "36WEa-024c" \
+        if VehicleServer.vehicle_get_name(vehicle) == "36wea-024c" \
                 and RailVehicleServer.vehicle_get_driver_cabin(vehicle) == RailVehicleServer.vehicle_get_rear_cabin(vehicle):
             break
         await key_tap(&"cabin_next")
         await step(ticks(1.0))
     var reached:RID = PlayerServer.player_get_vehicle()
-    assert_eq(VehicleServer.vehicle_get_name(reached), "36WEa-024c", "the player reached the C car")
+    assert_eq(VehicleServer.vehicle_get_name(reached), "36wea-024c", "the player reached the C car")
     assert_eq(RailVehicleServer.vehicle_get_driver_cabin(reached), RailVehicleServer.vehicle_get_rear_cabin(reached),
             "in its rear cab")
     await step(ticks(DRIVER_UPDATE_SECONDS))

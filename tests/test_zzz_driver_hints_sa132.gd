@@ -26,6 +26,8 @@ const MAX_CAB_CHANGES:int = 8
 const MAX_NOTCHES:int = 10
 const MOVE_OFF_SECONDS:float = 60.0
 const MOVED_OFF:float = 2.0
+## The scenery's order that makes the driver want to move off (ShuntVelocity, km/h)
+const SHUNT_VELOCITY:float = 40.0
 ## What a failure shows of the vehicle
 const STATE_SHOWN:Array[String] = [
     "battery_enabled", "power24_available", "cabin", "direction", "controller_main_position",
@@ -167,6 +169,39 @@ func test_the_hints_end_in_the_other_cars_cab() -> void:
             _story(), " ".join(["brake_local_position_normalized", "brake_air_pressure", "spring_brake/active",
                 "brake_manual_position", "tractive_force", "cabin", "direction"].map(func(key:String) -> String:
                     return "%s=%s" % [key, left.get(key)]))])
+
+
+## "Release train brakes" with the handle at running and the independent brake on: what is left is
+## the independent brake (driverhints.cpp:863-871), so its key is shown, and following it ends the
+## hint - not Kp6, which no longer moves anything (the player stood on it)
+func test_releasing_the_train_brakes_shows_the_independent_brakes_key() -> void:
+    if not await _enter():
+        return
+    await _follow_hints()
+    var vehicle:RID = VehicleServer.person_get_vehicle(_driver)
+    var brake:RailVehicleBrake = _brake(vehicle)
+    while brake.get_local_position_normalized() < 1.0:
+        var before:float = brake.get_local_position_normalized()
+        await _hold(&"local_brake_increase")
+        if brake.get_local_position_normalized() == before:
+            break
+    DriverServer.driver_send_command(_driver, "ShuntVelocity", SHUNT_VELOCITY, 0.0)
+    await wait_simulated_until(func() -> bool:
+            return _hinted([MaszynaLegacyDriverHints.Hint.BRAKING_FORCE_SET_ZERO]).size() > 0,
+            DRIVER_UPDATE_SECONDS, "the train brakes' release hinted")
+    var entry:Dictionary = _hinted([MaszynaLegacyDriverHints.Hint.BRAKING_FORCE_SET_ZERO])
+    assert_ne(entry.size(), 0, "the train brakes' release is hinted: %s" % _story())
+    if not entry:
+        return
+    var action:StringName = _cab_logic.get_action(entry["control"], entry["gesture"])
+    assert_eq(action, &"local_brake_decrease", "by the independent brake's key: %s" % _story())
+    for _step:int in MAX_STEPS:
+        entry = _hinted([MaszynaLegacyDriverHints.Hint.BRAKING_FORCE_SET_ZERO])
+        if not entry:
+            break
+        await _hold(_cab_logic.get_action(entry["control"], entry["gesture"]))
+    assert_false(_listed(MaszynaLegacyDriverHints.Hint.BRAKING_FORCE_SET_ZERO),
+            "the hinted keys release the train brakes: %s" % _story())
 
 
 ## The player walks through the cabs by `action` until `there`; the cab logic is the one of the

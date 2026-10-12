@@ -858,8 +858,18 @@ static func get_list(situation:MaszynaLegacyDriverTraction.Situation) -> Array[D
         if rear_cab and shown in REVERSER_SIDES:
             shown = REVERSER_SIDES[shown]
         var control:Array = CONTROLS[shown] if CONTROLS.has(shown) else [&"", CabinLogic.Gesture.PRESS]
-        if shown == Hint.BRAKING_FORCE_SET_ZERO and _released_by_ep(situation.vehicle):
-            control = EP_BRAKE_RELEASE_CONTROL
+        # releasing the train brakes releases the independent one too (DecBrake(),
+        # driverhints.cpp:863-871): once the handle stands released, the cylinders the independent
+        # brake keeps filled are what is left - its key, not the handle's that no longer moves
+        if shown == Hint.BRAKING_FORCE_SET_ZERO:
+            var ep:bool = _released_by_ep(situation.vehicle)
+            var brake:RailVehicleBrake = _brake(situation.vehicle)
+            if brake and brake.get_local_position_normalized() > 0.0 and absf(brake.get_controller_position()
+                    - brake.get_handle_position(RailVehicleBrake.HANDLE_POSITION_EP_RELEASE if ep
+                        else RailVehicleBrake.HANDLE_POSITION_DRIVE)) <= HANDLE_TOLERANCE:
+                control = CONTROLS[Hint.INDEPENDENT_BRAKE_RELEASE]
+            elif ep:
+                control = EP_BRAKE_RELEASE_CONTROL
         # a permit the preset switch gave is taken by it (ChangeDoorPermitPreset(), Mover.cpp:7762-7777):
         # towards the nearest preset of no doors - the switch applies a preset only as it moves, so
         # from that very preset through its neighbour (the permits the cab's deactivation gave,

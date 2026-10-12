@@ -40,6 +40,15 @@ const ENGINE_CHECK_NAMES:Dictionary[int, String] = {
     MaszynaLegacyAIDriver.EngineCheck.AIR: "main reservoir below %.1f bar",
 }
 
+## Why a vehicle of the trainset left the rails, as the stop reason's detail
+const DERAIL_CAUSE_NAMES:Dictionary[RailVehicleController.DerailCause, String] = {
+    RailVehicleController.DERAIL_CAUSE_NO_RAIL: "no rails",
+    RailVehicleController.DERAIL_CAUSE_CURVE: "overturned on a curve",
+    RailVehicleController.DERAIL_CAUSE_WIDE_GAUGE: "track too wide",
+    RailVehicleController.DERAIL_CAUSE_TRACK_CATEGORY: "wrong kind of track",
+    RailVehicleController.DERAIL_CAUSE_COLLISION: "collision",
+}
+
 ## The vehicle the player drives; an invalid RID while none
 var vehicle:RID = RID()
 ## The dark lamps' material, off while a lamp is lit
@@ -191,7 +200,19 @@ func _on_refresh_timer_timeout() -> void:
     # a stop ahead needs no words - the sign says it
     %StopReason.visible = stop and not stop_reason in [
             MaszynaLegacyDriverSpeed.StopReason.NONE, MaszynaLegacyDriverSpeed.StopReason.AHEAD]
-    if stop:
+    # a derailed vehicle of the trainset says so whatever the driver wants - it stands for good
+    var derailed:PackedStringArray = []
+    for car:RID in RailVehicleServer.vehicle_get_coupled(
+            vehicle, RailVehicleController.COUPLER_END_FRONT, RailVehicleController.COUPLING_FLAG_COUPLER):
+        var cause:RailVehicleController.DerailCause = (VehicleServer.vehicle_get_controller(car) as RailVehicleController).get_derail_cause()
+        if not cause == RailVehicleController.DERAIL_CAUSE_NONE and not tr(DERAIL_CAUSE_NAMES[cause]) in derailed:
+            derailed.append(tr(DERAIL_CAUSE_NAMES[cause]))
+    if derailed:
+        %StopReason.visible = true
+        %StopReasonValue.text = tr("Vehicle derailed")
+        %StopReasonDetail.text = ", ".join(derailed)
+        %StopReasonDetail.visible = true
+    elif stop:
         var detail:PackedStringArray = []
         match stop_reason:
             MaszynaLegacyDriverSpeed.StopReason.NOT_READY:

@@ -2086,3 +2086,30 @@ msgstr "Nie udało się uruchomić ekranów kabiny rysowanych przez skrypty Pyth
 
 msgid "Lazy loading (experimental)"
 msgstr "Leniwe ładowanie (eksperymentalne)"
+
+msgid "Hold the main pipe unlock button"
+msgstr "Przytrzymać przycisk odblokowania przewodu głównego"
+
+msgid "Deactivate the cabin at the other end"
+msgstr "Deaktywować kabinę na drugim końcu składu"
+
+msgid "Release the independent brake at the other end"
+msgstr "Odluźnić hamulec dodatkowy na drugim końcu składu"
+
+msgid "Vehicle derailed"
+msgstr "Pojazd wykolejony"
+
+msgid "no rails"
+msgstr "brak szyn"
+
+msgid "overturned on a curve"
+msgstr "przewrócony na łuku"
+
+msgid "track too wide"
+msgstr "za szeroki tor"
+
+msgid "wrong kind of track"
+msgstr "nieodpowiedni tor"
+
+msgid "collision"
+msgstr "zderzenie"

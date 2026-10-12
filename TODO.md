@@ -120,9 +120,9 @@
   position after the reverser (Driver.cpp:5778); the input action for `maxcurrent_sw` (Ctrl+F);
   `Engine:EngineMaxTemperature` (Mover.cpp:8306, not in the vendored Mover); the radio off after a
   Radio-Stop.
-* **Braking**: the braking test (`ForcePNBrake`, `DynamicBrakeTest`), unlocking the pipe before
-  the releaser (`control_main_pipe()`), individual release of an overcharged wagon, `manualbrakon`
-  on putting away, the weather's friction; why the eszelon almost stopped on n226 before E4 (x20).
+* **Braking**: the braking test (`ForcePNBrake`, `DynamicBrakeTest`), individual release of an
+  overcharged wagon, `manualbrakon` on putting away; why the eszelon almost stopped on n226 before
+  E4 (x20).
 * **Speed table**: passenger stop points, section and road speeds, stopping at an SBL, crossings,
   the switch branch of an event on a switch, the cargo train's distances; vehicles ahead - the scan
   from the rear end (Driver.cpp:6642), a signal beyond a vehicle ahead (`isforsomeoneelse`,
@@ -147,7 +147,7 @@
 * **Coupling and uncoupling - not checked on a scenery** (linia61, calkowo too heavy for a headless
   probe so far). Left: high voltage and power lines of a coupler number; `coupler_connect` joins in
   a fixed order; lights after the trainset changed (`CheckVehicles()`); `bh_EPB`; a coupling a
-  player left half done; margins of modern vehicles, the weather and a late train (`moveLate`).
+  player left half done.
 * **`movePrimary` is not ported** (`TController::primary()`, Driver.h:226-231): the others defer
   to it (Driver.cpp:2410-2430), only it runs the dynamic brake test (Driver.cpp:7856), and one
   moving through a gangway takes over (Driver.cpp:5870).

@@ -64,6 +64,8 @@ enum Hint {
     MASTER_CONTROLLER_SET_ZERO_SPEED,
     MASTER_CONTROLLER_SET_REVERSER_UNLOCK,
     TRAIN_BRAKE_SET_PIPE_UNLOCK,
+    ## Not the original's: it holds the button with no hint (control_main_pipe(), Driver.cpp:8252)
+    MAIN_PIPE_UNLOCK,
     TRAIN_BRAKE_RELEASE,
     TRAIN_BRAKE_APPLY,
     DIRECTION_FORWARD,
@@ -104,6 +106,9 @@ enum Hint {
     BRAKING_FORCE_LAP,
     INDEPENDENT_BRAKE_APPLY,
     INDEPENDENT_BRAKE_RELEASE,
+    ## Not the original's: a car of the trainset left with its own independent brake applied holds
+    ## it, released only from that car's cab
+    INDEPENDENT_BRAKE_RELEASE_OTHER_END,
     ANTISLIP,
     WAIT_LOAD_EXCHANGE,
     WAIT_DEPARTURE_TIME,
@@ -117,6 +122,9 @@ enum Hint {
     BUFFERS_COMPRESS,
     CAB_ACTIVATION,
     CAB_DEACTIVATION,
+    ## Not the original's: it asks for the deactivation in a cab that cannot do it - only the cab
+    ## with the control can (CabDeactivisation(), IsCabMaster(), Mover.cpp:2684)
+    CAB_DEACTIVATION_OTHER_END,
 }
 
 ## The vehicle of the driver's trainset a hint's device belongs to: the one it sits in
@@ -183,6 +191,7 @@ const TEXTS:Dictionary[Hint, String] = {
     Hint.MASTER_CONTROLLER_SET_ZERO_SPEED: "Set master controller to neutral",
     Hint.MASTER_CONTROLLER_SET_REVERSER_UNLOCK: "Set master controller to position %.0f",
     Hint.TRAIN_BRAKE_SET_PIPE_UNLOCK: "Set brake controller to pipe filling mode",
+    Hint.MAIN_PIPE_UNLOCK: "Hold the main pipe unlock button",
     Hint.TRAIN_BRAKE_RELEASE: "Release train brake",
     Hint.TRAIN_BRAKE_APPLY: "Apply train brake",
     Hint.DIRECTION_FORWARD: "Set reverser to forward",
@@ -223,6 +232,7 @@ const TEXTS:Dictionary[Hint, String] = {
     Hint.BRAKING_FORCE_LAP: "Lap train brake",
     Hint.INDEPENDENT_BRAKE_APPLY: "Apply independent brake",
     Hint.INDEPENDENT_BRAKE_RELEASE: "Release independent brake",
+    Hint.INDEPENDENT_BRAKE_RELEASE_OTHER_END: "Release the independent brake at the other end",
     Hint.ANTISLIP: "Apply anti slip brake",
     Hint.WAIT_LOAD_EXCHANGE: "Wait for passenger exchange to complete",
     Hint.WAIT_DEPARTURE_TIME: "Wait for departure time",
@@ -236,6 +246,7 @@ const TEXTS:Dictionary[Hint, String] = {
     Hint.BUFFERS_COMPRESS: "Apply tractive force to compress buffers",
     Hint.CAB_ACTIVATION: "Activate cabin",
     Hint.CAB_DEACTIVATION: "Deactivate cabin",
+    Hint.CAB_DEACTIVATION_OTHER_END: "Deactivate the cabin at the other end",
 }
 
 ## A switch of the cab: the switch of a hint and the position it wants
@@ -381,10 +392,13 @@ const CONTROLS:Dictionary = {
     Hint.DOOR_LEFT_OPEN: [&"door_left_sw", CabinLogic.Gesture.PRESS],
     Hint.DOOR_LEFT_CLOSE: [&"door_left_sw", CabinLogic.Gesture.PRESS],
     # a permit is revoked by closing the doors (Mover.cpp:8745-8749) - a push permit button only
-    # grants (Train.cpp:7213-7220), so the revoking hints have no key
+    # grants (Train.cpp:7213-7220), so the revoking hints have no key; but the preset switch's,
+    # where the vehicle has one (get_list())
     Hint.DOOR_RIGHT_PERMIT_ON: [&"doorrightpermit_sw", CabinLogic.Gesture.PRESS],
     Hint.DOOR_LEFT_PERMIT_ON: [&"doorleftpermit_sw", CabinLogic.Gesture.PRESS],
     Hint.HORN_ON: [&"hornlow_bt", CabinLogic.Gesture.PRESS],
+    Hint.CONSIST_HEATING_ON: [&"trainheating_sw", CabinLogic.Gesture.PRESS],
+    Hint.CONSIST_HEATING_OFF: [&"trainheating_sw", CabinLogic.Gesture.PRESS],
     Hint.SECURITY_SYSTEM_RESET: [SECURITY_RESET, CabinLogic.Gesture.PRESS],
     Hint.SHP_SYSTEM_RESET: [CABSIGNAL_RESET, CabinLogic.Gesture.PRESS],
     Hint.SECOND_CONTROLLER_SET_ZERO: [SECOND_CONTROLLER, CabinLogic.Gesture.DECREASE],
@@ -445,8 +459,9 @@ const GROUPS:Dictionary = {
 const OPPOSITES:Dictionary = {
     Hint.BATTERY_ON: [Hint.BATTERY_OFF],
     Hint.BATTERY_OFF: [Hint.BATTERY_ON],
-    Hint.CAB_ACTIVATION: [Hint.CAB_DEACTIVATION],
-    Hint.CAB_DEACTIVATION: [Hint.CAB_ACTIVATION],
+    Hint.CAB_ACTIVATION: [Hint.CAB_DEACTIVATION, Hint.CAB_DEACTIVATION_OTHER_END],
+    Hint.CAB_DEACTIVATION: [Hint.CAB_ACTIVATION, Hint.CAB_DEACTIVATION_OTHER_END],
+    Hint.CAB_DEACTIVATION_OTHER_END: [Hint.CAB_ACTIVATION, Hint.CAB_DEACTIVATION],
     Hint.RADIO_ON: [Hint.RADIO_OFF],
     Hint.RADIO_OFF: [Hint.RADIO_ON],
     Hint.OIL_PUMP_ON: [Hint.OIL_PUMP_OFF],
@@ -527,6 +542,14 @@ const SECURITY_RESET:StringName = &"security_reset_bt"
 const CABSIGNAL_RESET:StringName = &"shp_reset_bt"
 const RELEASER:StringName = &"releaser_bt"
 const TRAIN_BRAKE:StringName = &"brakectrl"
+## The light selector (lights_sw, Train.cpp:5220) and the hints it lights
+const LIGHT_SELECTOR:StringName = &"lights_sw"
+const LIGHT_CODES:Array[Hint] = [Hint.HEADCODE_PC1, Hint.HEADCODE_PC2, Hint.HEADCODE_PC5, Hint.HEADCODE_TB1, Hint.LIGHTS_OFF]
+## The door permit preset switch (Train.cpp:11853) and its preset of no doors (DoorPermitList=)
+const DOOR_PERMIT_PRESET:StringName = &"doorpermitpreset_sw"
+const NO_DOORS_PERMITTED:int = 0
+## The universal brake buttons' cab controls, by their number 1-3 (Train.cpp:11838)
+const UNIVERSAL_BRAKE_BUTTON:String = "universalbrake%d_bt"
 ## Releasing an EP brake: the handle down to its EP releasing position, below the driving one,
 ## which only holds the EP brake applied (TFVel6 bh_EPN = bh_RP, hamulce.cpp:34)
 const EP_BRAKE_RELEASE_CONTROL:Array = [TRAIN_BRAKE, CabinLogic.Gesture.DECREASE]
@@ -549,6 +572,8 @@ const HORN_LOW:int = 1
 const HORN_HIGH:int = 2
 ## The departure signal no longer matters past this speed [km/h] (driverhints.cpp:1040)
 const DEPARTURE_SIGNAL_MAX_SPEED:float = 5.0
+## No power comes from an EIM controller at or under this share (IsPower, Mover.cpp:7273)
+const NO_POWER_EIMIC:float = 0.005
 ## The train brake handle counts as at a position within this (is_equal(..., 0.2),
 ## driverhints.cpp:805, 856, 868)
 const HANDLE_TOLERANCE:float = 0.2
@@ -705,10 +730,6 @@ static func cue(situation:MaszynaLegacyDriverTraction.Situation, hint:Hint, para
                 if not done:
                     CabinSystem.act(cabin, CABSIGNAL_RESET, &"hold")
                     CabinSystem.act(cabin, CABSIGNAL_RESET, &"release")
-            # the handle to its driving position; the state does not tell that position, so it is
-            # held there on every cue
-            Hint.TRAIN_BRAKE_RELEASE:
-                CabinSystem.act(cabin, TRAIN_BRAKE_RELEASE, &"hold")
             Hint.TRAIN_BRAKE_APPLY:
                 situation.braking.apply_train_brake()
             Hint.INDEPENDENT_BRAKE_RELEASE:
@@ -839,6 +860,41 @@ static func get_list(situation:MaszynaLegacyDriverTraction.Situation) -> Array[D
         var control:Array = CONTROLS[shown] if CONTROLS.has(shown) else [&"", CabinLogic.Gesture.PRESS]
         if shown == Hint.BRAKING_FORCE_SET_ZERO and _released_by_ep(situation.vehicle):
             control = EP_BRAKE_RELEASE_CONTROL
+        # a permit the preset switch gave is taken by it (ChangeDoorPermitPreset(), Mover.cpp:7762-7777):
+        # towards the nearest preset of no doors - the switch applies a preset only as it moves, so
+        # from that very preset through its neighbour (the permits the cab's deactivation gave,
+        # InactiveCabFlag doorpermition, Mover.cpp:2690-2694)
+        if shown in [Hint.DOOR_LEFT_PERMIT_OFF, Hint.DOOR_RIGHT_PERMIT_OFF]:
+            var doors:RailVehicleDoors = _doors(situation.vehicle)
+            if doors and doors.permit_list:
+                var current:int = doors.get_permit_preset()
+                var target:int = current
+                for index:int in doors.permit_list.size():
+                    if int(doors.permit_list[index]) == NO_DOORS_PERMITTED \
+                            and (target == current or absi(index - current) < absi(target - current)):
+                        target = index
+                var upwards:bool = target > current or (target == current and current < doors.permit_list.size() - 1)
+                control = [DOOR_PERMIT_PRESET, CabinLogic.Gesture.INCREASE if upwards else CabinLogic.Gesture.DECREASE]
+        # a lamp code set by the light selector, where the vehicle has one (LightsList): its key
+        # towards the preset that shows it - in an active cab: an inactive one shows its red
+        # markers whatever the preset (InactiveCabFlag redmarkers, SetLights(), DynObj.cpp:7324)
+        if shown in LIGHT_CODES and not _active_cab(situation.vehicle) == 0:
+            var preset:int = MaszynaLegacyDriverLights.light_preset(situation, shown)
+            var lighting:RailVehicleLighting = VehicleServer.vehicle_component_get(
+                    situation.vehicle, VehicleComponentType.COMPONENT_LIGHTING) as RailVehicleLighting
+            if preset >= 0:
+                control = [LIGHT_SELECTOR, CabinLogic.Gesture.INCREASE if preset > lighting.get_position() - 1
+                        else CabinLogic.Gesture.DECREASE]
+        # the universal brake button the vehicle unlocks its main pipe with (UniversalBrakeButtonFlag,
+        # ub_UnlockPipe)
+        if shown == Hint.MAIN_PIPE_UNLOCK:
+            var brake:RailVehicleBrake = _brake(situation.vehicle)
+            var buttons:Array[int] = [brake.universal_brake_button_1, brake.universal_brake_button_2,
+                    brake.universal_brake_button_3]
+            for index:int in buttons.size():
+                if buttons[index] & MaszynaLegacyDriverBraking.UNIVERSAL_UNLOCK_PIPE:
+                    control = [StringName(UNIVERSAL_BRAKE_BUTTON % (index + 1)), CabinLogic.Gesture.PRESS]
+                    break
         listed.append({
             "hint": queued.hint,
             "text": TEXTS[shown],
@@ -867,7 +923,7 @@ static func is_done(situation:MaszynaLegacyDriverTraction.Situation, hint:Hint, 
         Hint.CAB_ACTIVATION:
             var master:RailVehicleMasterController = MaszynaLegacyDriverTraction.master_controller(vehicle)
             return master == null or master.get_cabin_controleable()
-        Hint.CAB_DEACTIVATION:
+        Hint.CAB_DEACTIVATION, Hint.CAB_DEACTIVATION_OTHER_END:
             return _active_cab(vehicle) == 0
         Hint.RADIO_ON, Hint.RADIO_OFF:
             var radio:RailVehicleRadio = VehicleServer.vehicle_component_get(
@@ -1021,6 +1077,9 @@ static func is_done(situation:MaszynaLegacyDriverTraction.Situation, hint:Hint, 
             var brake:RailVehicleBrake = _brake(vehicle)
             return brake == null or brake.main_pipe_minimum_unblocking_handle_position == PIPE_UNLOCK_NONE \
                     or situation.braking.position == brake.main_pipe_minimum_unblocking_handle_position
+        Hint.MAIN_PIPE_UNLOCK:
+            var brake:RailVehicleBrake = _brake(vehicle)
+            return brake == null or not brake.get_main_pipe_locked()
         Hint.SPRING_BRAKE_ON, Hint.SPRING_BRAKE_OFF:
             var spring_brake:RailVehicleSpringBrake = RailVehicleServer.vehicle_component_get(
                     vehicle, RailVehicleComponentType.COMPONENT_SPRING_BRAKE) as RailVehicleSpringBrake
@@ -1040,16 +1099,37 @@ static func is_done(situation:MaszynaLegacyDriverTraction.Situation, hint:Hint, 
             var master:RailVehicleMasterController = MaszynaLegacyDriverTraction.master_controller(controlling)
             if master == null:
                 return true
+            # the second controller is off power at 0, or whatever its position under the speed
+            # control (IsScndCtrlNoPowerPos(), Mover.cpp:2639-2641)
+            var control:RailVehicleSpeedControl = RailVehicleServer.vehicle_component_get(
+                    controlling, RailVehicleComponentType.COMPONENT_SPEED_CONTROL) as RailVehicleSpeedControl
+            var second_off:bool = master.get_second_position() == 0 or (control != null and control.speed_control_enabled)
             # a diesel with a gearbox is off power where its own ZeroSpeed() stops - on a position
             # without the clutch in (DecSpeed(), Driver.cpp:3740-3749), never at 0, where its engine
-            # gets no fuel; the original's check (IsMainCtrlNoPowerPos()) sent a player there
+            # gets no fuel; the original's check (IsMainCtrlNoPowerPos()) sent a player there. A
+            # universal controller is off power up to UniCtrlNoPowerPos (Mover.cpp:2496-2498): its
+            # lower positions are the train brake's (UCList IntegratedBrakePN, SA132), and a
+            # "neutral" asked there could never let the brake be released
             var diesel:RailVehicleDieselEngine = _diesel(controlling)
             var position:int = master.get_main_position()
+            # differs from the original: a universal controller is off power on its holding positions
+            # too while no power comes (eimic_real, IsPower, Mover.cpp:7273) - the SA132's 4, where
+            # its train brake releases and the original's own driver puts it (CheckTimeControllers()
+            # 5.1, DecBrakeEIM(), Driver.cpp:3396-3400, 4304-4321). Only up to UniCtrlNoPowerPos, the
+            # player was sent to lap and "release" the brake from there for ever
+            var universal:RailVehicleUniversalController = RailVehicleServer.vehicle_component_get(
+                    controlling, RailVehicleComponentType.COMPONENT_UNIVERSAL_CONTROLLER) as RailVehicleUniversalController
+            var engine:RailVehicleEngine = _engine(controlling)
+            if universal and engine and position < universal.positions.size() and second_off \
+                    and (universal.positions[position] as RailVehicleUniversalControllerListItem).target_value <= 0.0 \
+                    and engine.get_eimic_real() <= NO_POWER_EIMIC:
+                return true
             if diesel and diesel.get_type() == RailVehicleEngine.DIESEL \
+                    and diesel.cntrl_eim_control_type == RailVehicleEngine.EIM_CONTROL_TYPE_0 \
                     and position < diesel.throttle_table_positions.size():
                 return (diesel.throttle_table_positions[position] as RailVehicleThrottlePositionItem).clutch_behavior \
-                        == RailVehicleThrottlePositionItem.CLUTCH_BEHAVIOR_NONE and master.get_second_position() == 0
-            return position <= master.get_main_no_power_position() and master.get_second_position() == 0
+                        == RailVehicleThrottlePositionItem.CLUTCH_BEHAVIOR_NONE and second_off
+            return position <= master.get_main_no_power_position() and second_off
         Hint.MASTER_CONTROLLER_SET_REVERSER_UNLOCK:
             var master:RailVehicleMasterController = MaszynaLegacyDriverTraction.master_controller(controlling)
             return master == null or master.get_main_position() <= master.direction_change_max_position
@@ -1105,9 +1185,13 @@ static func is_done(situation:MaszynaLegacyDriverTraction.Situation, hint:Hint, 
             var left:bool = hint == Hint.DOOR_LEFT_PERMIT_ON or hint == Hint.DOOR_LEFT_PERMIT_OFF
             var permitted:bool = doors != null and (doors.get_left_open_permit() if left else doors.get_right_open_permit())
             return doors == null or permitted == (hint == Hint.DOOR_RIGHT_PERMIT_ON or hint == Hint.DOOR_LEFT_PERMIT_ON)
+        # differs from the original, done once the vigilance alone stops (driverhints.cpp:1206): it is
+        # cued for the cab signal as well (is_blinking(), Driver.cpp:6397), and with no button of
+        # its own the cab signal is acknowledged by this one - an SHP flashing alone hinted nothing
         Hint.SECURITY_SYSTEM_RESET:
             var security:RailVehicleSecuritySystem = _security(vehicle)
-            return security == null or not security.get_vigilance_blinking()
+            return security == null or not (security.get_vigilance_blinking()
+                    or (security.get_cabsignal_blinking() and not security.get_separate_acknowledge()))
         Hint.SHP_SYSTEM_RESET:
             var security:RailVehicleSecuritySystem = _security(vehicle)
             return security == null or not security.get_cabsignal_blinking()
@@ -1160,6 +1244,12 @@ static func is_done(situation:MaszynaLegacyDriverTraction.Situation, hint:Hint, 
         Hint.INDEPENDENT_BRAKE_RELEASE:
             var brake:RailVehicleBrake = _brake(vehicle)
             return brake == null or brake.get_local_position_normalized() < RELEASED_LOCAL_BRAKE
+        Hint.INDEPENDENT_BRAKE_RELEASE_OTHER_END:
+            for car:RID in situation.trainset.vehicles:
+                var brake:RailVehicleBrake = _brake(car)
+                if not car == vehicle and brake and brake.get_local_position_normalized() >= RELEASED_LOCAL_BRAKE:
+                    return false
+            return true
         Hint.RELEASER_ON, Hint.RELEASER_OFF:
             var brake:RailVehicleBrake = _brake(vehicle)
             return brake == null or brake.get_releaser_active() == (hint == Hint.RELEASER_ON)

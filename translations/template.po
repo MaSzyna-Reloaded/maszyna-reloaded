@@ -2086,3 +2086,30 @@ msgstr ""
 
 msgid "Lazy loading (experimental)"
 msgstr ""
+
+msgid "Hold the main pipe unlock button"
+msgstr ""
+
+msgid "Deactivate the cabin at the other end"
+msgstr ""
+
+msgid "Release the independent brake at the other end"
+msgstr ""
+
+msgid "Vehicle derailed"
+msgstr ""
+
+msgid "no rails"
+msgstr ""
+
+msgid "overturned on a curve"
+msgstr ""
+
+msgid "track too wide"
+msgstr ""
+
+msgid "wrong kind of track"
+msgstr ""
+
+msgid "collision"
+msgstr ""

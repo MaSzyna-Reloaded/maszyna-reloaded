@@ -16,8 +16,7 @@ class_name MaszynaLegacyDriverBraking
 ##
 ## Not ported yet: the electro-pneumatic and the EMU/DMU braking, the time-controlled handles
 ## (MHZ_K5P, MHZ_6P, M394, H14K1, St113, H1405 - moved every frame in the original), the manual
-## brake and the spring brake let off by the crew, the pipe unlocking before the releaser, the
-## weather's friction - see TODO.md, "Drivers".
+## brake and the spring brake let off by the crew - see TODO.md, "Drivers".
 
 ## BrakeCtrlPosition: lap, charging, running, and the range (gbh_*, Driver.h:196-200)
 const POSITION_LAP:float = -2.0
@@ -205,12 +204,18 @@ const TIME_HANDLE_TOLERANCE:float = 0.05
 const UNIVERSAL_HIGH_PRESSURE:int = 0x04
 const UNIVERSAL_OVERLOAD:int = 0x08
 const CHARGING_TOLERANCE:float = 0.5
+## The universal brake button's flag that unlocks the main pipe (ub_UnlockPipe, hamulce.h:151),
+## pressed while the driver wants more than this [m/s2] (control_main_pipe(), Driver.cpp:8254)
+const UNIVERSAL_UNLOCK_PIPE:int = 0x02
+const PIPE_UNLOCK_ACCELERATION:float = -0.03
 
 ## The driver brakes from this BrakeCtrlPosition on (Driver.cpp:3131, 4188, 4313)
 const BRAKING_FROM:float = 0.1
 
 ## BrakeCtrlPosition
 var position:float = POSITION_RUNNING
+## UniversalBrakeButtons' ub_UnlockPipe: the main pipe's lock held open
+var _unlocking_pipe:bool = false
 ## fBrakeTime [s]
 var delay:float = 0.0
 ## fAccThreshold [m/s2]: braking starts past it
@@ -321,17 +326,19 @@ func distance_multiplier(
     target:float, vehicle_speed:float, trainset:MaszynaLegacyDriverTrainset,
     trainset_type:RailVehicleServer.TrainsetType
 ) -> float:
+    # wet or snowy rails grip less: everything the longer (1 / Global.FrictionWeatherFactor, Driver.cpp:1733)
+    var weather:float = 1.0 / SimulationServer.simulation_get_weather_friction_factor()
     if target > FAST_TARGET:
-        return 1.0
+        return weather
     if target < STOP_TARGET:
         if _dmu and vehicle_speed < DMU_EASING_SPEED and target == 0.0:
             var most:float = clampf(1.0 + trainset.vehicles.size() * DMU_MULTIPLIER_PER_VEHICLE, DMU_MULTIPLIER_MIN, DMU_MULTIPLIER_MAX)
-            return lerpf(most, 1.0, vehicle_speed / DMU_EASING_SPEED)
+            return lerpf(most, 1.0, vehicle_speed / DMU_EASING_SPEED) * weather
         if _a0[1] > MULTIPLIER_A0 and (trainset_type == RailVehicleServer.TRAINSET_TYPE_CARGO
                 or trainset.gravity_acceleration > DOWNHILL_GRAVITY):
-            return lerpf(1.0, STOP_MULTIPLIER, clampf((_a0[1] - MULTIPLIER_A0) / MULTIPLIER_A0, 0.0, 1.0))
-        return 1.0
-    return lerpf(MOST_MULTIPLIER, 1.0, (target - STOP_TARGET) / MULTIPLIER_SPAN)
+            return lerpf(1.0, STOP_MULTIPLIER, clampf((_a0[1] - MULTIPLIER_A0) / MULTIPLIER_A0, 0.0, 1.0)) * weather
+        return weather
+    return lerpf(MOST_MULTIPLIER, 1.0, (target - STOP_TARGET) / MULTIPLIER_SPAN) * weather
 
 
 ## CheckVehicles() 4. (Driver.cpp:2284-2300): the whole train's deceleration by the brakes at a
@@ -419,9 +426,9 @@ func _set_brake_delays(vehicle:RID, trainset:MaszynaLegacyDriverTrainset, in_con
 ## (control_braking_force(), Driver.cpp:8065-8177)
 func control(situation:MaszynaLegacyDriverTraction.Situation, elapsed:float) -> void:
     delay -= elapsed
-    # the train brake is never left locked (Driver.cpp:7949-7951)
+    # the train brake is never left locked (Driver.cpp:7950-7952)
     if position == POSITION_LAP:
-        position = POSITION_RUNNING
+        MaszynaLegacyDriverHints.cue(situation, MaszynaLegacyDriverHints.Hint.TRAIN_BRAKE_RELEASE, 0.0, release_train_brake)
     # the brakes are not touched while the buffers are pressed to uncouple
     if situation.pressing:
         return
@@ -554,7 +561,8 @@ func set_time_controllers(situation:MaszynaLegacyDriverTraction.Situation) -> vo
     _hold_universal_controller(situation)
     # the universal buttons: high pressure and overload while charging (Driver.cpp:4248-4258)
     var charging:bool = absf(position - POSITION_CHARGING) < CHARGING_TOLERANCE
-    var pressed:int = UNIVERSAL_HIGH_PRESSURE | UNIVERSAL_OVERLOAD if charging else 0
+    var pressed:int = (UNIVERSAL_HIGH_PRESSURE | UNIVERSAL_OVERLOAD if charging else 0) \
+            | (UNIVERSAL_UNLOCK_PIPE if _unlocking_pipe else 0)
     var buttons:Array[int] = [brake.universal_brake_button_1, brake.universal_brake_button_2, brake.universal_brake_button_3]
     for index:int in buttons.size():
         MaszynaLegacyDriverHints.send(vehicle, "universal_brake_button", index, bool(pressed & buttons[index]))
@@ -565,6 +573,53 @@ func set_time_controllers(situation:MaszynaLegacyDriverTraction.Situation) -> vo
 ## (TODO.md).
 func apply_train_brake() -> void:
     position = POSITION_UNCOUPLING
+
+
+## trainbrakerelease's action (driverhints.cpp:796-800): the driver's own level to running - the
+## handle follows it in the time controllers, never the handle itself
+func release_train_brake() -> void:
+    position = POSITION_RUNNING
+
+
+## control_main_pipe() (Driver.cpp:8252-8261): the main pipe unlocked while the driver wants to go,
+## let go once it is. Differs from the original, which holds the button with no hint, only to go and
+## only once ready: the train brake handle at running cannot release on a locked, empty pipe - a
+## player told to stand was sent round "release" and "neutral" for ever (SA132,
+## MASZYNA_ORIGINAL_QUIRKS.md) - once the main reservoir has the air to fill it
+func control_main_pipe(situation:MaszynaLegacyDriverTraction.Situation) -> void:
+    var brake:RailVehicleBrake = _brake(situation.vehicle)
+    if brake == null:
+        return
+    # only the cab that drives fills the pipe through its handle (IsCabMaster())
+    var master:RailVehicleMasterController = MaszynaLegacyDriverTraction.master_controller(situation.vehicle)
+    if not brake.get_main_pipe_locked():
+        _unlocking_pipe = false
+    elif master and master.get_cabin_controleable() and (situation.speed.acceleration_desired > PIPE_UNLOCK_ACCELERATION or absf(brake.get_controller_position()
+                - brake.get_handle_position(RailVehicleBrake.HANDLE_POSITION_DRIVE)) <= MaszynaLegacyDriverHints.HANDLE_TOLERANCE) \
+            and MaszynaLegacyDriverHints.is_done(situation, MaszynaLegacyDriverHints.Hint.WAIT_PRESSURE_TOO_LOW, 0.0):
+        MaszynaLegacyDriverHints.cue(situation, MaszynaLegacyDriverHints.Hint.MAIN_PIPE_UNLOCK, 0.0, unlock_main_pipe)
+
+
+## mainpipeunlock's action: the universal brake button that unlocks the main pipe held, from the
+## next time controllers on, until the pipe is unlocked (control_main_pipe(), Driver.cpp:8255-8257)
+func unlock_main_pipe() -> void:
+    _unlocking_pipe = true
+
+
+## The driver's own level taken from the handle where the handle stands at running, lap or charging
+## ("sync virtual brake state with the 'real' one", Driver.cpp:2867-2878): the positions compared as
+## whole numbers, the first of them that matches wins
+func take_handle_position(vehicle:RID) -> void:
+    var brake:RailVehicleBrake = _brake(vehicle)
+    if brake == null or brake.cntrl_brake_handle_type == RailVehicleBrake.BRAKE_HANDLE_TYPE_NO_HANDLE:
+        return
+    var handle:int = int(brake.get_controller_position())
+    if handle == int(brake.get_handle_position(RailVehicleBrake.HANDLE_POSITION_DRIVE)):
+        position = POSITION_RUNNING
+    elif handle == int(brake.get_handle_position(RailVehicleBrake.HANDLE_POSITION_CUTOFF)):
+        position = POSITION_LAP
+    elif handle == int(brake.get_handle_position(RailVehicleBrake.HANDLE_POSITION_FILLING)):
+        position = POSITION_CHARGING
 
 
 ## independentbrakerelease's action (driverhints.cpp:901-910): the local brake off
@@ -939,8 +994,7 @@ func apply_independent_brake_only(situation:MaszynaLegacyDriverTraction.Situatio
             if brake.get_local_position_normalized() < most:
                 _set_local_brake(vehicle, situation.cabin, most))
     else:
-        # trainbrakerelease (driverhints.cpp:796-799): the driver's own level to running
-        MaszynaLegacyDriverHints.cue(situation, MaszynaLegacyDriverHints.Hint.TRAIN_BRAKE_RELEASE, 0.0, func() -> void: position = POSITION_RUNNING)
+        MaszynaLegacyDriverHints.cue(situation, MaszynaLegacyDriverHints.Hint.TRAIN_BRAKE_RELEASE, 0.0, release_train_brake)
 
 
 ## IncLocalBrakeLevel()/DecLocalBrakeLevel() through the knob; true when it moved

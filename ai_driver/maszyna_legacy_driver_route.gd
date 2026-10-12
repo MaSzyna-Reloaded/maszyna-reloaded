@@ -52,6 +52,14 @@ const TRAIN_MAX_BASE:float = 10.0
 const TRAIN_MAX_LOW:float = 15.0
 const TRAIN_MAX_HIGH:float = 40.0
 const CARGO_PROXIMITY:float = 10.0
+## A vehicle braking by an EIM controller keeps this much further when shunting (Driver.cpp:6717-6721),
+## and a trainset of more than one vehicle under rain or snow this much further (Driver.cpp:6722-6727,
+## 6759-6764) [m]
+const MODERN_PROXIMITY:float = 5.0
+const WEATHER_PROXIMITY:float = 5.0
+## A late train's speed margins (moveLate, Driver.cpp:6772-6777) [km/h]
+const LATE_VELOCITY_MINUS:float = 1.0
+const LATE_VELOCITY_PLUS:float = 5.0
 const STANDING_MAX_PROXIMITY:float = 50.0
 const STANDING_SPEED:float = 0.1
 const CONNECT_MIN_PROXIMITY:float = 2.0
@@ -282,8 +290,9 @@ func update(
     # IsCargoTrain (Driver.cpp:2303): keeps further from a stop, leaves a passenger stop at once
     var trainset_type:RailVehicleServer.TrainsetType = RailVehicleServer.trainset_get_type(vehicle)
     var cargo:bool = trainset_type == RailVehicleServer.TRAINSET_TYPE_CARGO
+    # moveLate: late on leaving the last station (UpdateDelayFlag(), Driver.cpp:5683-5692)
     _determine_distances(vehicle, order, speed, trainset, shunt_velocity, velocity_desired, coupling, cargo,
-            braking.acceleration_threshold)
+            braking.acceleration_threshold, timetable.latency < 0.0)
     reach = maxf(MIN_RANGE, MOVING_RANGE + brake_distance if absf(speed) > MOVEMENT_SPEED else STANDING_RANGE)
     var front_along:float = _front_along
     _update_table(reach, trainset)
@@ -857,11 +866,11 @@ func _is_proper_semaphore(kind:Kind, obey_train:bool) -> bool:
     return kind == Kind.SEMAPHORE or kind == Kind.SHUNT_SEMAPHORE or kind == Kind.OUTSIDE_STATION
 
 
-## determine_braking_distance(), determine_proximity_ranges() (Driver.cpp:6597-6812); the original's
-## margins for modern vehicles and for the weather are not ported (TODO.md)
+## determine_braking_distance(), determine_proximity_ranges() (Driver.cpp:6597-6812), with the
+## margins of an EIM controller, of the weather and of a late train
 func _determine_distances(
     vehicle:RID, order:int, speed:float, trainset:MaszynaLegacyDriverTrainset, shunt_velocity:float,
-    velocity_desired:float, coupling:bool, cargo:bool, acceleration_threshold:float
+    velocity_desired:float, coupling:bool, cargo:bool, acceleration_threshold:float, late:bool
 ) -> void:
     var velocity_ceiling:float = maxf(BRAKING_SPEED_FLOOR, ceilf(absf(speed)))
     brake_distance = DRIVER_BRAKING * velocity_ceiling * (BRAKING_SPEED_OFFSET + velocity_ceiling)
@@ -875,6 +884,9 @@ func _determine_distances(
     if brake and brake.get_delay_setting() == MaszynaLegacyDriverBraking.DELAY_SETTING_G:
         brake_distance += G_REACTION_FACTOR * velocity_ceiling
     var vehicles:float = trainset.vehicles.size()
+    # Global.FrictionWeatherFactor < 1: rain or snow, a trainset of more than one vehicle keeps further
+    var weather_margin:float = WEATHER_PROXIMITY \
+            if SimulationServer.simulation_get_weather_friction_factor() < 1.0 and vehicles > 1 else 0.0
     match order:
         MaszynaLegacyAIDriver.Order.CONNECT:
             if coupling:
@@ -885,16 +897,23 @@ func _determine_distances(
         MaszynaLegacyAIDriver.Order.DISCONNECT:
             _set_ranges(DISCONNECT_MIN_PROXIMITY, DISCONNECT_MAX_PROXIMITY, CLOSE_VELOCITY_PLUS, CLOSE_VELOCITY_MINUS)
         MaszynaLegacyAIDriver.Order.SHUNT:
-            _set_ranges(minf(SHUNT_MIN_BASE + vehicles, SHUNT_MIN_MAX), minf(SHUNT_MAX_BASE + vehicles, SHUNT_MAX_MAX),
+            # modern vehicles might brake slower at low speeds (EIMCtrlType > 0, Driver.cpp:6717-6721)
+            var engine:RailVehicleEngine = VehicleServer.vehicle_component_get(
+                    RailVehicleServer.vehicle_find_powered(vehicle), VehicleComponentType.COMPONENT_ENGINE) as RailVehicleEngine
+            var modern_margin:float = MODERN_PROXIMITY \
+                    if engine and not engine.cntrl_eim_control_type == RailVehicleEngine.EIM_CONTROL_TYPE_0 else 0.0
+            _set_ranges(minf(SHUNT_MIN_BASE + vehicles, SHUNT_MIN_MAX) + modern_margin + weather_margin,
+                    minf(SHUNT_MAX_BASE + vehicles, SHUNT_MAX_MAX) + modern_margin + weather_margin,
                     SHUNT_VELOCITY_PLUS, minf(SHUNT_VELOCITY_MINUS_SHARE * shunt_velocity, SHUNT_VELOCITY_MINUS_MAX))
         MaszynaLegacyAIDriver.Order.LOOSE_SHUNT:
             _set_ranges(COUPLING_MIN_PROXIMITY, COUPLING_MAX_PROXIMITY, SHUNT_VELOCITY_PLUS, CLOSE_VELOCITY_MINUS)
         MaszynaLegacyAIDriver.Order.OBEY_TRAIN:
-            var extra:float = CARGO_PROXIMITY if cargo else 0.0
+            var extra:float = (CARGO_PROXIMITY if cargo else 0.0) + weather_margin
+            # a late train presses on (moveLate, Driver.cpp:6772-6777)
             _set_ranges(clampf(TRAIN_MIN_BASE + vehicles, TRAIN_MIN_LOW, TRAIN_MIN_HIGH) + extra,
                     clampf(TRAIN_MAX_BASE + vehicles, TRAIN_MAX_LOW, TRAIN_MAX_HIGH) + extra,
-                    clampf(ceilf(TRAIN_VELOCITY_SHARE * velocity_desired), TRAIN_VELOCITY_PLUS_LOW, TRAIN_VELOCITY_HIGH),
-                    clampf(roundf(TRAIN_VELOCITY_SHARE * velocity_desired), TRAIN_VELOCITY_MINUS_LOW, TRAIN_VELOCITY_HIGH))
+                    LATE_VELOCITY_PLUS if late else clampf(ceilf(TRAIN_VELOCITY_SHARE * velocity_desired), TRAIN_VELOCITY_PLUS_LOW, TRAIN_VELOCITY_HIGH),
+                    LATE_VELOCITY_MINUS if late else clampf(roundf(TRAIN_VELOCITY_SHARE * velocity_desired), TRAIN_VELOCITY_MINUS_LOW, TRAIN_VELOCITY_HIGH))
             if absf(speed) < STANDING_SPEED:
                 # stood too far: it does not draw up the last metres
                 max_proximity = STANDING_MAX_PROXIMITY

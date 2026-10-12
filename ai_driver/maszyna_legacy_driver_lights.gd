@@ -89,6 +89,50 @@ static func off(situation:MaszynaLegacyDriverTraction.Situation) -> void:
     _light(situation, 0, 0)
 
 
+## The light selector's preset (0-based) nearest to the one it stands at whose lamps show a lamp
+## code hint's pattern - the first column at the end driven from, the second at the other, whichever
+## the cab (SetLights(), RaLightsSet(), DynObj.cpp:7322-7380); -1 on a vehicle without a selector or
+## without such a preset
+static func light_preset(situation:MaszynaLegacyDriverTraction.Situation, hint:MaszynaLegacyDriverHints.Hint) -> int:
+    var lighting:RailVehicleLighting = VehicleServer.vehicle_component_get(
+            situation.vehicle, VehicleComponentType.COMPONENT_LIGHTING) as RailVehicleLighting
+    var presets:Array = lighting.get_lights_list() if lighting else []
+    var current:int = lighting.get_position() - 1 if lighting else 0
+    var found:int = -1
+    for index:int in presets.size():
+        var item:RailVehicleLightListItem = presets[index]
+        var head:int = _preset_pattern(item, true)
+        var rear:int = _preset_pattern(item, false)
+        var shows_hint:bool = false
+        match hint:
+            MaszynaLegacyDriverHints.Hint.HEADCODE_PC1:
+                shows_hint = head == PC1
+            MaszynaLegacyDriverHints.Hint.HEADCODE_PC2:
+                shows_hint = head == PC2
+            MaszynaLegacyDriverHints.Hint.HEADCODE_PC5:
+                shows_hint = (rear & RED_MARKERS) == RED_MARKERS
+            MaszynaLegacyDriverHints.Hint.HEADCODE_TB1:
+                var tb1:Vector2i = _tb1(situation)
+                shows_hint = head == tb1.x and rear == tb1.y
+            MaszynaLegacyDriverHints.Hint.LIGHTS_OFF:
+                shows_hint = head == 0 and rear == 0
+        if shows_hint and (found < 0 or absi(index - current) < absi(found - current)):
+            found = index
+    return found
+
+
+## A preset's lamps of its first (`head`) or second column, as the original's bits (the LightsList
+## row, MoverRailVehicleLighting)
+static func _preset_pattern(item:RailVehicleLightListItem, head:bool) -> int:
+    if head:
+        return (HEADLIGHT_UPPER if item.cabin_a_head_light else 0) | (HEADLIGHT_LEFT if item.cabin_a_left_white_signal else 0) \
+                | (REDMARKER_LEFT if item.cabin_a_left_red_signal else 0) | (HEADLIGHT_RIGHT if item.cabin_a_right_white_signal else 0) \
+                | (REDMARKER_RIGHT if item.cabin_a_right_red_signal else 0) | (REAR_END_SIGNALS if item.cabin_a_end_signals else 0)
+    return (HEADLIGHT_UPPER if item.cabin_b_head_light else 0) | (HEADLIGHT_LEFT if item.cabin_b_left_white_signal else 0) \
+            | (REDMARKER_LEFT if item.cabin_b_left_red_signal else 0) | (HEADLIGHT_RIGHT if item.cabin_b_right_white_signal else 0) \
+            | (REDMARKER_RIGHT if item.cabin_b_right_red_signal else 0) | (REAR_END_SIGNALS if item.cabin_b_end_signals else 0)
+
+
 ## Whether the trainset shows a lamp code hint's lamps and no other (has_signal_pc1_on(),
 ## has_signal_on(): iLights == pattern, DynObj.cpp:7507-7553) - a wrong signal is no lamp code
 static func shows(situation:MaszynaLegacyDriverTraction.Situation, hint:MaszynaLegacyDriverHints.Hint) -> bool:

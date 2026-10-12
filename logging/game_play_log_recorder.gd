@@ -19,6 +19,7 @@ const REPEAT_GAP_MSEC: int = 1000
 const ROLE_PREFIX: String = "VEHICLE_PERSON_ROLE_"
 const CABIN_PREFIX: String = "RAIL_VEHICLE_CABIN_"
 const CONTACT_LOSS_PREFIX: String = "PANTOGRAPH_CONTACT_LOSS_"
+const DERAIL_CAUSE_PREFIX: String = "DERAIL_CAUSE_"
 
 ## Lines: "<time> <simulation time> <kind> <subject> <details>", the subject a name and
 ## its RID ("SN61-02#2"), the details key=value:
@@ -29,6 +30,7 @@ const CONTACT_LOSS_PREFIX: String = "PANTOGRAPH_CONTACT_LOSS_"
 ##   command <name#rid> <command> p1=<p1> p2=<p2> [repeats=<n> until=<simulation time> last=<p1>,<p2>]
 ##   main_switch <name#rid> opened cause=<no_voltage|overvoltage|ground_fault|overload|switched_off>
 ##   pantograph <name#rid> lost index=<0|1> cause=<not_reaching|no_wire|dead_wire> track=<name> along=<m>
+##   vehicle <name#rid> derailed cause=<no_rail|curve|wide_gauge|track_category|collision> track=<name> along=<m>
 ##   event <event> [activator=<name>];  scenery left;  game closed
 var _gameplay_log: GameLogger = GameLog.get_logger("gameplay")
 var _scenario_log: GameLogger = GameLog.get_logger("scenario")
@@ -44,6 +46,7 @@ var _last_trainset: String = ""
 var _role_names: Dictionary[int, String] = {}
 var _cabin_kind_names: Dictionary[int, String] = {}
 var _contact_loss_names: Dictionary[int, String] = {}
+var _derail_cause_names: Dictionary[int, String] = {}
 ## The engines whose main switch is logged, by vehicle - connected when the vehicle is logged as
 ## created, disconnected when it is freed
 var _engines: Dictionary[RID, RailVehicleEngine] = {}
@@ -75,6 +78,9 @@ func _ready() -> void:
     for constant: String in ClassDB.class_get_enum_constants(&"RailVehicleServer", &"PantographContactLoss"):
         _contact_loss_names[ClassDB.class_get_integer_constant(&"RailVehicleServer", constant)] = \
                 constant.trim_prefix(CONTACT_LOSS_PREFIX).to_lower()
+    for constant: String in ClassDB.class_get_enum_constants(&"RailVehicleController", &"DerailCause"):
+        _derail_cause_names[ClassDB.class_get_integer_constant(&"RailVehicleController", constant)] = \
+                constant.trim_prefix(DERAIL_CAUSE_PREFIX).to_lower()
 
 
 ## For a scenery being started
@@ -94,6 +100,7 @@ func start() -> void:
     VehicleServer.vehicle_freed.connect(_on_vehicle_freed)
     RailVehicleServer.vehicle_trainset_changed.connect(_on_vehicle_trainset_changed)
     RailVehicleServer.vehicle_pantograph_contact_lost.connect(_on_vehicle_pantograph_contact_lost)
+    RailVehicleServer.vehicle_derailed.connect(_on_vehicle_derailed)
     # the player is made with the game, before any scenery
     _write_person(PlayerServer.player_get_person(), "present")
 
@@ -125,6 +132,7 @@ func _close(subject: String, what: String) -> void:
     VehicleServer.vehicle_freed.disconnect(_on_vehicle_freed)
     RailVehicleServer.vehicle_trainset_changed.disconnect(_on_vehicle_trainset_changed)
     RailVehicleServer.vehicle_pantograph_contact_lost.disconnect(_on_vehicle_pantograph_contact_lost)
+    RailVehicleServer.vehicle_derailed.disconnect(_on_vehicle_derailed)
     for vehicle: RID in _engines:
         if is_instance_valid(_engines[vehicle]):
             _engines[vehicle].engine_stop.disconnect(_on_engine_stop.bind(vehicle))
@@ -245,6 +253,15 @@ func _on_vehicle_pantograph_contact_lost(vehicle: RID, pantograph: int,
     _write_repeated()
     _trainset_log(vehicle).info(_entry("pantograph", _named(vehicle, VehicleServer.vehicle_get_name(vehicle)),
             "lost index=%d cause=%s track=%s along=%.2f" % [pantograph, _contact_loss_names.get(cause, str(cause)),
+                TrackServer.track_get_name(track) if track.is_valid() else "-", float(position.get("along", 0.0))]))
+
+
+func _on_vehicle_derailed(vehicle: RID, cause: RailVehicleController.DerailCause) -> void:
+    var position: Dictionary = RailVehicleServer.vehicle_get_track_position(vehicle)
+    var track: RID = position.get("track_rid", RID())
+    _write_repeated()
+    _trainset_log(vehicle).info(_entry("vehicle", _named(vehicle, VehicleServer.vehicle_get_name(vehicle)),
+            "derailed cause=%s track=%s along=%.2f" % [_derail_cause_names.get(cause, str(cause)),
                 TrackServer.track_get_name(track) if track.is_valid() else "-", float(position.get("along", 0.0))]))
 
 

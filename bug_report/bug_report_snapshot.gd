@@ -94,7 +94,7 @@ static func simulation(world: SceneryWorld, started_msec: int) -> Dictionary:
         var environment: MaszynaEnvironmentNode = world.get_environment()
         result["date"] = "%04d-%02d-%02d" % [environment.year, environment.month, environment.day]
         result["weather"] = {
-            "weather": MaszynaEnvironment.Weather.find_key(environment.weather),
+            "weather": ClassDB.class_get_enum_constants(&"SimulationServer", &"Weather")[environment.weather],
             "season": MaszynaEnvironment.Season.find_key(environment.season),
             "cloudiness": environment.cloudiness,
             "precipitation": environment.precipitation,

@@ -241,7 +241,11 @@ func _on_vehicle_command_received(vehicle:RID, command:String, _p1:Variant, _p2:
         return
     var reverser:bool = (command == "direction_increase" or command == "direction_decrease") \
             and not controller.get_direction() == VehicleController.DIRECTION_NEUTRAL
-    if not (command == "cab_activation_auto" or reverser):
+    # a cab switched on by hand as well - a vehicle without the automatic activation
+    # (AutomaticCabActivation=No, SA132) never sends the automatic one, and its driver kept the way
+    # of the cab the player had left
+    var activated:bool = command == "cab_activation_auto" or (command == "cab_activation" and _p1 == true)
+    if not (activated or reverser):
         return
     var direction:int = controller.get_direction_absolute()
     if direction == VehicleController.DIRECTION_NEUTRAL:
@@ -740,7 +744,16 @@ func _update(driver:RID) -> void:
         MaszynaLegacyDriverHints.cue(situation, MaszynaLegacyDriverHints.Hint.CAB_ACTIVATION)
     elif master and not controller.cntrl_automatic_cab_activation and (master.get_cabin() == -_cabin_direction(driver)
             or not master.get_cabin_controleable() or not powered):
-        MaszynaLegacyDriverHints.cue(situation, MaszynaLegacyDriverHints.Hint.CAB_DEACTIVATION)
+        # the deactivation done where it can be: the cab with the control, else the player is sent
+        # back to it (CabDeactivisation() takes only IsCabMaster(), Mover.cpp:2684)
+        var here:bool = master.get_cabin_controleable() or not powered
+        MaszynaLegacyDriverHints.cue(situation, MaszynaLegacyDriverHints.Hint.CAB_DEACTIVATION
+                if here else MaszynaLegacyDriverHints.Hint.CAB_DEACTIVATION_OTHER_END)
+        # the independent brake left applied there let off on the same way back - it brakes its car
+        # whatever cab drives (Mover.cpp:4025), and leaving the driving cab deactivates it
+        # (Train.cpp:10950-10954), so a second way back empties the pipe
+        if not here:
+            MaszynaLegacyDriverHints.cue(situation, MaszynaLegacyDriverHints.Hint.INDEPENDENT_BRAKE_RELEASE_OTHER_END)
     # the doors warned of at their closing close now (Doors(), Driver.cpp:4374-4378)
     if state.departure_warned:
         MaszynaLegacyDriverHints.cue(situation, MaszynaLegacyDriverHints.Hint.DEPARTURE_SIGNAL_OFF)
@@ -808,6 +821,19 @@ func _update(driver:RID) -> void:
             and state.speed.acceleration_desired > MaszynaLegacyDriverSpeed.NO_ACCELERATION \
             and state.traction.action_time >= 0.0:
         _start_closing_doors(situation)
+    # differs from the original, which takes the permits back only as its own driver departs
+    # (Driver.cpp:4389-4392): an EIM controller asked for power gives none while a door permit stands
+    # (eimic_max, Mover.cpp:6758-6769) - the permits a deactivated cab grants (InactiveCabFlag,
+    # Mover.cpp:2690-2694) left a player in the other cab at full power, standing, told nothing
+    if own_doors and (own_doors.get_left_open_permit() or own_doors.get_right_open_permit()) \
+            and _asks_for_power(situation):
+        MaszynaLegacyDriverHints.cue(situation, MaszynaLegacyDriverHints.Hint.DOOR_LEFT_PERMIT_OFF)
+        MaszynaLegacyDriverHints.cue(situation, MaszynaLegacyDriverHints.Hint.DOOR_RIGHT_PERMIT_OFF)
+    # the same for the independent brake of a car left: it brakes that car whatever the cab driving
+    # (the player sent there by the standing driver's hints before going to the other cab)
+    if _asks_for_power(situation):
+        MaszynaLegacyDriverHints.cue(situation, MaszynaLegacyDriverHints.Hint.INDEPENDENT_BRAKE_RELEASE_OTHER_END)
+    state.braking.control_main_pipe(situation)
     if state.traction.prepare(situation):
         state.traction.control(situation)
         state.braking.control(situation, elapsed)
@@ -954,9 +980,15 @@ func _prepare_engine(situation:MaszynaLegacyDriverTraction.Situation) -> bool:
             if engine and not engine.motor_blowers_speed == 0.0:
                 MaszynaLegacyDriverHints.cue(situation, MaszynaLegacyDriverHints.Hint.FRONT_MOTOR_BLOWERS_ON)
                 MaszynaLegacyDriverHints.cue(situation, MaszynaLegacyDriverHints.Hint.REAR_MOTOR_BLOWERS_ON)
-        # quirk kept: cued whatever the handle shows - the original's condition ends in a stray `;`
-        # (Driver.cpp:2881-2884)
-        MaszynaLegacyDriverHints.cue(situation, MaszynaLegacyDriverHints.Hint.TRAIN_BRAKE_RELEASE)
+        # the driver's level taken from the handle, then the handle off running released - the
+        # original's inner condition ends in a stray `;`, so the control pressure does not matter
+        # (Driver.cpp:2867-2884)
+        situation.braking.take_handle_position(vehicle)
+        var brake:RailVehicleBrake = RailVehicleServer.vehicle_component_get(
+                vehicle, RailVehicleComponentType.COMPONENT_BRAKES) as RailVehicleBrake
+        if brake and not brake.get_controller_position() == brake.get_handle_position(RailVehicleBrake.HANDLE_POSITION_DRIVE):
+            MaszynaLegacyDriverHints.cue(situation, MaszynaLegacyDriverHints.Hint.TRAIN_BRAKE_RELEASE, 0.0,
+                    situation.braking.release_train_brake)
         var spring_brake:RailVehicleSpringBrake = RailVehicleServer.vehicle_component_get(
                 vehicle, RailVehicleComponentType.COMPONENT_SPRING_BRAKE) as RailVehicleSpringBrake
         MaszynaLegacyDriverHints.cue(situation, MaszynaLegacyDriverHints.Hint.SPRING_BRAKE_ON if spring_brake and spring_brake.get_active() else MaszynaLegacyDriverHints.Hint.SPRING_BRAKE_OFF)
@@ -1252,6 +1284,23 @@ static func _cabin_direction(driver:RID) -> int:
         RailVehicleCabinKind.RAIL_VEHICLE_CABIN_REAR:
             return -1
     return 0
+
+
+## Whether the master controller of an EIM controller stands where it adds power: a universal
+## controller's position with a target above none (UniCtrlList[].SetCtrlVal), any other past its
+## positions of no power
+static func _asks_for_power(situation:MaszynaLegacyDriverTraction.Situation) -> bool:
+    if MaszynaLegacyDriverTraction.eim_control_type(situation) == RailVehicleEngine.EIM_CONTROL_TYPE_0:
+        return false
+    var master:RailVehicleMasterController = MaszynaLegacyDriverTraction.master_controller(situation.controlling)
+    if master == null:
+        return false
+    var universal:RailVehicleUniversalController = RailVehicleServer.vehicle_component_get(
+            situation.controlling, RailVehicleComponentType.COMPONENT_UNIVERSAL_CONTROLLER) as RailVehicleUniversalController
+    var position:int = master.get_main_position()
+    if universal and position < universal.positions.size():
+        return (universal.positions[position] as RailVehicleUniversalControllerListItem).target_value > 0.0
+    return position > master.get_main_no_power_position()
 
 
 ## The vehicle's active cab (CabActive) - none on a vehicle without a master controller

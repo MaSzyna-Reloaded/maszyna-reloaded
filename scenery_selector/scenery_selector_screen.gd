@@ -8,7 +8,7 @@ extends Control
 ## loading screen below. Escape asks to quit (quit_requested).
 
 ## trainset: the shown trainset as arranged here (MaszynaIncludeNode.trainset_override)
-signal scenery_selected(filename: String, train_id: String, trainset: Array[MaszynaDynamicData])
+signal scenery_selected(filename: String, vehicle_id: String, trainset: Array[MaszynaDynamicData])
 ## Escape - the game fades out and quits
 signal quit_requested
 ## The gear - the settings are the game's, not this screen's
@@ -297,7 +297,7 @@ func load_selected_scenery() -> void:
     var index: int = %SceneryList.get_selected()
     _ui_sounds.play(&"load_scenery")
     %Content.visible = false
-    scenery_selected.emit(_files[index], _get_selected_train_id(), _get_arranged_trainset())
+    scenery_selected.emit(_files[index], _get_selected_vehicle_id(), _get_arranged_trainset())
     var tween: Tween = create_tween()
     tween.tween_property(%Background.material, "shader_parameter/dissolve", 1.0, DISSOLVE_TIME)
     tween.tween_callback(hide)
@@ -309,7 +309,7 @@ func _get_arranged_trainset() -> Array[MaszynaDynamicData]:
     var trainset: Array[MaszynaDynamicData] = []
     for vehicle: MaszynaSceneryInfo.Vehicle in _vehicles:
         var dynamic: MaszynaDynamicData = MaszynaDynamicData.new()
-        dynamic.name = vehicle.train_id
+        dynamic.name = vehicle.vehicle_id
         dynamic.data_path = vehicle.data_path
         dynamic.file_name = vehicle.file_name
         dynamic.skin = vehicle.skin
@@ -319,11 +319,12 @@ func _get_arranged_trainset() -> Array[MaszynaDynamicData]:
 
 
 ## The player starts in the headdriver vehicle of the selected trainset
-func _get_selected_train_id() -> String:
+func _get_selected_vehicle_id() -> String:
     var index: int = %TrainsetList.get_selected()
     if not _info or index < 0:
         return ""
-    return _listed_trainsets[index].get_driver_train_id()
+    var driver: MaszynaSceneryInfo.Vehicle = _listed_trainsets[index].get_driver_vehicle()
+    return driver.vehicle_id if driver else ""
 
 
 func _show_details(index: int) -> void:
@@ -416,8 +417,8 @@ func _show_vehicles(selected: int) -> void:
     var tiles: Array[TileGrid.Tile] = []
     for vehicle: MaszynaSceneryInfo.Vehicle in _vehicles:
         var tile: TileGrid.Tile = TileGrid.Tile.new(
-            vehicle.data_path, vehicle.file_name, vehicle.skin, vehicle.train_id,
-            "%s (%s)" % [vehicle.train_id, vehicle.data_path.get_file()]
+            vehicle.data_path, vehicle.file_name, vehicle.skin, vehicle.vehicle_id,
+            "%s (%s)" % [vehicle.get_display_name(), vehicle.data_path.get_file()]
         )
         tile.flipped = vehicle.reversed
         tile.removable = _is_removable(tiles.size())
@@ -503,7 +504,7 @@ func ask_remove_vehicle(index: int) -> void:
     _removed_index = index
     var vehicle: MaszynaSceneryInfo.Vehicle = _vehicles[index]
     %RemoveVehicleQuestion.message = tr("%s leaves the trainset.") % (
-        vehicle.train_id if vehicle.train_id else vehicle.file_name
+        vehicle.get_display_name() if vehicle.get_display_name() else vehicle.file_name
     )
     %RemoveVehicleQuestion.ask()
 
@@ -654,7 +655,8 @@ func _fade_list_panel(to_alpha: float) -> void:
 ## A trainset is named by the vehicle the player starts in - the "trainset" line carries the
 ## starting track, not a name; the vehicles are named in "node <x> <y> <name> dynamic"
 static func _get_trainset_name(trainset: MaszynaSceneryInfo.Trainset) -> String:
-    return trainset.get_driver_train_id()
+    var driver: MaszynaSceneryInfo.Vehicle = trainset.get_driver_vehicle()
+    return driver.get_display_name() if driver else ""
 
 
 ## Its vehicles as arranged, and whether that is not as the scenario gives them

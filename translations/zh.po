@@ -506,7 +506,7 @@ msgstr "滑板"
 msgid "none"
 msgstr "无"
 
-msgid "(no train id)"
+msgid "(no vehicle id)"
 msgstr "（无列车编号）"
 
 msgid "(unnamed)"

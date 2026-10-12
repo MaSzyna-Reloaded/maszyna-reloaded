@@ -506,7 +506,7 @@ msgstr ""
 msgid "none"
 msgstr ""
 
-msgid "(no train id)"
+msgid "(no vehicle id)"
 msgstr ""
 
 msgid "(unnamed)"

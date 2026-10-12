@@ -506,7 +506,7 @@ msgstr "Smykadlo"
 msgid "none"
 msgstr "žádná"
 
-msgid "(no train id)"
+msgid "(no vehicle id)"
 msgstr "(bez identifikátoru)"
 
 msgid "(unnamed)"

@@ -53,7 +53,7 @@ func show_vehicle(vehicle: MaszynaSceneryInfo.Vehicle) -> void:
     # every vehicle path is used with a leading slash (see maszyna_rail_vehicle_3d_instancer.gd)
     _data_path = "/" + vehicle.data_path
     %Name.text = vehicle.file_name if vehicle.file_name else vehicle.data_path.get_file()
-    %Subtitle.text = "%s - %s" % [vehicle.train_id, vehicle.data_path]
+    %Subtitle.text = "%s - %s" % [vehicle.get_display_name(), vehicle.data_path]
     %ModelRoot.rotation = Vector3.ZERO
     _build_model(vehicle.skin)
     _build_skin_grid()
@@ -73,7 +73,7 @@ func _build_model(skin: String) -> void:
     if _model:
         _model.queue_free()
 
-    _model = MaszynaRailVehicle3DInstancer.build_exterior(_data_path, _vehicle.file_name, skin, _vehicle.train_id)
+    _model = MaszynaRailVehicle3DInstancer.build_exterior(_data_path, _vehicle.file_name, skin, _vehicle.vehicle_id)
     _attachments.clear()
     for attachment:Node in _model.get_children():
         _attachments.append(attachment as E3DModelInstance)
@@ -105,7 +105,7 @@ func _build_skin_grid() -> void:
             _skins.append(skin)
     var tiles: Array[TileGrid.Tile] = []
     for skin: String in _skins:
-        tiles.append(TileGrid.Tile.new(_data_path, _vehicle.file_name, skin, _vehicle.train_id, skin, skin))
+        tiles.append(TileGrid.Tile.new(_data_path, _vehicle.file_name, skin, _vehicle.vehicle_id, skin, skin))
     %SkinsGrid.set_tiles(tiles)
 
 

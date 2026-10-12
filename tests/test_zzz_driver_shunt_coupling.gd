@@ -53,8 +53,8 @@ func before_each() -> void:
     add_child(_scenery)
     if not await wait_loaded(_scenery.scenery_loaded, SCENERY):
         return
-    _driven = VehicleServer.vehicle_get_rid_by_name("sn61-02")
-    _standing = VehicleServer.vehicle_get_rid_by_name("sn61-03")
+    _driven = VehicleServer.vehicle_get_rid_by_id("sn61-02")
+    _standing = VehicleServer.vehicle_get_rid_by_id("sn61-03")
     _driver = DriverServer.vehicle_get_driver(_driven)
     VehicleServer.vehicle_command_received.connect(_on_vehicle_command_received)
     DriverServer.driver_order_changed.connect(_on_driver_order_changed)

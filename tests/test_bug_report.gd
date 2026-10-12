@@ -122,12 +122,15 @@ func test_a_directory_endpoint_saves_the_report_instead_of_sending_it() -> void:
 
 
 ## Linux, macOS and Windows set one of each pair; the test sets them all, to a home and a login of
-## its own, and puts back what there was
+## its own, and puts back what there was - one that was not set is unset again: an empty USERPROFILE
+## left behind changed the home find_maszyna_game_dirs() searches, and the next test's game
+## directory became the installation found there
 func test_the_home_directory_and_the_login_leave_no_trace_in_what_is_sent() -> void:
     var variables: PackedStringArray = BugReportSender.HOME_VARIABLES + BugReportSender.USER_VARIABLES
     var kept: Dictionary[String, String] = {}
     for variable: String in variables:
-        kept[variable] = OS.get_environment(variable)
+        if OS.has_environment(variable):
+            kept[variable] = OS.get_environment(variable)
     OS.set_environment("HOME", "/home/jan.kowalski")
     OS.set_environment("USERPROFILE", "C:\\Users\\jan.kowalski")
     OS.set_environment("USER", "jan.kowalski")
@@ -140,7 +143,10 @@ func test_the_home_directory_and_the_login_leave_no_trace_in_what_is_sent() -> v
         "D:\\Steam\\jan.kowalski\\MaSzyna and jan.kowalskiego stays",
     ]))
     for variable: String in variables:
-        OS.set_environment(variable, kept[variable])
+        if kept.has(variable):
+            OS.set_environment(variable, kept[variable])
+        else:
+            OS.unset_environment(variable)
 
     assert_eq(masked, "\n".join([
         "ERROR: Cannot load ~/.local/share/Steam/scenery/drewno.inc",

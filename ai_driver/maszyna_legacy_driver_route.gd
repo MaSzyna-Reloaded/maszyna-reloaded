@@ -23,6 +23,9 @@ class_name MaszynaLegacyDriverRoute
 const MIN_RANGE:float = 750.0
 ## The vehicles ahead are looked for at least this far [m] (scan_obstacles(), Driver.cpp:6663)
 const OBSTACLE_RANGE:float = 1000.0
+## A vehicle ahead nearer than this [m] is measured between the couplers, not along the track between
+## the primary axles (scan_obstacles(), Driver.cpp:6672)
+const OBSTACLE_COUPLER_RANGE:float = 100.0
 const MOVING_RANGE:float = 400.0
 const STANDING_RANGE:float = 1500.0
 ## Moving faster than this [km/h] (EU07_AI_MOVEMENT)
@@ -529,6 +532,10 @@ func update(
                 maxf(OBSTACLE_RANGE, reach))
     if obstacle:
         obstacle_speed = VehicleServer.vehicle_get_speed(obstacle.vehicle_rid)
+        # at short distances the range is measured between the couplers (Driver.cpp:6672-6675)
+        if obstacle.distance < OBSTACLE_COUPLER_RANGE:
+            obstacle.distance = RailVehicleServer.vehicle_get_coupler_distance(
+                    trainset.vehicles[0], obstacle.vehicle_rid)
 
 
 ## The table brought up to date (TableCheck(), TableTraceRoute(), Driver.cpp:430-779): where the

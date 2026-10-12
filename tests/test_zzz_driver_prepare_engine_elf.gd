@@ -15,7 +15,7 @@ extends MaszynaGutTest
 
 const FIXTURES_GAME_DIR:String = "res://tests/fixtures"
 const SCENERY:String = "startup_en76-001-a.scn"
-const DRIVEN:String = "EN76-001-A"
+const DRIVEN:String = "en76-001-a"
 ## The driver's update it takes the unit ready on: both pantographs raised, the line breakers
 ## closed and the converters on by the tenth (20.2 s measured) - each PREPARE_TIME after the one
 ## before, the first within PREPARE_TIME of the order
@@ -40,7 +40,7 @@ func before_each():
     # the scenery is announced once its vehicles are built and its drivers given their AI
     if not await wait_loaded(scenery.scenery_loaded, SCENERY):
         return
-    vehicle_rid = VehicleServer.vehicle_get_rid_by_name(DRIVEN)
+    vehicle_rid = VehicleServer.vehicle_get_rid_by_id(DRIVEN)
 
 
 func after_each():
@@ -65,7 +65,7 @@ func test_the_driver_raises_the_pantographs_of_every_car_and_takes_the_unit_read
                 car, VehicleComponentType.COMPONENT_ENGINE) as RailVehicleEngine
         if engine:
             assert_true(engine.get_main_switch_enabled(), "%s's line breaker closed: %s" % [
-                    VehicleServer.vehicle_get_name(car), _cars()])
+                    VehicleServer.vehicle_get_id(car), _cars()])
 
 
 func test_the_driver_told_to_go_moves_the_unit_off() -> void:
@@ -99,7 +99,7 @@ func _cars() -> String:
         var engine:RailVehicleEngine = VehicleServer.vehicle_component_get(
                 car, VehicleComponentType.COMPONENT_ENGINE) as RailVehicleEngine
         cars.append("%s main_switch=%s pantographs=%s/%s voltage=%.0f" % [
-                VehicleServer.vehicle_get_name(car), engine.get_main_switch_enabled() if engine else false,
+                VehicleServer.vehicle_get_id(car), engine.get_main_switch_enabled() if engine else false,
                 source.get_collector_pantograph_first_active() if source else false,
                 source.get_collector_pantograph_second_active() if source else false,
                 source.get_collector_voltage() if source else 0.0])

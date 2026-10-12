@@ -53,7 +53,7 @@ func show_vehicle(vehicle: MaszynaSceneryInfo.Vehicle) -> void:
     # every vehicle path is used with a leading slash (see maszyna_rail_vehicle_3d_instancer.gd)
     _data_path = "/" + vehicle.data_path
     %Name.text = vehicle.file_name if vehicle.file_name else vehicle.data_path.get_file()
-    %Subtitle.text = "%s - %s" % [vehicle.get_display_name(), vehicle.data_path]
+    %Subtitle.text = "%s - %s" % [vehicle.get_name(), vehicle.data_path]
     %ModelRoot.rotation = Vector3.ZERO
     _build_model(vehicle.skin)
     _build_skin_grid()

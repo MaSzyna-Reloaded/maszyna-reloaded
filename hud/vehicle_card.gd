@@ -85,9 +85,9 @@ func _show_trainset() -> void:
             continue
         var dynamic:MaszynaDynamicData = MaszynaLegacyVehicleSystem.vehicle_get_dynamic(trainset_vehicle)
         _trainset.append(trainset_vehicle)
-        var vehicle_name:String = VehicleServer.vehicle_get_name(trainset_vehicle)
         tiles.append(TileGrid.Tile.new(dynamic.data_path, dynamic.file_name, dynamic.skin,
-                vehicle_name, "%s (%s)" % [vehicle_name, dynamic.data_path.get_file()]))
+                VehicleServer.vehicle_get_id(trainset_vehicle), "%s (%s)" % [
+                    VehicleServer.vehicle_get_name(trainset_vehicle), dynamic.data_path.get_file()]))
     %Trainset.set_tiles(tiles)
 
 

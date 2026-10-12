@@ -177,7 +177,7 @@ func test_world_initializes_on_each_scenery_load_and_detaches_on_unload() -> voi
     _world.load_scenery("ep07.scn", trainset)
     assert_true(await wait_until(func() -> bool:
         return get_signal_emit_count(_player, "initialization_ready") == 1, LOAD_TIMEOUT))
-    assert_eq(PlayerServer.player_get_vehicle(), VehicleServer.vehicle_get_rid_by_name("ep07-424"))
+    assert_eq(PlayerServer.player_get_vehicle(), VehicleServer.vehicle_get_rid_by_id("ep07-424"))
     assert_true(SceneryStreamingServer.streaming_has_camera())
     await _world.unload_scenery()
     assert_false(SceneryStreamingServer.streaming_has_camera())

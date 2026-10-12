@@ -38,7 +38,7 @@ var _ai_log: GameLogger = GameLog.get_logger("ai")
 ## Between start() and stop()
 var _recording: bool = false
 ## The names of the vehicles logged as created: a freed vehicle's name is gone when it is announced
-var _vehicle_names: Dictionary[RID, String] = {}
+var _vehicle_ids: Dictionary[RID, String] = {}
 ## The trainset logged last - every vehicle of a trainset announces the same change
 var _last_trainset: String = ""
 ## VehiclePersonRole.Role and RailVehicleCabinKind.Kind by value, as words: the constant's own name
@@ -137,7 +137,7 @@ func _close(subject: String, what: String) -> void:
         if is_instance_valid(_engines[vehicle]):
             _engines[vehicle].engine_stop.disconnect(_on_engine_stop.bind(vehicle))
     _engines.clear()
-    _vehicle_names.clear()
+    _vehicle_ids.clear()
     _last_trainset = ""
     _repeat_timer.stop()
     _write_repeated()
@@ -146,7 +146,7 @@ func _close(subject: String, what: String) -> void:
 
 
 func _on_vehicle_command_received(vehicle_rid: RID, command: String, p1: Variant, p2: Variant) -> void:
-    var key: String = "%s %s" % [_named(vehicle_rid, VehicleServer.vehicle_get_name(vehicle_rid)), command]
+    var key: String = "%s %s" % [_named(vehicle_rid, VehicleServer.vehicle_get_id(vehicle_rid)), command]
     var now: int = Time.get_ticks_msec()
     if key == _repeated_key and now - _repeated_msec <= REPEAT_GAP_MSEC:
         _repeats += 1
@@ -155,7 +155,7 @@ func _on_vehicle_command_received(vehicle_rid: RID, command: String, p1: Variant
         _write_repeated()
         _repeated_log = _gameplay_log if vehicle_rid == PlayerServer.player_get_vehicle() else _ai_log
         _repeated_key = key
-        _repeated_line = _entry("command", _named(vehicle_rid, VehicleServer.vehicle_get_name(vehicle_rid)),
+        _repeated_line = _entry("command", _named(vehicle_rid, VehicleServer.vehicle_get_id(vehicle_rid)),
                 "%s p1=%s p2=%s" % [command, p1, p2])
         _repeats = 1
     _repeated_msec = now
@@ -165,7 +165,7 @@ func _on_vehicle_command_received(vehicle_rid: RID, command: String, p1: Variant
 func _on_event_launched(event: RID, activator: RID) -> void:
     _write_repeated()
     _scenario_log.info(_entry("event", ScenarioEventServer.event_get_name(event),
-            "activator=%s" % VehicleServer.vehicle_get_name(activator) if activator.is_valid() else ""))
+            "activator=%s" % VehicleServer.vehicle_get_id(activator) if activator.is_valid() else ""))
 
 
 func _on_person_created(person: RID) -> void:
@@ -203,11 +203,11 @@ func _on_cabin_person_role_changed(cabin: RID, person: RID, role: VehiclePersonR
 
 ## The vehicle has its simulation: built, named - it counts as made from here
 func _on_vehicle_configured(vehicle: RID) -> void:
-    if _vehicle_names.has(vehicle):
+    if _vehicle_ids.has(vehicle):
         return
-    _vehicle_names[vehicle] = VehicleServer.vehicle_get_name(vehicle)
+    _vehicle_ids[vehicle] = VehicleServer.vehicle_get_id(vehicle)
     _write_repeated()
-    _gameplay_log.info(_entry("vehicle", _named(vehicle, _vehicle_names[vehicle]), "created"))
+    _gameplay_log.info(_entry("vehicle", _named(vehicle, _vehicle_ids[vehicle]), "created"))
     var engine: RailVehicleEngine = VehicleServer.vehicle_component_get(
             vehicle, VehicleComponentType.COMPONENT_ENGINE) as RailVehicleEngine
     if engine:
@@ -216,11 +216,11 @@ func _on_vehicle_configured(vehicle: RID) -> void:
 
 
 func _on_vehicle_freed(vehicle: RID) -> void:
-    if not _vehicle_names.has(vehicle):
+    if not _vehicle_ids.has(vehicle):
         return
     _write_repeated()
-    _gameplay_log.info(_entry("vehicle", _named(vehicle, _vehicle_names[vehicle]), "freed"))
-    _vehicle_names.erase(vehicle)
+    _gameplay_log.info(_entry("vehicle", _named(vehicle, _vehicle_ids[vehicle]), "freed"))
+    _vehicle_ids.erase(vehicle)
     if _engines.has(vehicle) and is_instance_valid(_engines[vehicle]):
         _engines[vehicle].engine_stop.disconnect(_on_engine_stop.bind(vehicle))
     _engines.erase(vehicle)
@@ -242,7 +242,7 @@ func _on_engine_stop(vehicle: RID) -> void:
     elif electric and electric.get_fuse_active():
         cause = "overload"
     _write_repeated()
-    _trainset_log(vehicle).info(_entry("main_switch", _named(vehicle, VehicleServer.vehicle_get_name(vehicle)),
+    _trainset_log(vehicle).info(_entry("main_switch", _named(vehicle, VehicleServer.vehicle_get_id(vehicle)),
             "opened cause=%s" % cause))
 
 
@@ -251,7 +251,7 @@ func _on_vehicle_pantograph_contact_lost(vehicle: RID, pantograph: int,
     var position: Dictionary = RailVehicleServer.vehicle_get_track_position(vehicle)
     var track: RID = position.get("track_rid", RID())
     _write_repeated()
-    _trainset_log(vehicle).info(_entry("pantograph", _named(vehicle, VehicleServer.vehicle_get_name(vehicle)),
+    _trainset_log(vehicle).info(_entry("pantograph", _named(vehicle, VehicleServer.vehicle_get_id(vehicle)),
             "lost index=%d cause=%s track=%s along=%.2f" % [pantograph, _contact_loss_names.get(cause, str(cause)),
                 TrackServer.track_get_name(track) if track.is_valid() else "-", float(position.get("along", 0.0))]))
 
@@ -260,7 +260,7 @@ func _on_vehicle_derailed(vehicle: RID, cause: RailVehicleController.DerailCause
     var position: Dictionary = RailVehicleServer.vehicle_get_track_position(vehicle)
     var track: RID = position.get("track_rid", RID())
     _write_repeated()
-    _trainset_log(vehicle).info(_entry("vehicle", _named(vehicle, VehicleServer.vehicle_get_name(vehicle)),
+    _trainset_log(vehicle).info(_entry("vehicle", _named(vehicle, VehicleServer.vehicle_get_id(vehicle)),
             "derailed cause=%s track=%s along=%.2f" % [_derail_cause_names.get(cause, str(cause)),
                 TrackServer.track_get_name(track) if track.is_valid() else "-", float(position.get("along", 0.0))]))
 
@@ -279,7 +279,7 @@ func _on_vehicle_trainset_changed(vehicle: RID) -> void:
     var members: Array[String] = []
     for coupled: RID in RailVehicleServer.vehicle_get_coupled(
             vehicle, RailVehicleController.COUPLER_END_FRONT, RailVehicleController.COUPLING_FLAG_COUPLER):
-        members.append(_named(coupled, VehicleServer.vehicle_get_name(coupled)))
+        members.append(_named(coupled, VehicleServer.vehicle_get_id(coupled)))
     var trainset: String = ",".join(members)
     # the same trainset from its other vehicles, or read from its other end
     var reversed_members: Array[String] = members.duplicate()
@@ -306,7 +306,7 @@ func _write_person(person: RID, what: String) -> void:
 func _cabin_text(cabin: RID) -> String:
     var vehicle: RID = VehicleServer.cabin_get_vehicle(cabin)
     return "vehicle=%s cab=%s" % [
-        _named(vehicle, VehicleServer.vehicle_get_name(vehicle)),
+        _named(vehicle, VehicleServer.vehicle_get_id(vehicle)),
         _cabin_kind_names.get(RailVehicleServer.cabin_get_kind(cabin), "-"),
     ]
 

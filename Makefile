@@ -6,7 +6,7 @@
 # SDK container - LINUX_SDK_MOUNT. For development against a local checkout of libmaszyna instead
 # (its uncommitted work included): make libmaszyna-local LIBMASZYNA_LOCAL=<path>; the path is kept
 # in .libmaszyna-local (not versioned) until make libmaszyna-submodule. The Linux SDK container
-# mounts this checkout only, so compile-release-linux needs the submodule.
+# mounts this checkout and the local one, so a release builds from either.
 LIBMASZYNA_LOCAL_FILE:=.libmaszyna-local
 LIBMASZYNA:=$(or $(shell cat $(LIBMASZYNA_LOCAL_FILE) 2>/dev/null),vendor/libmaszyna)
 LIBMASZYNA_MAKE=$(MAKE) -C $(LIBMASZYNA) GODOT_PROJECT_DIR=$(CURDIR) LINUX_SDK_MOUNT=$(CURDIR)

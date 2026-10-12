@@ -304,12 +304,14 @@ func load_selected_scenery() -> void:
 
 
 ## The scenery is loaded with the trainset as the grid shows it - its vehicles, their order and
-## their skins; an added vehicle has no name of the scenery
+## their skins; a declared vehicle goes with its place in the declared trainset, by which the
+## scenery pairs it (ids repeat), an added one has no place and no name of the scenery
 func _get_arranged_trainset() -> Array[MaszynaDynamicData]:
     var trainset: Array[MaszynaDynamicData] = []
     for vehicle: MaszynaSceneryInfo.Vehicle in _vehicles:
         var dynamic: MaszynaDynamicData = MaszynaDynamicData.new()
         dynamic.vehicle_id = vehicle.vehicle_id
+        dynamic.trainset_index = vehicle.trainset_index
         dynamic.name = vehicle.name
         dynamic.data_path = vehicle.data_path
         dynamic.file_name = vehicle.file_name

@@ -38,7 +38,8 @@ WINDOWS_INSTALLER_RUN=docker run --rm --user $(shell id -u):$(shell id -g) -v $(
 # addons/libmaszyna leads to the local checkout; git leaves the versioned link (to the submodule)
 # out of the status meanwhile
 libmaszyna-local:
-	test -d "$(LIBMASZYNA_LOCAL)/addons/libmaszyna"
+	@test -n "$(LIBMASZYNA_LOCAL)" || { echo "Which libmaszyna checkout? make libmaszyna-local LIBMASZYNA_LOCAL=<path>" >&2; exit 1; }
+	@test -d "$(LIBMASZYNA_LOCAL)/addons/libmaszyna" || { echo "$(LIBMASZYNA_LOCAL) is not a libmaszyna checkout: it has no addons/libmaszyna" >&2; exit 1; }
 	realpath "$(LIBMASZYNA_LOCAL)" > $(LIBMASZYNA_LOCAL_FILE)
 	! git ls-files --error-unmatch addons/libmaszyna > /dev/null 2>&1 || git update-index --skip-worktree addons/libmaszyna
 	ln -sfn "$$(cat $(LIBMASZYNA_LOCAL_FILE))/addons/libmaszyna" addons/libmaszyna

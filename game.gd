@@ -120,18 +120,18 @@ func _ready() -> void:
             ) % UserSettings.get_maszyna_game_dir())
             get_tree().quit(EXIT_INVALID_GAME_DIR)
             return
-        var train_id: String = ""
+        var vehicle_id: String = ""
         var vehicle_at: int = args.find(ARG_VEHICLE)
         if vehicle_at >= 0 and vehicle_at + 1 < args.size():
-            train_id = args[vehicle_at + 1]
+            vehicle_id = args[vehicle_at + 1]
         elif exported and OS.is_stdout_verbose():
             for at: int in args.size():
                 if not at == scenery_at + 1 and not args[at].begins_with("-"):
-                    train_id = args[at]
+                    vehicle_id = args[at]
                     break
         # in lower case, as the original takes -v (application.cpp:1142) - the scenery's vehicles
         # are named so
-        start_scenery(args[scenery_at + 1], train_id.to_lower(), DECLARED_TRAINSET)
+        start_scenery(args[scenery_at + 1], vehicle_id.to_lower(), DECLARED_TRAINSET)
     elif scenery:
         start_scenery(scenery, "", DECLARED_TRAINSET)
     else:
@@ -139,10 +139,10 @@ func _ready() -> void:
         $BugReport.show_edge_button()
 
 
-## Loads scenery/<filename> and puts the player in train_id (none: the scenery's own driver) -
+## Loads scenery/<filename> and puts the player in vehicle_id (none: the scenery's own driver) -
 ## chosen in the selector, or given on the command line; trainset is the player's trainset as the
 ## selector arranged it (MaszynaIncludeNode.trainset_override), empty for the declared one
-func start_scenery(filename: String, train_id: String, trainset: Array[MaszynaDynamicData]) -> void:
+func start_scenery(filename: String, vehicle_id: String, trainset: Array[MaszynaDynamicData]) -> void:
     _play_music(MUSIC_LOADING_VOLUME_DB)
     # the world starts while the loading screen fades out, not when it is built, and at the wall
     # clock's speed whatever the last one ran at
@@ -151,7 +151,7 @@ func start_scenery(filename: String, train_id: String, trainset: Array[MaszynaDy
     HUDServer.hud_set_visible(false)
     $BugReport.hide_edge_button()
     var info: MaszynaSceneryInfo = MaszynaSceneryInfo.read(filename)
-    $GameHud.show_scenario(info, train_id)
+    $GameHud.show_scenario(info, vehicle_id)
     # the name the scenery list gave it ("//$l", "//$n" and the file name)
     $LoadingScreen.show_loading(MaszynaSceneryInfo.read_display_name(filename))
     # the selector dissolves into the loading screen and hides once it is done; the loading below
@@ -183,7 +183,7 @@ func start_scenery(filename: String, train_id: String, trainset: Array[MaszynaDy
             log_files.append(handler.get_path())
     $GamePlayLogRecorder.start()
     $BugReport.attach_world(_world, log_files)
-    await _world.load_scenery(filename, trainset, train_id)
+    await _world.load_scenery(filename, trainset, vehicle_id)
     await _build_surroundings()
     var tween: Tween = create_tween()
     tween.tween_property($LoadingScreen, "modulate:a", 0.0, LOADING_FADE_OUT_TIME)
@@ -338,7 +338,7 @@ func _apply_music_settings() -> void:
 
 
 ## The world's scenario is ready; player initialization is coordinated by the world scene.
-func _on_scenery_loaded(_first_train_id: String) -> void:
+func _on_scenery_loaded(_first_vehicle_id: String) -> void:
     $GameHud.attach_script_context(_world.get_script_context())
     _music_tween = create_tween()
     _music_tween.tween_property($Music, "volume_linear", 0.0, MUSIC_FADE_OUT_TIME)

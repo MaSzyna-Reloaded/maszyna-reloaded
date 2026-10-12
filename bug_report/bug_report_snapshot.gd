@@ -76,7 +76,7 @@ static func scenario(world: SceneryWorld) -> Dictionary:
             "filename": scenery.filename,
             "title": scenery.title,
             "start_time": scenery.start_time,
-            "first_train_id": scenery.first_train_id,
+            "first_vehicle_id": scenery.first_vehicle_id,
         })
     return result
 

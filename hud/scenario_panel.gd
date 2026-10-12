@@ -10,9 +10,9 @@ extends PanelContainer
 signal close_requested
 
 
-## The scenario the player has started; an empty train_id lets the scenery pick its own driver, so
+## The scenario the player has started; an empty vehicle_id lets the scenery pick its own driver, so
 ## there is no chosen trainset whose mission could be shown
-func show_scenario(info:MaszynaSceneryInfo, train_id:String) -> void:
+func show_scenario(info:MaszynaSceneryInfo, vehicle_id:String) -> void:
     %Title.text = info.title
     %Description.text = info.description
     %Description.visible = not info.description == ""
@@ -24,7 +24,8 @@ func show_scenario(info:MaszynaSceneryInfo, train_id:String) -> void:
     %Image.visible = not %Image.texture == null
     %Mission.text = ""
     for trainset:MaszynaSceneryInfo.Trainset in info.trainsets:
-        if train_id and trainset.get_driver_train_id() == train_id:
+        var driver:MaszynaSceneryInfo.Vehicle = trainset.get_driver_vehicle()
+        if vehicle_id and driver and driver.vehicle_id == vehicle_id:
             %Mission.text = trainset.description
             break
     %MissionSection.visible = not %Mission.text == ""

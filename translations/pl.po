@@ -506,7 +506,7 @@ msgstr "Ślizg"
 msgid "none"
 msgstr "brak"
 
-msgid "(no train id)"
+msgid "(no vehicle id)"
 msgstr "(bez identyfikatora)"
 
 msgid "(unnamed)"

@@ -62,7 +62,7 @@ func show_scenario(info:MaszynaSceneryInfo) -> void:
             if not trainset.is_drivable():
                 continue
             for vehicle:MaszynaSceneryInfo.Vehicle in trainset.vehicles:
-                _drivable_vehicle_names[vehicle.train_id] = true
+                _drivable_vehicle_names[vehicle.vehicle_id] = true
     %AllTrainsetsSwitch.visible = _has_scenario
     _update_rows()
 

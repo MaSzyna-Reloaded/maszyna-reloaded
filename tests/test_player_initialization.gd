@@ -9,7 +9,7 @@ const VEHICLE_OFFSET:float = 100.0
 const PLAYER_POSITION:Vector3 = Vector3(30.0, 3.0, 615.0)
 
 class ScenerySource extends Node:
-    signal scenery_loaded(first_train_id:String)
+    signal scenery_loaded(first_vehicle_id:String)
 
 var _player:MaszynaPlayer
 var _streamer:Node

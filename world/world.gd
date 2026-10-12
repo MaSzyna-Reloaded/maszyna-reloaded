@@ -9,8 +9,8 @@ extends Node3D
 signal load_progress(progress: float, stage: MaszynaIncludeNode.LoadStage, message: String)
 ## The includes parsed so far (MaszynaIncludeNode.load_files_parsed)
 signal load_files_parsed(count: int, filename: String)
-## The scenery has loaded, with its first vehicle's train_id (MaszynaSceneryNode.scenery_loaded)
-signal scenery_loaded(first_train_id: String)
+## The scenery has loaded, with its first vehicle's vehicle_id (MaszynaSceneryNode.scenery_loaded)
+signal scenery_loaded(first_vehicle_id: String)
 ## The share of the scenario's start done (0..1), between the load and scenery_loaded
 ## (MaszynaLegacyScenario.start())
 signal scenario_progress(progress: float)
@@ -21,11 +21,11 @@ var _scenario: MaszynaLegacyScenario = null
 
 ## Loads scenery/<filename>, the player's trainset as arranged (MaszynaIncludeNode.trainset_override),
 ## and starts its scenario - done once `scenery_loaded` has been emitted
-func load_scenery(filename: String, trainset: Array[MaszynaDynamicData], train_id: String = "") -> void:
+func load_scenery(filename: String, trainset: Array[MaszynaDynamicData], vehicle_id: String = "") -> void:
     %MaszynaSceneryNode.filename = filename
     %MaszynaSceneryNode.trainset_override.assign(trainset)
     %Player.clear_start_train()
-    %Player.start_vehicle_id = train_id
+    %Player.start_vehicle_id = vehicle_id
     %MaszynaSceneryNode.load()
     await %Player.initialization_ready
 
@@ -60,14 +60,14 @@ func _on_scenery_load_files_parsed(count: int, filename: String) -> void:
 
 
 ## The game runs the scenario of a loaded scenery; the scenery only loads it
-func _on_scenery_loaded(first_train_id: String) -> void:
+func _on_scenery_loaded(first_vehicle_id: String) -> void:
     _scenario = MaszynaLegacyScenario.new()
     # started - a scenery without sounds tells no share of it on the way
     scenario_progress.emit(0.0)
     await _scenario.start(%MaszynaSceneryNode, scenario_progress.emit)
     if not %Player.start_vehicle_id:
-        %Player.start_vehicle_id = first_train_id
-    scenery_loaded.emit(first_train_id)
+        %Player.start_vehicle_id = first_vehicle_id
+    scenery_loaded.emit(first_vehicle_id)
 
 
 func _on_scenery_unloading() -> void:

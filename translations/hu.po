@@ -506,7 +506,7 @@ msgstr "Csúszósaru"
 msgid "none"
 msgstr "nincs"
 
-msgid "(no train id)"
+msgid "(no vehicle id)"
 msgstr "(nincs azonosító)"
 
 msgid "(unnamed)"

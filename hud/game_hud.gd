@@ -273,8 +273,8 @@ func attach_environment(environment: MaszynaEnvironmentNode) -> void:
 
 ## The scenario the player has started, for the "Scenario" entry of the View menu - hidden until
 ## the player opens it
-func show_scenario(info: MaszynaSceneryInfo, train_id: String) -> void:
-    %ScenarioPanel.show_scenario(info, train_id)
+func show_scenario(info: MaszynaSceneryInfo, vehicle_id: String) -> void:
+    %ScenarioPanel.show_scenario(info, vehicle_id)
     %VehicleSelectorPanel.show_scenario(info)
 
 

@@ -24,7 +24,7 @@ var _player_vehicle:RID = RID()
 ## The vehicle of the active row, whose card the selector has open; lit
 var _active_vehicle:RID = RID()
 ## The scenery's names of the vehicles of the trainsets the player can drive
-var _drivable_vehicle_names:Dictionary[String, bool] = {}
+var _drivable_vehicle_ids:Dictionary[String, bool] = {}
 ## Without a scenario (a scene put together by hand) every vehicle is listed
 var _has_scenario:bool = false
 
@@ -55,14 +55,14 @@ func show_active_vehicle(vehicle:RID) -> void:
 
 ## The scenario played: its trainsets the player cannot drive are listed only with the switch on
 func show_scenario(info:MaszynaSceneryInfo) -> void:
-    _drivable_vehicle_names.clear()
+    _drivable_vehicle_ids.clear()
     _has_scenario = info != null
     if info:
         for trainset:MaszynaSceneryInfo.Trainset in info.trainsets:
             if not trainset.is_drivable():
                 continue
             for vehicle:MaszynaSceneryInfo.Vehicle in trainset.vehicles:
-                _drivable_vehicle_names[vehicle.vehicle_id] = true
+                _drivable_vehicle_ids[vehicle.vehicle_id] = true
     %AllTrainsetsSwitch.visible = _has_scenario
     _update_rows()
 
@@ -111,7 +111,7 @@ func _update_row(vehicle:RID) -> void:
     var listed:bool = VehicleServer.vehicle_exists(vehicle) and (
             DriverServer.vehicle_get_driver(vehicle).is_valid() or vehicle == _player_vehicle) and (
             vehicle == _player_vehicle or not _has_scenario or %AllTrainsetsSwitch.button_pressed
-            or _drivable_vehicle_names.has(VehicleServer.vehicle_get_name(vehicle)))
+            or _drivable_vehicle_ids.has(VehicleServer.vehicle_get_id(vehicle)))
     var row:VehicleSelectorRow = _rows.get(vehicle)
     if row and not listed:
         _rows.erase(vehicle)

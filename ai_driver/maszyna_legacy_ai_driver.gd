@@ -517,7 +517,7 @@ func _handle_command(driver:RID, command:String, value1:float, value2:float, pos
     var vehicle:RID = VehicleServer.person_get_vehicle(driver)
     # the original writes every order to its log (TController::PutCommand(), Driver.cpp:4470)
     GameLog.get_logger("ai").debug("%s: %s %s %s (order %s)" % [
-            VehicleServer.vehicle_get_name(vehicle), command, value1, value2,
+            VehicleServer.vehicle_get_id(vehicle), command, value1, value2,
             state.orders[state.order_position]])
     if command.begins_with(TIMETABLE_PREFIX):
         _take_timetable(driver, state, command.trim_prefix(TIMETABLE_PREFIX), value1, value2, position)
@@ -1104,6 +1104,13 @@ func _update_connect(situation:MaszynaLegacyDriverTraction.Situation) -> void:
     if not _is_coupled_as_asked(state.coupling_vehicle, state.coupling_end, state.coupler):
         var neighbour:RailVehicleNeighbour = RailVehicleServer.vehicle_find_vehicle(
                 state.coupling_vehicle, state.coupling_end, MaszynaLegacyDriverRoute.OBSTACLE_RANGE)
+        # the coupling end's neighbour as the vehicle keeps it (Neighbours[], Driver.cpp:7002): near,
+        # between the couplers less their adapters, not between the primary axles (DynObj.cpp:7577)
+        if neighbour and neighbour.distance < MaszynaLegacyDriverRoute.OBSTACLE_COUPLER_RANGE:
+            neighbour.distance = RailVehicleServer.vehicle_get_coupler_distance(
+                    state.coupling_vehicle, neighbour.vehicle_rid) \
+                    - RailVehicleServer.vehicle_get_coupler_adapter_length(state.coupling_vehicle, state.coupling_end) \
+                    - RailVehicleServer.vehicle_get_coupler_adapter_length(neighbour.vehicle_rid, neighbour.end)
         var compatible:bool = true
         if neighbour and neighbour.distance < ADAPTER_DISTANCE \
                 and not RailVehicleServer.vehicle_is_coupler_automatic(state.coupling_vehicle, state.coupling_end) \

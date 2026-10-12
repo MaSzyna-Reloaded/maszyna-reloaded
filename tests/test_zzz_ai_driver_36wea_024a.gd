@@ -24,7 +24,7 @@ func test_the_driver_walks_to_the_rear_cab_with_the_player() -> void:
             RailVehicleController.COUPLING_FLAG_COUPLER):
         var engine:RailVehicleEngine = _engine(car)
         if engine and _master(car):
-            assert_true(engine.get_main_switch_enabled(), "%s's line breaker stays closed" % VehicleServer.vehicle_get_name(car))
+            assert_true(engine.get_main_switch_enabled(), "%s's line breaker stays closed" % VehicleServer.vehicle_get_id(car))
     await key_tap(&"cab_activation_toggle")
     await step(ticks(DRIVER_UPDATE_SECONDS))
     assert_eq(_master(player_vehicle).get_cabin(), -1, "the rear cab is the active one")
@@ -59,13 +59,13 @@ func _walk_to_the_rear_cab_of_c() -> void:
     await key_tap(&"direction_decrease")
     for _change:int in MAX_CAB_CHANGES:
         var vehicle:RID = PlayerServer.player_get_vehicle()
-        if VehicleServer.vehicle_get_name(vehicle) == "36wea-024c" \
+        if VehicleServer.vehicle_get_id(vehicle) == "36wea-024c" \
                 and RailVehicleServer.vehicle_get_driver_cabin(vehicle) == RailVehicleServer.vehicle_get_rear_cabin(vehicle):
             break
         await key_tap(&"cabin_next")
         await step(ticks(1.0))
     var reached:RID = PlayerServer.player_get_vehicle()
-    assert_eq(VehicleServer.vehicle_get_name(reached), "36wea-024c", "the player reached the C car")
+    assert_eq(VehicleServer.vehicle_get_id(reached), "36wea-024c", "the player reached the C car")
     assert_eq(RailVehicleServer.vehicle_get_driver_cabin(reached), RailVehicleServer.vehicle_get_rear_cabin(reached),
             "in its rear cab")
     await step(ticks(DRIVER_UPDATE_SECONDS))

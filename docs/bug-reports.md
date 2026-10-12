@@ -92,7 +92,7 @@ Every value is UTF-8 text:
 | `description` | what the player wrote, whole, trimmed; never empty |
 | `build` | the build number of the game (`GameDataServer.build_get_number()`, e.g. `20261003-1708`) |
 | `scenery` | the scenery's file (`stary_jawor_eszelon.scn`), empty in the selector |
-| `vehicle` | the vehicle the player drives (its scenery name), empty when none |
+| `vehicle` | the vehicle the player drives (its vehicle id), empty when none |
 
 The game sends a report only after the player ticked "I agree to sharing the hardware information
 and the report, and to publishing them on GitHub".
@@ -156,9 +156,9 @@ Logs are arrays of text lines, oldest first, fields separated by single spaces.
 | `hardware` | `build`, `godot` (engine version), `os`, `os_version`, `distribution`, `architecture`, `debug`, `editor`, `double_precision`, `cpu`, `cpu_threads`, `memory` (`OS.get_memory_info()`, bytes), `gpu_vendor`, `gpu`, `gpu_type` (`DEVICE_TYPE_DISCRETE_GPU`, ...), `gpu_driver`, `graphics_api_version`, `rendering_method`, `rendering_driver`, `screen_size`, `window_size`, `window_mode` (`WINDOW_MODE_FULLSCREEN`, ...), `locale`, `language` |
 | `scenario` | `vehicle`, `occupied_cab`; with a scenery also `filename`, `title`, `start_time` (hours), `first_vehicle_id` |
 | `simulation` | `real_seconds_since_start` (wall clock since the scenery started), `simulation_time`, `time_of_day` (hours), `speed` (asked), `current_speed`, `light_level`; with a scenery also `date` (`YYYY-MM-DD`) and `weather`: `weather` (`WEATHER_RAIN`, ...), `season`, `cloudiness`, `precipitation`, `temperature` (the scenery's, °C), `air_temperature` (the simulation's, °C), `wind_direction` (°), `wind_strength`, `fog_enabled`, `fog_density`, `fog_distance` (m) |
-| `camera` | `mode` (`CAMERA_MODE_CABIN`, ...), `target` (vehicle name), `follow_view`, `vehicle_transform` and, with a scenery, `transform` - each `{"origin": [x, y, z], "rotation_radians": [x, y, z]}` |
+| `camera` | `mode` (`CAMERA_MODE_CABIN`, ...), `target` (vehicle id), `follow_view`, `vehicle_transform` and, with a scenery, `transform` - each `{"origin": [x, y, z], "rotation_radians": [x, y, z]}` |
 | `streaming` | `enabled`, `building`, `camera_position`, `camera_chunk`, `draw_distance`, `statistics` (`SceneryStreamingServer.streaming_get_statistics()`) |
-| `vehicles` | `trainset`: every vehicle coupled to the player's, `{"name", "position", "state", "config"}` - the full state and configuration dumps; `nearby`: every other vehicle within 2000 m, `{"name", "position", "distance", "state"}` |
+| `vehicles` | `trainset`: every vehicle coupled to the player's, `{"vehicle_id", "position", "state", "config"}` - the full state and configuration dumps; `nearby`: every other vehicle within 2000 m, `{"vehicle_id", "position", "distance", "state"}` |
 | `signal_heads` | lines, nearest first, every signal head within 2000 m (see below) |
 | `events` | `launched`: lines, the last 200 events that ran (see below); `upcoming`: the queued events in the order they run, `{"event", "seconds_left"}` |
 | `commands` | lines, the last 500 commands the player's vehicle received (see below) |

@@ -66,7 +66,7 @@ static func hardware() -> Dictionary:
 static func scenario(world: SceneryWorld) -> Dictionary:
     var vehicle: RID = PlayerServer.player_get_vehicle()
     var result: Dictionary = {
-        "vehicle": VehicleServer.vehicle_get_name(vehicle),
+        "vehicle": VehicleServer.vehicle_get_id(vehicle),
         "driver_cabin": enum_name(&"RailVehicleCabinKind", &"Kind",
                 RailVehicleServer.cabin_get_kind(RailVehicleServer.vehicle_get_driver_cabin(vehicle))),
     }
@@ -112,7 +112,7 @@ static func simulation(world: SceneryWorld, started_msec: int) -> Dictionary:
 static func camera(world: SceneryWorld) -> Dictionary:
     var result: Dictionary = {
         "mode": enum_name(&"PlayerCameraServer", &"CameraMode", PlayerCameraServer.camera_get_mode()),
-        "target": VehicleServer.vehicle_get_name(PlayerCameraServer.camera_get_target()),
+        "target": VehicleServer.vehicle_get_id(PlayerCameraServer.camera_get_target()),
         "follow_view": enum_name(
                 &"PlayerCameraServer", &"CameraFollowView", PlayerCameraServer.camera_get_follow_view()),
         "vehicle_transform": transform_to_dictionary(
@@ -147,7 +147,7 @@ static func vehicles(origin: Vector3) -> Dictionary:
                 vehicle, RailVehicleController.COUPLER_END_FRONT, RailVehicleController.COUPLING_FLAG_COUPLER))
     for rid: RID in coupled:
         trainset.append({
-            "name": VehicleServer.vehicle_get_name(rid),
+            "vehicle_id": VehicleServer.vehicle_get_id(rid),
             "position": vector_to_array(RailVehicleServer.vehicle_get_transform(rid).origin),
             "state": VehicleServer.vehicle_dump_state(rid),
             "config": VehicleServer.vehicle_dump_config(rid),
@@ -157,7 +157,7 @@ static func vehicles(origin: Vector3) -> Dictionary:
         if rid in coupled or position.distance_to(origin) > NEARBY_RADIUS:
             continue
         nearby.append({
-            "name": VehicleServer.vehicle_get_name(rid),
+            "vehicle_id": VehicleServer.vehicle_get_id(rid),
             "position": vector_to_array(position),
             "distance": position.distance_to(origin),
             "state": VehicleServer.vehicle_dump_state(rid),

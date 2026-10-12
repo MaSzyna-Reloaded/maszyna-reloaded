@@ -25,7 +25,7 @@ func test_a_compressor_switched_on_is_not_hinted() -> void:
             continue
         allowed = allowed or (brake.compressor_speed > 0.0 and brake.get_compressor_allowed())
         cars.append("%s speed=%s power=%s allowed=%s running=%s" % [
-                VehicleServer.vehicle_get_name(car), brake.compressor_speed, brake.compressor_power,
+                VehicleServer.vehicle_get_id(car), brake.compressor_speed, brake.compressor_power,
                 brake.get_compressor_allowed(), brake.get_compressor_enabled()])
     assert_true(allowed, "the start-up switched a compressor on: %s" % "; ".join(cars))
     var hinted:bool = false

@@ -23,7 +23,7 @@ func test_a_unit_moved_off_is_ready_for_its_driver() -> void:
     for car:RID in VehicleServer.vehicle_get_rids():
         var dump:Dictionary = VehicleServer.vehicle_dump_state(car)
         cars.append("%s power=%s main_switch=%s pantograph=%s/%s voltage=%s" % [
-                VehicleServer.vehicle_get_name(car), VehicleServer.vehicle_get_controller(car).power,
+                VehicleServer.vehicle_get_id(car), VehicleServer.vehicle_get_controller(car).power,
                 dump.get("main_switch_enabled"), dump.get("current_collector/pantograph_first_active"),
                 dump.get("current_collector/pantograph_second_active"), dump.get("current_collector/voltage")])
     assert_eq(state.get("engine_missing", -1), 0, "nothing missing: %s" % "; ".join(cars))
@@ -37,7 +37,7 @@ func test_a_unit_moved_off_is_ready_for_its_driver() -> void:
     var source:RailVehicleEnginePowerSource = RailVehicleServer.vehicle_component_get(
             unit, RailVehicleComponentType.COMPONENT_ENGINE_POWER_SOURCE) as RailVehicleEnginePowerSource
     texts.append("unit %s collectors=%d valves=%s/%s" % [
-            VehicleServer.vehicle_get_name(unit), source.current_collector_number_of_collectors,
+            VehicleServer.vehicle_get_id(unit), source.current_collector_number_of_collectors,
             source.get_collector_pantograph_first_valve_active(), source.get_collector_pantograph_second_valve_active()])
     assert_true(MaszynaLegacyDriverHints.TEXTS[MaszynaLegacyDriverHints.Hint.REAR_PANTOGRAPH_VALVE_ON] in texts,
             "a hint to raise pantograph B: %s" % [texts])

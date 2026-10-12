@@ -309,7 +309,8 @@ func _get_arranged_trainset() -> Array[MaszynaDynamicData]:
     var trainset: Array[MaszynaDynamicData] = []
     for vehicle: MaszynaSceneryInfo.Vehicle in _vehicles:
         var dynamic: MaszynaDynamicData = MaszynaDynamicData.new()
-        dynamic.name = vehicle.vehicle_id
+        dynamic.vehicle_id = vehicle.vehicle_id
+        dynamic.name = vehicle.name
         dynamic.data_path = vehicle.data_path
         dynamic.file_name = vehicle.file_name
         dynamic.skin = vehicle.skin
@@ -418,7 +419,7 @@ func _show_vehicles(selected: int) -> void:
     for vehicle: MaszynaSceneryInfo.Vehicle in _vehicles:
         var tile: TileGrid.Tile = TileGrid.Tile.new(
             vehicle.data_path, vehicle.file_name, vehicle.skin, vehicle.vehicle_id,
-            "%s (%s)" % [vehicle.get_display_name(), vehicle.data_path.get_file()]
+            "%s (%s)" % [vehicle.get_name(), vehicle.data_path.get_file()]
         )
         tile.flipped = vehicle.reversed
         tile.removable = _is_removable(tiles.size())
@@ -504,7 +505,7 @@ func ask_remove_vehicle(index: int) -> void:
     _removed_index = index
     var vehicle: MaszynaSceneryInfo.Vehicle = _vehicles[index]
     %RemoveVehicleQuestion.message = tr("%s leaves the trainset.") % (
-        vehicle.get_display_name() if vehicle.get_display_name() else vehicle.file_name
+        vehicle.get_name() if vehicle.get_name() else vehicle.file_name
     )
     %RemoveVehicleQuestion.ask()
 
@@ -656,7 +657,7 @@ func _fade_list_panel(to_alpha: float) -> void:
 ## starting track, not a name; the vehicles are named in "node <x> <y> <name> dynamic"
 static func _get_trainset_name(trainset: MaszynaSceneryInfo.Trainset) -> String:
     var driver: MaszynaSceneryInfo.Vehicle = trainset.get_driver_vehicle()
-    return driver.get_display_name() if driver else ""
+    return driver.get_name() if driver else ""
 
 
 ## Its vehicles as arranged, and whether that is not as the scenario gives them

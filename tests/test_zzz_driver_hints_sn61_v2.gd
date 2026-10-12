@@ -143,7 +143,7 @@ func test_the_releaser_is_not_asked_for_once_the_independent_brake_is_let_off() 
 ## SN61-02 of the scenery entered and started by nothing but the hints, top to bottom; true when its
 ## engine runs
 func _start_by_hints(scenery:String) -> bool:
-    if not await enter_vehicle(scenery, "SN61-02"):
+    if not await enter_vehicle(scenery, "sn61-02"):
         return false
     _driver = DriverServer.vehicle_get_driver(occupied)
     assert_true(_driver.is_valid(), "the scenery's driver is seated in SN61-02")

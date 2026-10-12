@@ -8,6 +8,9 @@ extends GutHookScript
 
 
 func run() -> void:
+    # no ResourceCache read or written: a test builds everything from its fixtures, never from what
+    # a previous run compiled (a stale scenery cache read as a regression, FINDINGS.md 2026-10-12)
+    ProjectSettings.set_setting("maszyna/cache/enabled", false)
     SimulationServer.simulation_unpause()
     SimulationServer.simulation_reset_speed()
     DriverServer.implementation_register(SceneryInstancer.DRIVER_IMPLEMENTATION, MaszynaLegacyAIDriver.new())

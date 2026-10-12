@@ -129,7 +129,9 @@ func _ready() -> void:
                 if not at == scenery_at + 1 and not args[at].begins_with("-"):
                     train_id = args[at]
                     break
-        start_scenery(args[scenery_at + 1], train_id, DECLARED_TRAINSET)
+        # in lower case, as the original takes -v (application.cpp:1142) - the scenery's vehicles
+        # are named so
+        start_scenery(args[scenery_at + 1], train_id.to_lower(), DECLARED_TRAINSET)
     elif scenery:
         start_scenery(scenery, "", DECLARED_TRAINSET)
     else:

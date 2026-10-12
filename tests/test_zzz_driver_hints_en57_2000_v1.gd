@@ -10,7 +10,7 @@ const DRIVER_UPDATE_SECONDS:float = 5.0
 
 
 func test_a_compressor_switched_on_is_not_hinted() -> void:
-    await run_startup("startup_en57-2000_v1.scn", "EN57-2067ra", Kind.ELECTRIC_MULTIPLE_UNIT)
+    await run_startup("startup_en57-2000_v1.scn", "en57-2067ra", Kind.ELECTRIC_MULTIPLE_UNIT)
     var driver:RID = DriverServer.vehicle_get_driver(occupied)
     assert_true(driver.is_valid(), "the scenery's driver is seated in the unit")
     if not driver.is_valid():

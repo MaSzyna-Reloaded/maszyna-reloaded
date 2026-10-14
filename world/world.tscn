@@ -13,9 +13,8 @@
 [node name="World" type="Node3D" unique_id=747719912]
 script = ExtResource("1_world")
 
-[node name="SceneryStreamer" type="Node" parent="." unique_id=79567195 node_paths=PackedStringArray("camera")]
+[node name="SceneryStreamer" type="Node" parent="." unique_id=79567195]
 script = ExtResource("8_streamer")
-camera = NodePath("../Player/FreeCamera3D")
 
 [node name="MaszynaEnvironmentNode" type="Node" parent="." unique_id=603722115]
 unique_name_in_owner = true

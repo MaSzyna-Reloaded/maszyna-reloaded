@@ -55,10 +55,12 @@ func test_streaming_does_not_start_before_scenery_loaded() -> void:
     add_child(_player)
     _source.scenery_loaded.connect(_player._on_scenery_loaded)
     assert_false(SceneryStreamingServer.streaming_has_camera())
+    assert_null(_player.camera, "no camera of the player's before it has started")
     assert_signal_emit_count(_player, "initialization_ready", 0)
     _source.scenery_loaded.emit("")
     assert_true(SceneryStreamingServer.streaming_has_camera())
-    assert_eq(get_viewport().get_camera_3d(), _player.free_camera)
+    assert_eq(get_viewport().get_camera_3d(), _player.camera, "the player's one camera, current from initialization_ready")
+    assert_eq(_player.camera.get_parent(), _player.free_view, "started outside, it looks through the free view")
     assert_signal_emit_count(_player, "initialization_ready", 1)
 
 
@@ -161,7 +163,7 @@ func test_first_streaming_camera_is_already_in_the_selected_cabin() -> void:
     var shown:Cabin3D = CabinSystem.vehicle_get_cabin(_vehicle.get_rid())
     assert_eq(positions[0], shown.get_camera_transform().origin)
     PlayerCameraServer.camera_toggle_cabin()
-    assert_eq(SceneryStreamingServer.streaming_get_camera_position(), _player.free_camera.global_position)
+    assert_eq(SceneryStreamingServer.streaming_get_camera_position(), _player.free_view.global_position)
     assert_eq(PlayerServer.player_get_vehicle(), _vehicle.get_rid(), "view changes do not leave the vehicle")
     _player.clear_start_train()
     assert_false(SceneryStreamingServer.streaming_has_camera())
@@ -186,7 +188,7 @@ func test_world_initializes_on_each_scenery_load_and_detaches_on_unload() -> voi
     assert_true(await wait_until(func() -> bool:
         return get_signal_emit_count(_player, "initialization_ready") == 2, LOAD_TIMEOUT))
     assert_false(PlayerServer.player_get_vehicle().is_valid())
-    assert_eq(SceneryStreamingServer.streaming_get_camera_position(), _player.free_camera.global_position)
+    assert_eq(SceneryStreamingServer.streaming_get_camera_position(), _player.free_view.global_position)
 
 
 func test_scenery_vehicle_without_a_cabin_scene_waits_for_its_cabin() -> void:

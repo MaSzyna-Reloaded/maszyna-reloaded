@@ -43,6 +43,7 @@ sfx_bank = ExtResource("6_player_sfx_bank")
 [node name="Terrain3D" type="Terrain3D" parent="."]
 unique_name_in_owner = true
 material = SubResource("Terrain3DMaterial_world")
+mesh_size = 64
 
 [node name="ScenarioKeyboard" type="Node" parent="."]
 unique_name_in_owner = true

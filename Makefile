@@ -1,4 +1,4 @@
-.PHONY: libmaszyna-local libmaszyna-submodule compile-debug compile-release compile-profiling compile-release-symbols compile-release-linux compile-windows-release compile-android-release build-number release release-linux release-linux-symbols release-windows release-android release-clear-godot-cache windows-installer-image windows-installer-image-push run-tests check-staged-uids install-git-hooks
+.PHONY: terrain3d libmaszyna-local libmaszyna-submodule compile-debug compile-release compile-profiling compile-release-symbols compile-release-linux compile-windows-release compile-android-release build-number release release-linux release-linux-symbols release-windows release-android release-clear-godot-cache windows-installer-image windows-installer-image-push run-tests check-staged-uids install-git-hooks
 .DEFAULT_GOAL = compile-debug
 
 # libmaszyna is the vendor/libmaszyna submodule; its make builds the library into this project
@@ -53,6 +53,19 @@ libmaszyna-submodule:
 
 compile-debug compile-release compile-profiling compile-release-symbols compile-release-linux compile-windows-release compile-android-release: $(BUILD_NUMBER_FILE)
 	$(LIBMASZYNA_MAKE) $@
+
+
+# Terrain3D (the vendor/terrain3d submodule, the world's ground) built double precision: its release
+# builds are single precision and do not load in the double precision game. Its godot-cpp is moved
+# to libmaszyna's commit (Terrain3D 1.0.2's own is too old for the 4.7 API) and the patch adapts it to
+# that godot-cpp; the libraries land in the submodule's addon, which addons/terrain_3d links.
+TERRAIN3D:=vendor/terrain3d
+terrain3d:
+	cd $(TERRAIN3D)/godot-cpp && git fetch -q --depth 100 origin master && git checkout -q $$(git -C $(abspath $(LIBMASZYNA))/godot-cpp rev-parse HEAD)
+	cd $(TERRAIN3D) && (git apply --check $(CURDIR)/patches/terrain3d-godot-cpp-10.patch 2>/dev/null && git apply $(CURDIR)/patches/terrain3d-godot-cpp-10.patch || true)
+	cd $(TERRAIN3D) && for t in template_debug template_release; do \
+		scons platform=linux target=$$t precision=double custom_api_file=$(abspath $(LIBMASZYNA))/extension_api.json -j$$(nproc) || exit 1; \
+	done
 
 
 # The build number is stamped only when it is asked for, so a build never changes it: it describes

@@ -42,7 +42,7 @@ const STEP:float = 20.0
 
 var _tracks:Array[RID] = []
 var _events:Array[RID] = []
-var _scenery:MaszynaIncludeNode = null
+var _scenery:MaszynaLegacyIncludeNode = null
 var _vehicles:Array[RailVehicle3D] = []
 var _vehicle:RID = RID()
 var _trainset:MaszynaLegacyDriverTrainset = null
@@ -73,7 +73,7 @@ func before_each() -> void:
     var context:MaszynaImporterContext = MaszynaImporterContext.new()
     parser.register_handler("event", func(p:MaszynaParser) -> Array: return EventImporter.new().import(p, context))
     parser.parse()
-    _scenery = MaszynaIncludeNode.new()
+    _scenery = MaszynaLegacyIncludeNode.new()
     _scenery.autoload = false
     add_child(_scenery)
     var memcells:Array[MaszynaMemcellData] = []

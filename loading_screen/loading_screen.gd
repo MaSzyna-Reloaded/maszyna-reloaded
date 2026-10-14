@@ -40,14 +40,14 @@ func show_loading(display_name: String) -> void:
     _progress = 0.0
     _started_msec = Time.get_ticks_msec()
     _progressed_msec = _started_msec
-    %Board.show_progress(0.0, MaszynaIncludeNode.LoadStage.FILES, "")
+    %Board.show_progress(0.0, MaszynaSceneryContentNode.LoadStage.FILES, "")
     %Board.show_elapsed(0)
     %Board.show_stalled(false)
     visible = true
     %Clock.start()
 
 
-func set_progress(progress: float, stage: MaszynaIncludeNode.LoadStage, message: String) -> void:
+func set_progress(progress: float, stage: MaszynaSceneryContentNode.LoadStage, message: String) -> void:
     if progress > _progress:
         _progress = progress
         _progressed_msec = Time.get_ticks_msec()

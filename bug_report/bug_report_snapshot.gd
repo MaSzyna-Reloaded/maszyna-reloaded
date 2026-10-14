@@ -71,9 +71,9 @@ static func scenario(world: SceneryWorld) -> Dictionary:
                 RailVehicleServer.cabin_get_kind(RailVehicleServer.vehicle_get_driver_cabin(vehicle))),
     }
     if world:
-        var scenery: MaszynaSceneryNode = world.get_scenery()
+        var scenery: MaszynaSceneryContentNode = world.get_scenery()
         result.merge({
-            "filename": scenery.filename,
+            "filename": scenery.get_scenery_name(),
             "title": scenery.title,
             "start_time": scenery.start_time,
             "first_vehicle_id": scenery.first_vehicle_id,

@@ -7,7 +7,7 @@ extends Control
 ## trainset is restored. After "Load" the background dissolves into the
 ## loading screen below. Escape asks to quit (quit_requested).
 
-## trainset: the shown trainset as arranged here (MaszynaIncludeNode.trainset_override)
+## trainset: the shown trainset as arranged here (MaszynaSceneryContentNode.trainset_override)
 signal scenery_selected(filename: String, vehicle_id: String, trainset: Array[MaszynaDynamicData])
 ## Escape - the game fades out and quits
 signal quit_requested
@@ -112,6 +112,14 @@ func list_sceneries() -> void:
             continue
         _files.append(file)
         _titles.append(MaszynaSceneryInfo.read_display_name(file))
+    # the worlds of the game's own format (MaszynaWorld), on the same list
+    var worlds_dir: String = UserSettings.get_maszyna_game_dir().path_join(MaszynaWorld.WORLDS_DIR)
+    var worlds: PackedStringArray = DirAccess.get_files_at(worlds_dir) if DirAccess.dir_exists_absolute(worlds_dir) else PackedStringArray()
+    worlds.sort()
+    for file: String in worlds:
+        if file.get_extension().to_lower() == MaszynaWorld.DESCRIPTION_EXTENSION:
+            _files.append(file)
+            _titles.append(MaszynaSceneryInfo.read_display_name(file))
     var notes: PackedStringArray = []
     for file: String in _files:
         notes.append(file.get_basename().to_upper())

@@ -23,14 +23,14 @@ const SLICE_MARGIN:float = 0.1
 const WARNING_DURATION:float = 3.0
 
 var _previous_game_dir:String = ""
-var _scenery:MaszynaSceneryNode
+var _scenery:MaszynaLegacySceneryNode
 var _vehicle:RID
 
 
 func before_each() -> void:
     _previous_game_dir = UserSettings.get_maszyna_game_dir()
     UserSettings.save_maszyna_game_dir(FIXTURES_GAME_DIR)
-    _scenery = MaszynaSceneryNode.new()
+    _scenery = MaszynaLegacySceneryNode.new()
     _scenery.filename = SCENERY
     add_child(_scenery)
     # the scenery is announced once its vehicles are built and its drivers given their AI

@@ -18,14 +18,14 @@ const CONVERTER_UPDATE:int = 5
 const SLICE_MARGIN:float = 0.1
 
 var _previous_game_dir:String = ""
-var scenery:MaszynaSceneryNode
+var scenery:MaszynaLegacySceneryNode
 var vehicle_rid:RID
 
 
 func before_each():
     _previous_game_dir = UserSettings.get_maszyna_game_dir()
     UserSettings.save_maszyna_game_dir(FIXTURES_GAME_DIR)
-    scenery = MaszynaSceneryNode.new()
+    scenery = MaszynaLegacySceneryNode.new()
     scenery.filename = SCENERY
     add_child(scenery)
     # the scenery is announced once its vehicles are built and its drivers given their AI

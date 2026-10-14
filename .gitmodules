@@ -14,3 +14,9 @@
 [submodule "vendor/gut"]
 	path = vendor/gut
 	url = https://github.com/bitwes/Gut.git
+[submodule "vendor/terrain3d"]
+	path = vendor/terrain3d
+	url = https://github.com/TokisanGames/Terrain3D.git
+[submodule "vendor/gnd-biomes"]
+	path = vendor/gnd-biomes
+	url = https://github.com/GamesNotDeveloped/godot-biomes.git

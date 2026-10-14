@@ -48,6 +48,8 @@ const EXIT_INVALID_GAME_DIR: int = 1
 ## The 3D world of a scenery - made when one is chosen, freed in the menu, which renders nothing
 ## behind it
 const WORLD_SCENE: PackedScene = preload("world/world.tscn")
+## The world of a scenery of the game's own format (MaszynaWorld, a .json and a .pck)
+const WORLD_PCK_SCENE: PackedScene = preload("world/world_pck.tscn")
 
 ## The game's log files of a scenery (GameLogFileHandler), each started afresh with it, beside the
 ## engine's file log (Log folder, the Debug settings) - none with the file logging off. A run
@@ -141,7 +143,7 @@ func _ready() -> void:
 
 ## Loads scenery/<filename> and puts the player in vehicle_id (none: the scenery's own driver) -
 ## chosen in the selector, or given on the command line; trainset is the player's trainset as the
-## selector arranged it (MaszynaIncludeNode.trainset_override), empty for the declared one
+## selector arranged it (MaszynaSceneryContentNode.trainset_override), empty for the declared one
 func start_scenery(filename: String, vehicle_id: String, trainset: Array[MaszynaDynamicData]) -> void:
     _play_music(MUSIC_LOADING_VOLUME_DB)
     # the world starts while the loading screen fades out, not when it is built, and at the wall
@@ -159,7 +161,8 @@ func start_scenery(filename: String, vehicle_id: String, trainset: Array[Maszyna
     if $ScenerySelectorScreen.visible:
         await $ScenerySelectorScreen.hidden
     # made under the loading screen: its environment and first frames stall the main thread
-    _world = WORLD_SCENE.instantiate() as SceneryWorld
+    var pck_world: bool = filename.get_extension().to_lower() == MaszynaWorld.DESCRIPTION_EXTENSION
+    _world = (WORLD_PCK_SCENE if pck_world else WORLD_SCENE).instantiate() as SceneryWorld
     _world.load_progress.connect(_on_world_load_progress)
     _world.scenario_progress.connect(_on_world_scenario_progress)
     _world.load_files_parsed.connect($LoadingScreen.set_files)
@@ -196,7 +199,7 @@ func start_scenery(filename: String, vehicle_id: String, trainset: Array[Maszyna
 
 
 ## The scenery's load on the loading screen, in its share of the progress
-func _on_world_load_progress(progress: float, stage: MaszynaIncludeNode.LoadStage, message: String) -> void:
+func _on_world_load_progress(progress: float, stage: MaszynaSceneryContentNode.LoadStage, message: String) -> void:
     $LoadingScreen.set_progress(progress * SCENERY_LOAD_SHARE, stage, message)
 
 
@@ -204,7 +207,7 @@ func _on_world_load_progress(progress: float, stage: MaszynaIncludeNode.LoadStag
 func _on_world_scenario_progress(progress: float) -> void:
     $LoadingScreen.set_progress(
             lerpf(SCENERY_LOAD_SHARE, SURROUNDINGS_STREAMING_PROGRESS, progress),
-            MaszynaIncludeNode.LoadStage.SURROUNDINGS, "")
+            MaszynaSceneryContentNode.LoadStage.SURROUNDINGS, "")
 
 
 ## The player's surroundings, the last stage of the loading screen: the streaming's chunks around
@@ -231,12 +234,12 @@ func _build_surroundings() -> void:
         var built: float = 1.0 - float(pending) / most_pending if most_pending > 0 else 0.0
         progress = maxf(progress, lerpf(SURROUNDINGS_STREAMING_PROGRESS, 0.99, built))
         $LoadingScreen.set_progress(
-                progress, MaszynaIncludeNode.LoadStage.SURROUNDINGS, "")
+                progress, MaszynaSceneryContentNode.LoadStage.SURROUNDINGS, "")
         await get_tree().process_frame
     SceneryStreamingServer.area_unwatch(SURROUNDINGS_CHUNK_RADIUS)
     SceneryStreamingServer.area_ready.disconnect(_on_surroundings_area_ready)
     RailVehicleRenderingServer.builds_finished.disconnect(_on_surroundings_vehicles_built)
-    $LoadingScreen.set_progress(1.0, MaszynaIncludeNode.LoadStage.SURROUNDINGS, "")
+    $LoadingScreen.set_progress(1.0, MaszynaSceneryContentNode.LoadStage.SURROUNDINGS, "")
     print("[SceneryLoad] SURROUNDINGS %.1f s" % ((Time.get_ticks_msec() - started_msec) / 1000.0))
 
 

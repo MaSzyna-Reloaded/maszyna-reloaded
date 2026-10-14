@@ -26,7 +26,7 @@ const HANG_GUARD_SECONDS:float = 60.0
 const MSEC_PER_SECOND:float = 1000.0
 
 var _previous_game_dir:String = ""
-var _scenery:MaszynaSceneryNode
+var _scenery:MaszynaLegacySceneryNode
 var _driven:RID
 var _standing:RID
 var _driver:RID
@@ -48,7 +48,7 @@ func before_each() -> void:
     _connected = false
     _previous_game_dir = UserSettings.get_maszyna_game_dir()
     UserSettings.save_maszyna_game_dir(FIXTURES_GAME_DIR)
-    _scenery = MaszynaSceneryNode.new()
+    _scenery = MaszynaLegacySceneryNode.new()
     _scenery.filename = SCENERY
     add_child(_scenery)
     if not await wait_loaded(_scenery.scenery_loaded, SCENERY):

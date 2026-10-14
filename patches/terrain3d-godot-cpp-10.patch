@@ -1,0 +1,23 @@
+diff --git a/src/constants.h b/src/constants.h
+index 547dc52..8f69919 100644
+--- a/src/constants.h
++++ b/src/constants.h
+@@ -3,8 +3,18 @@
+ #ifndef CONSTANTS_CLASS_H
+ #define CONSTANTS_CLASS_H
+ 
++#include <functional>
++
+ using namespace godot;
+ 
++// godot-cpp 10 moved these into the Math namespace
++#ifndef Math_PI
++#define Math_PI Math::PI
++#endif
++#ifndef Math_TAU
++#define Math_TAU Math::TAU
++#endif
++
+ // Macros
+ #define RS RenderingServer::get_singleton()
+ #define PS PhysicsServer3D::get_singleton()

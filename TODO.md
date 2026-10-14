@@ -1,5 +1,14 @@
 # TODO
 
+## World (own format)
+
+* Terrain3D (`vendor/terrain3d`) is built double precision by `make terrain3d` on Linux only, and the
+  release workflow does not build it yet: a release has no Terrain3D library, so a world of the own
+  format has no ground there. Build it in CI (and a Windows library, cross-compiled like libmaszyna's)
+  before a release carries worlds.
+* The submodule is left modified by its build (its godot-cpp moved to libmaszyna's commit,
+  `patches/terrain3d-godot-cpp-10.patch` applied) - a fork with both committed would keep it clean.
+
 ## HUD
 
 * The HUD keeps copies of the player's state: `DrivingAid.vehicle`, `FollowedVehicleChip.vehicle`,

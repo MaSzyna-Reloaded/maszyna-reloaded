@@ -36,6 +36,7 @@ general/3d_panning_strength=0.55
 
 [autoload]
 
+BiomesServer="*res://addons/gnd_biomes/biomes_server.gd"
 TrackRenderingServer="*res://addons/libmaszyna/tracks/track_rendering_server.gd"
 TractionRenderingServer="*res://addons/libmaszyna/traction/traction_rendering_server.gd"
 MaszynaSceneryChunkRenderingServer="*res://addons/libmaszyna/legacy/scenery/maszyna_scenery_chunk_rendering_server.gd"
@@ -971,4 +972,28 @@ gnd_wind_turbulence={
 gnd_wind_pattern={
 "type": "sampler2D",
 "value": ""
+}
+sgt_legacy_renderer={
+"type": "int",
+"value": 0
+}
+sgt_player_position={
+"type": "vec3",
+"value": Vector3(1000000, 1000000, 1000000)
+}
+sgt_player_mov={
+"type": "vec3",
+"value": Vector3(0, 0, 0)
+}
+sgt_normal_displacement={
+"type": "sampler2D",
+"value": ""
+}
+sgt_motion_texture={
+"type": "sampler2D",
+"value": ""
+}
+gnd_high_quality_foliage={
+"type": "bool",
+"value": true
 }

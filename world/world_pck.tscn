@@ -8,7 +8,7 @@
 [ext_resource type="Script" uid="uid://b02h32v57jji1" path="res://addons/libmaszyna/scenario/scenario_keyboard.gd" id="7_scenario_keyboard"]
 [ext_resource type="Script" uid="uid://clkcp3220jqpe" path="res://addons/libmaszyna/scenery/scenery_streamer.gd" id="8_streamer"]
 [ext_resource type="Script" path="res://world/sky/gnd_skydome_maszyna_environment.gd" id="9_sky"]
-[ext_resource type="Script" path="res://world/world_terrain_streamer.gd" id="10_terrain_streamer"]
+[ext_resource type="Script" path="res://addons/reloaded_terrain/world_terrain_streamer.gd" id="10_terrain_streamer"]
 
 [sub_resource type="Terrain3DMaterial" id="Terrain3DMaterial_world"]
 world_background = 0

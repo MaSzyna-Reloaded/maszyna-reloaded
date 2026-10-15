@@ -2,14 +2,9 @@
 
 ## World (own format)
 
-* Terrain3D (`vendor/terrain3d`) is built double precision by `make terrain3d` on Linux only: the CI
-  builds it (job terrain3d, cached) for the editor of the tests and of every export and the Linux
-  game, but the Windows and Android games have no Terrain3D library, so a world of the own format
-  has no ground there. Build those too (Windows cross-compiled like libmaszyna's, Android with the
-  NDK) before their releases carry worlds.
-* The submodule is left modified by its build (its godot-cpp moved to libmaszyna's commit,
-  `patches/terrain3d-godot-cpp-10.patch` and `patches/terrain3d-region-window.patch` applied) - a
-  fork with them committed would keep it clean.
+* Terrain3D comes from reloaded-terrain's release (`make terrain3d`): built there for Linux and
+  Windows; the Android game has no Terrain3D library, so a world of the own format has no ground
+  there - reloaded-terrain is to build it too (the NDK) before an Android release carries worlds.
 * Online worlds: a `MaszynaWorldSectorSource` that downloads - the blocks around the start whole,
   then single sectors out of a block's pack by HTTP range (a sector's files lie one after another
   in it) - into a cache on the disk, with a manifest of the blocks' versions.

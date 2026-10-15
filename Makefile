@@ -1,4 +1,4 @@
-.PHONY: terrain3d terrain3d-patches libmaszyna-local libmaszyna-submodule compile-debug compile-release compile-profiling compile-release-symbols compile-release-linux compile-windows-release compile-android-release build-number release release-linux release-linux-symbols release-windows release-android release-clear-godot-cache windows-installer-image windows-installer-image-push run-tests check-staged-uids install-git-hooks
+.PHONY: terrain3d libmaszyna-local libmaszyna-submodule compile-debug compile-release compile-profiling compile-release-symbols compile-release-linux compile-windows-release compile-android-release build-number release release-linux release-linux-symbols release-windows release-android release-clear-godot-cache windows-installer-image windows-installer-image-push run-tests check-staged-uids install-git-hooks
 .DEFAULT_GOAL = compile-debug
 
 # libmaszyna is the vendor/libmaszyna submodule; its make builds the library into this project
@@ -55,31 +55,16 @@ compile-debug compile-release compile-profiling compile-release-symbols compile-
 	$(LIBMASZYNA_MAKE) $@
 
 
-# Terrain3D (the vendor/terrain3d submodule, the world's ground) built double precision: its release
-# builds are single precision and do not load in the double precision game. Its godot-cpp is moved
-# to libmaszyna's commit (Terrain3D 1.0.2's own is too old for the 4.7 API) and the patch adapts it to
-# that godot-cpp; the libraries land in the submodule's addon, which addons/terrain_3d links.
-# terrain3d-region-window.patch lets the region map's 32x32 window move (Terrain3DData.
-# set_region_map_origin()) and makes the shaders work relative to it, so a world's regions can be
-# streamed anywhere around the camera and stay precise hundreds of km from the origin.
-# Each patch is applied only while it still applies, i.e. once (terrain3d-patches) - also to the
-# addon's own scripts and shaders, so a checkout given built libraries (the CI's) applies them too.
-# The engine's API it is built against is dumped by libmaszyna's Makefile from the double precision
-# Godot (GODOT), once.
-TERRAIN3D:=vendor/terrain3d
-TERRAIN3D_PATCHES:=terrain3d-godot-cpp-10.patch terrain3d-region-window.patch
-LIBMASZYNA_API:=$(abspath $(LIBMASZYNA))/extension_api.json
-$(LIBMASZYNA_API):
-	$(MAKE) -C $(LIBMASZYNA) $@ GODOT=$(GODOT)
-terrain3d-patches:
-	cd $(TERRAIN3D) && for p in $(TERRAIN3D_PATCHES); do \
-		git apply --check $(CURDIR)/patches/$$p 2>/dev/null && git apply $(CURDIR)/patches/$$p || true; \
-	done
-terrain3d: terrain3d-patches $(LIBMASZYNA_API)
-	cd $(TERRAIN3D)/godot-cpp && git fetch -q --depth 100 origin master && git checkout -q $$(git -C $(abspath $(LIBMASZYNA))/godot-cpp rev-parse HEAD)
-	cd $(TERRAIN3D) && for t in template_debug template_release; do \
-		scons platform=linux target=$$t precision=double custom_api_file=$(LIBMASZYNA_API) -j$$(nproc) || exit 1; \
-	done
+# Terrain3D (the world's ground) patched and built double precision for the worlds, and the worlds'
+# terrain streamer (WorldTerrainStreamer): the release RELOADED_TERRAIN of reloaded-terrain
+# (github.com/MaSzyna-Reloaded/reloaded-terrain, tags YYMMDDHHMM) - its reloaded-terrain-<tag>.zip,
+# addons/terrain_3d and addons/reloaded_terrain, unzipped here. Nothing here builds Terrain3D.
+RELOADED_TERRAIN:=2610152101
+RELOADED_TERRAIN_ZIP:=https://github.com/MaSzyna-Reloaded/reloaded-terrain/releases/download/$(RELOADED_TERRAIN)/reloaded-terrain-$(RELOADED_TERRAIN).zip
+terrain3d:
+	curl -fsSL -o .reloaded-terrain.zip $(RELOADED_TERRAIN_ZIP)
+	unzip -qo .reloaded-terrain.zip
+	rm .reloaded-terrain.zip
 
 
 # The build number is stamped only when it is asked for, so a build never changes it: it describes

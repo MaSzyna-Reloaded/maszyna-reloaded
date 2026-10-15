@@ -16,7 +16,7 @@ func _open_scenery(filename: String) -> MaszynaSceneryContentNode:
     _world = WorldPack.open_world(description)
     %WorldTerrainStreamer.open(_world, description)
     add_child(_world)
-    _biomes = WorldPack.open_biomes(description, %Terrain3D)
+    _biomes = WorldPack.open_biomes(description, %Terrain3D, _world)
     if _biomes:
         add_child(_biomes)
     _world.environment_node_path = _world.get_path_to(%MaszynaEnvironmentNode)

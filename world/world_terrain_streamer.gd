@@ -31,8 +31,9 @@ var _unreadable: Dictionary[Vector2i, bool] = {}
 func open(world: MaszynaWorld, description: Dictionary) -> void:
     var terrain_description: Dictionary = description["terrain"]
     terrain.change_region_size(int(terrain_description["region_size"]))
-    # the game's terrain atlas: files of the game's directory (the importer's editor reads no .pck)
-    terrain.assets = load(UserSettings.get_maszyna_game_dir().path_join(terrain_description["assets"])) as Terrain3DAssets
+    # the terrain's atlas, shared by the worlds: in its pack of the game's world_assets (MaszynaWorld.mount()),
+    # in the importer's editor registered under the same path (SIWorldAssets)
+    terrain.assets = load(terrain_description["assets"]) as Terrain3DAssets
     _world = world
     _world.sectors.sector_loaded.connect(_on_sector_loaded)
     _world.sectors.sector_unloaded.connect(_on_sector_unloaded)

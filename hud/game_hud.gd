@@ -271,6 +271,13 @@ func attach_environment(environment: MaszynaEnvironmentNode) -> void:
     %DebugHud.attach_environment(environment)
 
 
+## The world of the own format being shown and what streams its terrain, for the world windows;
+## null while there is none
+func attach_world(world: MaszynaWorld, terrain: WorldTerrainStreamer) -> void:
+    %DebugHud.attach_world(world)
+    %WorldTerrainPanel.attach_streamer(terrain)
+
+
 ## The scenario the player has started, for the "Scenario" entry of the View menu - hidden until
 ## the player opens it
 func show_scenario(info: MaszynaSceneryInfo, vehicle_id: String) -> void:

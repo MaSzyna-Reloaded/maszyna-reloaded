@@ -59,10 +59,17 @@ compile-debug compile-release compile-profiling compile-release-symbols compile-
 # builds are single precision and do not load in the double precision game. Its godot-cpp is moved
 # to libmaszyna's commit (Terrain3D 1.0.2's own is too old for the 4.7 API) and the patch adapts it to
 # that godot-cpp; the libraries land in the submodule's addon, which addons/terrain_3d links.
+# terrain3d-region-window.patch lets the region map's 32x32 window move (Terrain3DData.
+# set_region_map_origin()) and makes the shaders work relative to it, so a world's regions can be
+# streamed anywhere around the camera and stay precise hundreds of km from the origin.
+# Each patch is applied only while it still applies, i.e. once.
 TERRAIN3D:=vendor/terrain3d
+TERRAIN3D_PATCHES:=terrain3d-godot-cpp-10.patch terrain3d-region-window.patch
 terrain3d:
 	cd $(TERRAIN3D)/godot-cpp && git fetch -q --depth 100 origin master && git checkout -q $$(git -C $(abspath $(LIBMASZYNA))/godot-cpp rev-parse HEAD)
-	cd $(TERRAIN3D) && (git apply --check $(CURDIR)/patches/terrain3d-godot-cpp-10.patch 2>/dev/null && git apply $(CURDIR)/patches/terrain3d-godot-cpp-10.patch || true)
+	cd $(TERRAIN3D) && for p in $(TERRAIN3D_PATCHES); do \
+		git apply --check $(CURDIR)/patches/$$p 2>/dev/null && git apply $(CURDIR)/patches/$$p || true; \
+	done
 	cd $(TERRAIN3D) && for t in template_debug template_release; do \
 		scons platform=linux target=$$t precision=double custom_api_file=$(abspath $(LIBMASZYNA))/extension_api.json -j$$(nproc) || exit 1; \
 	done

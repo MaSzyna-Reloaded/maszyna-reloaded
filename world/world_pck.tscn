@@ -8,6 +8,7 @@
 [ext_resource type="Script" uid="uid://b02h32v57jji1" path="res://addons/libmaszyna/scenario/scenario_keyboard.gd" id="7_scenario_keyboard"]
 [ext_resource type="Script" uid="uid://clkcp3220jqpe" path="res://addons/libmaszyna/scenery/scenery_streamer.gd" id="8_streamer"]
 [ext_resource type="Script" path="res://world/sky/gnd_skydome_maszyna_environment.gd" id="9_sky"]
+[ext_resource type="Script" path="res://world/world_terrain_streamer.gd" id="10_terrain_streamer"]
 
 [sub_resource type="Terrain3DMaterial" id="Terrain3DMaterial_world"]
 world_background = 0
@@ -45,6 +46,11 @@ unique_name_in_owner = true
 material = SubResource("Terrain3DMaterial_world")
 mesh_size = 64
 
+[node name="WorldTerrainStreamer" type="Node" parent="." node_paths=PackedStringArray("terrain")]
+unique_name_in_owner = true
+script = ExtResource("10_terrain_streamer")
+terrain = NodePath("../Terrain3D")
+
 [node name="ScenarioKeyboard" type="Node" parent="."]
 unique_name_in_owner = true
 script = ExtResource("7_scenario_keyboard")
@@ -54,6 +60,7 @@ weather_path = NodePath("../Sky/_WorldEnvironment/Weather")
 
 [connection signal="configuration_changed" from="MaszynaEnvironmentNode" to="Sky" method="apply_configuration"]
 [connection signal="camera_changed" from="Player" to="SceneryStreamer" method="set_camera"]
+[connection signal="camera_changed" from="Player" to="Terrain3D" method="set_camera"]
 [connection signal="initialization_ready" from="Player" to="SceneryStreamer" method="set_active" binds= [true]]
 [connection signal="initialization_stopped" from="Player" to="SceneryStreamer" method="set_active" binds= [false]]
 [connection signal="scenery_loaded" from="." to="Player" method="_on_scenery_loaded"]

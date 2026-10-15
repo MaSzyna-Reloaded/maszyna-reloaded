@@ -4,6 +4,8 @@
 [ext_resource type="PackedScene" path="res://hud/help_panel.tscn" id="12_help_panel"]
 [ext_resource type="Script" path="res://hud/game_hud.gd" id="game_hud"]
 [ext_resource type="PackedScene" path="res://addons/libmaszyna/debug_hud/debug_hud.tscn" id="debug_hud"]
+[ext_resource type="Script" path="res://addons/libmaszyna/debug_hud/window.gd" id="41_window"]
+[ext_resource type="PackedScene" path="res://world/world_terrain_panel.tscn" id="42_world_terrain"]
 [ext_resource type="PackedScene" path="res://addons/libmaszyna/cabin/cabin_control_tooltip.tscn" id="23_cabin_tooltip"]
 [ext_resource type="PackedScene" path="res://hud/transcripts_panel.tscn" id="24_transcripts"]
 [ext_resource type="PackedScene" path="res://hud/timetable_panel.tscn" id="25_timetable"]
@@ -112,6 +114,26 @@ title = "Diagnostics"
 [node name="DebugHud" parent="." instance=ExtResource("debug_hud")]
 unique_name_in_owner = true
 layout_mode = 0
+
+[node name="WorldTerrain" type="Container" parent="DebugHud"]
+top_level = true
+custom_minimum_size = Vector2(100, 50)
+clip_contents = true
+layout_mode = 0
+offset_left = 1304.0
+offset_top = 400.0
+offset_right = 1604.0
+offset_bottom = 640.0
+script = ExtResource("41_window")
+title = "World Terrain"
+
+[node name="WorldTerrainScroll" type="ScrollContainer" parent="DebugHud/WorldTerrain"]
+layout_mode = 2
+
+[node name="WorldTerrainPanel" parent="DebugHud/WorldTerrain/WorldTerrainScroll" instance=ExtResource("42_world_terrain")]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
 
 [node name="CabinControlTooltip" parent="." instance=ExtResource("23_cabin_tooltip")]
 layout_mode = 0

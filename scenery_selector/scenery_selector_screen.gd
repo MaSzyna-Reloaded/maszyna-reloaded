@@ -117,7 +117,8 @@ func list_sceneries() -> void:
     var worlds: PackedStringArray = DirAccess.get_files_at(worlds_dir) if DirAccess.dir_exists_absolute(worlds_dir) else PackedStringArray()
     worlds.sort()
     for file: String in worlds:
-        if file.get_extension().to_lower() == MaszynaWorld.DESCRIPTION_EXTENSION:
+        # a world of a format the game does not read is not listed (MaszynaWorld.read_description())
+        if file.get_extension().to_lower() == MaszynaWorld.DESCRIPTION_EXTENSION and MaszynaWorld.read_description(file):
             _files.append(file)
             _titles.append(MaszynaSceneryInfo.read_display_name(file))
     var notes: PackedStringArray = []

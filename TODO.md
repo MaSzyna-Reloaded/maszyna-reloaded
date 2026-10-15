@@ -7,7 +7,13 @@
   format has no ground there. Build it in CI (and a Windows library, cross-compiled like libmaszyna's)
   before a release carries worlds.
 * The submodule is left modified by its build (its godot-cpp moved to libmaszyna's commit,
-  `patches/terrain3d-godot-cpp-10.patch` applied) - a fork with both committed would keep it clean.
+  `patches/terrain3d-godot-cpp-10.patch` and `patches/terrain3d-region-window.patch` applied) - a
+  fork with them committed would keep it clean.
+* Online worlds: a `MaszynaWorldSectorSource` that downloads - the blocks around the start whole,
+  then single sectors out of a block's pack by HTTP range (a sector's files lie one after another
+  in it) - into a cache on the disk, with a manifest of the blocks' versions.
+* The world's infrastructure (tracks, traction, signalling) is loaded whole; for a world of all
+  Poland it is to be a server's.
 
 ## HUD
 

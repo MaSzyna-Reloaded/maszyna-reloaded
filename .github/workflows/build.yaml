@@ -64,8 +64,48 @@ jobs:
             bin/libmaszyna/linux/maszyna-python-host.64
           if-no-files-found: error
 
+  # Terrain3D's libraries (make terrain3d: double precision, patched), built again only when its
+  # sources, its patches or the godot-cpp they are built against change, and handed to the jobs
+  # that run the editor: each applies the patches to the addon's own files (make terrain3d-patches)
+  terrain3d:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          submodules: recursive
+
+      - name: Terrain3D's sources
+        id: sources
+        run: |
+          echo "key=terrain3d-$(git rev-parse HEAD:vendor/terrain3d)-$(git -C vendor/libmaszyna rev-parse HEAD:godot-cpp)-${{ hashFiles('patches/terrain3d-*.patch') }}" >> "$GITHUB_OUTPUT"
+
+      - uses: actions/cache@v4
+        id: cache
+        with:
+          path: vendor/terrain3d/project/addons/terrain_3d/bin
+          key: ${{ steps.sources.outputs.key }}
+
+      - name: Fetch the double precision Godot
+        if: steps.cache.outputs.cache-hit != 'true'
+        run: |
+          vendor/libmaszyna/ci/fetch-godot.sh godot.linuxbsd.editor.double.x86_64
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+
+      - name: Build Terrain3D
+        if: steps.cache.outputs.cache-hit != 'true'
+        run: |
+          pipx install scons
+          make terrain3d
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: terrain3d
+          path: vendor/terrain3d/project/addons/terrain_3d/bin
+          if-no-files-found: error
+
   run-tests:
-    needs: build-host
+    needs: [build-host, terrain3d]
     runs-on: ubuntu-24.04
     steps:
       - name: Check out the code
@@ -87,6 +127,14 @@ jobs:
       - name: Make the Python host executable
         run: chmod +x bin/libmaszyna/linux/maszyna-python-host.64
 
+      - uses: actions/download-artifact@v8
+        with:
+          name: terrain3d
+          path: vendor/terrain3d/project/addons/terrain_3d/bin
+
+      - name: Patch Terrain3D's addon
+        run: make terrain3d-patches
+
       - name: Import the project
         run: godot-double --headless --path . --import
 
@@ -107,7 +155,7 @@ jobs:
           path: test_results.xml
 
   build:
-    needs: build-host
+    needs: [build-host, terrain3d]
     strategy:
       fail-fast: false
       matrix:
@@ -186,6 +234,14 @@ jobs:
           key: ${{ matrix.platform }}
 
       # the exporting editor loads build-host's library: -o keeps make from building it again
+      - uses: actions/download-artifact@v8
+        with:
+          name: terrain3d
+          path: vendor/terrain3d/project/addons/terrain_3d/bin
+
+      - name: Patch Terrain3D's addon
+        run: make terrain3d-patches
+
       - name: Build and export ${{ matrix.platform }}
         run: make -o compile-debug release-${{ matrix.platform }}
 

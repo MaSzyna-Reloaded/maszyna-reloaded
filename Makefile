@@ -1,4 +1,4 @@
-.PHONY: terrain3d libmaszyna-local libmaszyna-submodule compile-debug compile-release compile-profiling compile-release-symbols compile-release-linux compile-windows-release compile-android-release build-number release release-linux release-linux-symbols release-windows release-android release-clear-godot-cache windows-installer-image windows-installer-image-push run-tests check-staged-uids install-git-hooks
+.PHONY: terrain3d terrain3d-patches libmaszyna-local libmaszyna-submodule compile-debug compile-release compile-profiling compile-release-symbols compile-release-linux compile-windows-release compile-android-release build-number release release-linux release-linux-symbols release-windows release-android release-clear-godot-cache windows-installer-image windows-installer-image-push run-tests check-staged-uids install-git-hooks
 .DEFAULT_GOAL = compile-debug
 
 # libmaszyna is the vendor/libmaszyna submodule; its make builds the library into this project
@@ -62,16 +62,23 @@ compile-debug compile-release compile-profiling compile-release-symbols compile-
 # terrain3d-region-window.patch lets the region map's 32x32 window move (Terrain3DData.
 # set_region_map_origin()) and makes the shaders work relative to it, so a world's regions can be
 # streamed anywhere around the camera and stay precise hundreds of km from the origin.
-# Each patch is applied only while it still applies, i.e. once.
+# Each patch is applied only while it still applies, i.e. once (terrain3d-patches) - also to the
+# addon's own scripts and shaders, so a checkout given built libraries (the CI's) applies them too.
+# The engine's API it is built against is dumped by libmaszyna's Makefile from the double precision
+# Godot (GODOT), once.
 TERRAIN3D:=vendor/terrain3d
 TERRAIN3D_PATCHES:=terrain3d-godot-cpp-10.patch terrain3d-region-window.patch
-terrain3d:
-	cd $(TERRAIN3D)/godot-cpp && git fetch -q --depth 100 origin master && git checkout -q $$(git -C $(abspath $(LIBMASZYNA))/godot-cpp rev-parse HEAD)
+LIBMASZYNA_API:=$(abspath $(LIBMASZYNA))/extension_api.json
+$(LIBMASZYNA_API):
+	$(MAKE) -C $(LIBMASZYNA) $@ GODOT=$(GODOT)
+terrain3d-patches:
 	cd $(TERRAIN3D) && for p in $(TERRAIN3D_PATCHES); do \
 		git apply --check $(CURDIR)/patches/$$p 2>/dev/null && git apply $(CURDIR)/patches/$$p || true; \
 	done
+terrain3d: terrain3d-patches $(LIBMASZYNA_API)
+	cd $(TERRAIN3D)/godot-cpp && git fetch -q --depth 100 origin master && git checkout -q $$(git -C $(abspath $(LIBMASZYNA))/godot-cpp rev-parse HEAD)
 	cd $(TERRAIN3D) && for t in template_debug template_release; do \
-		scons platform=linux target=$$t precision=double custom_api_file=$(abspath $(LIBMASZYNA))/extension_api.json -j$$(nproc) || exit 1; \
+		scons platform=linux target=$$t precision=double custom_api_file=$(LIBMASZYNA_API) -j$$(nproc) || exit 1; \
 	done
 
 

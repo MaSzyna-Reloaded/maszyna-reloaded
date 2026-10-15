@@ -75,8 +75,10 @@ func _ready() -> void:
     %View.set_item_shortcut(ViewItem.TIMETABLE, ActionShortcut.create(&"timetable_toggle"))
     # Shift+F2 - free in the original, whose F-keys ignore modifiers (driveruilayer.cpp:115)
     %View.set_item_shortcut(ViewItem.SCENARIO, ActionShortcut.create(&"scenario_toggle"))
-    # F12 - free in the original without Shift (driveruilayer.cpp:174)
+    # F12 - free in the original without Shift (driveruilayer.cpp:174); the key only shown:
+    # DebugHud takes hud_toggle itself
     %View.set_item_shortcut(ViewItem.CONTROLS, ActionShortcut.create(&"hud_toggle"))
+    %View.set_item_shortcut_disabled(ViewItem.CONTROLS, true)
     # F1, as the original's driving aid (driveruilayer.cpp:76)
     %View.set_item_shortcut(ViewItem.DRIVING_AID, ActionShortcut.create(&"driving_aid_toggle"))
     # F3, as the original's scenario window with its hints (driveruilayer.cpp:168)
@@ -129,10 +131,14 @@ func _on_view_menu_index_pressed(index: int) -> void:
         HUDServer.card_open(PlayerServer.player_get_vehicle())
         return
     if index == ViewItem.CONTROLS:
-        %View.toggle_item_checked(index)
-        %DebugHud.windows_set_visible(%View.is_item_checked(index))
+        %DebugHud.windows_toggle()
         return
     HUDServer.panel_toggle(VIEW_PANELS[index])
+
+
+## The DebugHud's windows shown or hidden all at once: the View menu's "Controls" ticked
+func _on_debug_hud_windows_visibility_changed(shown: bool) -> void:
+    %View.set_item_checked(ViewItem.CONTROLS, shown)
 
 
 ## A HUD element opened or closed in HUDServer: its View menu entry ticked, the element shown
@@ -268,7 +274,7 @@ func attach_script_context(context: RID) -> void:
 ## The environment of the world being shown, for the weather and time window; null while there is
 ## no world (the menu)
 func attach_environment(environment: MaszynaEnvironmentNode) -> void:
-    %DebugHud.attach_environment(environment)
+    %DebugHud.environment = environment
 
 
 ## The world of the own format being shown and what streams its terrain, for the world windows;

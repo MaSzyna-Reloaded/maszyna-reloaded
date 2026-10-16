@@ -31,6 +31,12 @@ What lives here:
   addon.
 * **The original's driver** - `ai_driver/`: the AI driver (Driver.cpp, mtable.cpp ported), the
   `DriverImplementation` libmaszyna's `DriverServer` runs for the drivers a scenery declares.
+* **Road traffic** - `world/world_pck.tscn` and `world/traffic/`: the cars, buses and lorries of
+  `dynamic/` (`RoadTrafficVehicles`, by the weights of the world's scene) driven by libmaszyna's
+  `RoadTrafficServer` on the roads of a world's sectors while they are loaded
+  (`MaszynaWorld.sector_roads_built` / `sector_roads_freeing`); how busy the roads are by the hour
+  and where is the scene's curve and heat map, how busy and how many vehicles the settings' two
+  rows (Vehicles).
 * **[Problem reports](bug-reports)** - `bug_report/`: what the game sends to the reporting
   endpoint.
 * **Releases** - `make release-linux`, `release-windows`, `release-android` and the CI workflow

@@ -13,8 +13,23 @@
 [sub_resource type="Terrain3DMaterial" id="Terrain3DMaterial_world"]
 world_background = 0
 
+[sub_resource type="Curve" id="Curve_traffic_time_of_day"]
+_limits = [0.0, 1.0, 0.0, 24.0]
+_data = [Vector2(0, 0.1), 0.0, 0.0, 0, 0, Vector2(4, 0.05), 0.0, 0.0, 0, 0, Vector2(7, 0.8), 0.0, 0.0, 0, 0, Vector2(8, 1), 0.0, 0.0, 0, 0, Vector2(10, 0.6), 0.0, 0.0, 0, 0, Vector2(13, 0.65), 0.0, 0.0, 0, 0, Vector2(16, 1), 0.0, 0.0, 0, 0, Vector2(18, 0.8), 0.0, 0.0, 0, 0, Vector2(21, 0.35), 0.0, 0.0, 0, 0, Vector2(24, 0.1), 0.0, 0.0, 0, 0]
+point_count = 10
+
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_traffic_density"]
+frequency = 0.0005
+
 [node name="World" type="Node3D"]
 script = ExtResource("1_world")
+traffic_weights = Dictionary[int, float]({
+8: 0.1,
+9: 0.05,
+10: 0.85
+})
+traffic_time_of_day = SubResource("Curve_traffic_time_of_day")
+traffic_density_noise = SubResource("FastNoiseLite_traffic_density")
 
 [node name="SceneryStreamer" type="Node" parent="."]
 script = ExtResource("8_streamer")

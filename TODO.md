@@ -10,6 +10,8 @@
   in it) - into a cache on the disk, with a manifest of the blocks' versions.
 * The world's infrastructure (tracks, traction, signalling) is loaded whole; for a world of all
   Poland it is to be a server's.
+* Road traffic (`RoadTrafficServer`) runs in a world of the own format only: the roads of a .scn
+  scenery have none.
 
 ## HUD
 

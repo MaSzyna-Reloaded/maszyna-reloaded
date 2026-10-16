@@ -1391,6 +1391,12 @@ msgstr "Vzdálenost detailů vozidel"
 msgid "Real mirrors"
 msgstr "Skutečná zrcátka"
 
+msgid "Road traffic density"
+msgstr "Hustota silničního provozu"
+
+msgid "Road traffic vehicles"
+msgstr "Vozidla silničního provozu"
+
 msgid "Smoke"
 msgstr "Kouř"
 

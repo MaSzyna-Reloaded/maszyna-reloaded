@@ -1391,6 +1391,12 @@ msgstr "Járműrészletek távolsága"
 msgid "Real mirrors"
 msgstr "Valódi tükrök"
 
+msgid "Road traffic density"
+msgstr "Közúti forgalom sűrűsége"
+
+msgid "Road traffic vehicles"
+msgstr "Közúti forgalom járművei"
+
 msgid "Smoke"
 msgstr "Füst"
 

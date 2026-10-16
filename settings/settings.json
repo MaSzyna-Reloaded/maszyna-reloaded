@@ -806,6 +806,24 @@
                     "key": "maszyna/rendering/real_mirrors",
                     "type": "bool",
                     "default": true
+                },
+                {
+                    "title": "Road traffic density",
+                    "store": "project",
+                    "key": "maszyna/traffic/density",
+                    "type": "float",
+                    "hint": "range",
+                    "hint_string": "0,1,0.05",
+                    "default": 0.5
+                },
+                {
+                    "title": "Road traffic vehicles",
+                    "store": "project",
+                    "key": "maszyna/traffic/max_vehicles",
+                    "type": "int",
+                    "hint": "range",
+                    "hint_string": "0,300,1",
+                    "default": 60
                 }
             ]
         },

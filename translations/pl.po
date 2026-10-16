@@ -1391,6 +1391,12 @@ msgstr "Zasięg szczegółów pojazdów"
 msgid "Real mirrors"
 msgstr "Prawdziwe lusterka"
 
+msgid "Road traffic density"
+msgstr "Natężenie ruchu ulicznego"
+
+msgid "Road traffic vehicles"
+msgstr "Pojazdy ruchu ulicznego"
+
 msgid "Smoke"
 msgstr "Dym"
 

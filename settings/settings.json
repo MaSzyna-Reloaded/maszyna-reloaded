@@ -823,7 +823,7 @@
                     "type": "int",
                     "hint": "range",
                     "hint_string": "0,300,1",
-                    "default": 60
+                    "default": 120
                 }
             ]
         },

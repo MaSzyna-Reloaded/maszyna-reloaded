@@ -1,0 +1,38 @@
+{
+    "takes": [
+        {
+            "name": "day",
+            "scenery": "$wrzosy_eie2620.scn",
+            "warm_up": 150.0,
+            "shots": [
+                {"name": "day_front", "vehicle": "es64f4-846", "view": "trainset_front", "pre_roll": 4.0, "duration": 5.0},
+                {"name": "day_bogie", "vehicle": "es64f4-846", "view": "bogie", "pre_roll": 3.0, "duration": 4.0},
+                {"name": "day_cabin", "vehicle": "es64f4-846", "view": "cabin", "pre_roll": 3.0, "duration": 5.0},
+                {"name": "day_driveby", "vehicle": "es64f4-846", "view": "driveby", "pre_roll": 4.0, "duration": 7.0}
+            ]
+        },
+        {
+            "name": "rain",
+            "scenery": "$wrzosy_eie2620.scn",
+            "weather": "rain",
+            "warm_up": 115.0,
+            "shots": [
+                {"name": "rain_front", "vehicle": "en76-001a", "view": "trainset_front", "pre_roll": 6.0, "duration": 5.0},
+                {"name": "rain_cabin", "vehicle": "en76-001a", "view": "cabin", "pre_roll": 4.0, "duration": 5.0},
+                {"name": "rain_rear", "vehicle": "en76-001a", "view": "trainset_rear", "pre_roll": 6.0, "duration": 5.0}
+            ]
+        },
+        {
+            "name": "night",
+            "scenery": "$wrzosy_eie2620.scn",
+            "time_of_day": 19.1,
+            "cab_lights": true,
+            "warm_up": 160.0,
+            "shots": [
+                {"name": "night_front", "vehicle": "en76-001a", "view": "trainset_front", "pre_roll": 4.0, "duration": 6.0},
+                {"name": "night_cabin", "vehicle": "en76-001a", "view": "cabin", "pre_roll": 3.0, "duration": 6.0},
+                {"name": "night_rear", "vehicle": "en76-001a", "view": "trainset_rear", "pre_roll": 4.0, "duration": 5.0}
+            ]
+        }
+    ]
+}

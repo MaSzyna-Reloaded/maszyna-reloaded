@@ -380,8 +380,8 @@ msgstr "Kamera"
 msgid "Camera chunk"
 msgstr "Fragment kamery"
 
-msgid "Draw distance"
-msgstr "Zasięg widoczności"
+msgid "Tracks and traction distance"
+msgstr "Zasięg torów i trakcji"
 
 msgid "Chunks"
 msgstr "Fragmenty"

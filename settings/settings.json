@@ -285,14 +285,13 @@
             "title": "Scenery",
             "settings": [
                 {
-                    "title": "Draw distance",
+                    "title": "Tracks and traction distance",
                     "store": "project",
-                    "key": "maszyna/scenery/draw_distance",
+                    "key": "maszyna/scenery/tracks/distance",
                     "type": "float",
                     "hint": "range",
                     "hint_string": "100,20000,10,suffix:m",
-                    "default": 3000.0,
-                    "advanced": true
+                    "default": 2000.0
                 },
                 {
                     "title": "Lazy loading (experimental)",

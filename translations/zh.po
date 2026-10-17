@@ -380,8 +380,8 @@ msgstr "摄像机"
 msgid "Camera chunk"
 msgstr "摄像机区块"
 
-msgid "Draw distance"
-msgstr "绘制距离"
+msgid "Tracks and traction distance"
+msgstr "轨道和接触网距离"
 
 msgid "Chunks"
 msgstr "区块"

@@ -380,8 +380,8 @@ msgstr "Kamera"
 msgid "Camera chunk"
 msgstr "Kamera blokk"
 
-msgid "Draw distance"
-msgstr "Látótávolság"
+msgid "Tracks and traction distance"
+msgstr "Sínek és felsővezeték távolsága"
 
 msgid "Chunks"
 msgstr "Blokkok"

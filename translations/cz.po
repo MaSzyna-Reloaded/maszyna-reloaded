@@ -380,8 +380,8 @@ msgstr "Kamera"
 msgid "Camera chunk"
 msgstr "Blok kamery"
 
-msgid "Draw distance"
-msgstr "Dohlednost"
+msgid "Tracks and traction distance"
+msgstr "Dosah kolejí a trakce"
 
 msgid "Chunks"
 msgstr "Bloky"

@@ -380,7 +380,7 @@ msgstr ""
 msgid "Camera chunk"
 msgstr ""
 
-msgid "Draw distance"
+msgid "Tracks and traction distance"
 msgstr ""
 
 msgid "Chunks"

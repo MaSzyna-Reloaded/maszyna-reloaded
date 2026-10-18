@@ -99,6 +99,15 @@
                     "default": true
                 },
                 {
+                    "title": "Multi-bounce ambient occlusion",
+                    "store": "user",
+                    "section": "render",
+                    "key": "multi_bounce_occlusion_enabled",
+                    "type": "bool",
+                    "default": true,
+                    "restart_required": true
+                },
+                {
                     "title": "Indirect lighting (SSIL)",
                     "store": "user",
                     "section": "render",
@@ -113,6 +122,35 @@
                     "key": "ssr_enabled",
                     "type": "bool",
                     "default": true
+                },
+                {
+                    "title": "Contact shadows (SSCS)",
+                    "store": "project",
+                    "key": "rendering/lights_and_shadows/contact_shadow/enabled",
+                    "type": "bool",
+                    "default": true
+                },
+                {
+                    "title": "Contact shadow length",
+                    "store": "project",
+                    "key": "rendering/lights_and_shadows/contact_shadow/shadow_length",
+                    "type": "int",
+                    "hint": "enum",
+                    "hint_string": "Short:0,Medium:1,Long:2",
+                    "default": 1,
+                    "depends_on": "rendering/lights_and_shadows/contact_shadow/enabled",
+                    "advanced": true
+                },
+                {
+                    "title": "Contact shadow surface thickness",
+                    "store": "project",
+                    "key": "rendering/lights_and_shadows/contact_shadow/surface_thickness",
+                    "type": "float",
+                    "hint": "range",
+                    "hint_string": "0.001,0.1,0.001",
+                    "default": 0.01,
+                    "depends_on": "rendering/lights_and_shadows/contact_shadow/enabled",
+                    "advanced": true
                 },
                 {
                     "title": "Volumetric fog",
@@ -278,6 +316,15 @@
                     "hint": "range",
                     "hint_string": "0.5,2,0.01",
                     "default": 1.0
+                },
+                {
+                    "title": "Texture streaming",
+                    "store": "user",
+                    "section": "render",
+                    "key": "texture_streaming_enabled",
+                    "type": "bool",
+                    "default": true,
+                    "restart_required": true
                 }
             ]
         },

@@ -1553,11 +1553,32 @@ msgstr "Időbeli élsimítás (TAA)"
 msgid "Ambient occlusion (SSAO)"
 msgstr "Környezeti takarás (SSAO)"
 
+msgid "Multi-bounce ambient occlusion"
+msgstr "Többszörös visszaverődés a környezeti takarásban"
+
 msgid "Indirect lighting (SSIL)"
 msgstr "Közvetett megvilágítás (SSIL)"
 
 msgid "Reflections (SSR)"
 msgstr "Tükröződések (SSR)"
+
+msgid "Contact shadows (SSCS)"
+msgstr "Kontaktárnyékok (SSCS)"
+
+msgid "Contact shadow length"
+msgstr "Kontaktárnyék hossza"
+
+msgid "Short"
+msgstr "Rövid"
+
+msgid "Medium"
+msgstr "Közepes"
+
+msgid "Long"
+msgstr "Hosszú"
+
+msgid "Contact shadow surface thickness"
+msgstr "Kontaktárnyék felületi vastagsága"
 
 msgid "Global illumination (SDFGI)"
 msgstr "Globális megvilágítás (SDFGI)"
@@ -1576,6 +1597,9 @@ msgstr "Fényszóródás erőssége (bloom)"
 
 msgid "Gamma"
 msgstr "Gamma"
+
+msgid "Texture streaming"
+msgstr "Textúrák streamelése"
 
 msgid "Vertical sync"
 msgstr "Függőleges szinkronizálás"

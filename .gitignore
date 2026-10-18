@@ -7,6 +7,8 @@
 /test_results.xml
 # make libmaszyna-local
 /.libmaszyna-local
+# the player's engine settings read at the engine's start (engine_overrides.gd)
+/override.cfg
 
 # Documentation site
 /docs/_site/

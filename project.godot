@@ -3302,8 +3302,11 @@ common/max_physics_steps_per_frame=2
 
 [rendering]
 
+textures/streaming/enabled=true
 textures/vram_compression/import_etc2_astc=true
+lights_and_shadows/contact_shadow/enabled=true
 lights_and_shadows/directional_shadow/soft_shadow_filter_quality=0
+lights_and_shadows/multi_bounce_occlusion/enabled=true
 textures/default_filters/anisotropic_filtering_level=3
 environment/volumetric_fog/volume_size=96
 environment/volumetric_fog/volume_depth=96

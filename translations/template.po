@@ -1553,10 +1553,31 @@ msgstr ""
 msgid "Ambient occlusion (SSAO)"
 msgstr ""
 
+msgid "Multi-bounce ambient occlusion"
+msgstr ""
+
 msgid "Indirect lighting (SSIL)"
 msgstr ""
 
 msgid "Reflections (SSR)"
+msgstr ""
+
+msgid "Contact shadows (SSCS)"
+msgstr ""
+
+msgid "Contact shadow length"
+msgstr ""
+
+msgid "Short"
+msgstr ""
+
+msgid "Medium"
+msgstr ""
+
+msgid "Long"
+msgstr ""
+
+msgid "Contact shadow surface thickness"
 msgstr ""
 
 msgid "Global illumination (SDFGI)"
@@ -1575,6 +1596,9 @@ msgid "Bloom intensity"
 msgstr ""
 
 msgid "Gamma"
+msgstr ""
+
+msgid "Texture streaming"
 msgstr ""
 
 msgid "Vertical sync"

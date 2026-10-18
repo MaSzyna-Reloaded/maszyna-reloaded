@@ -1553,11 +1553,32 @@ msgstr "时间抗锯齿 (TAA)"
 msgid "Ambient occlusion (SSAO)"
 msgstr "环境光遮蔽 (SSAO)"
 
+msgid "Multi-bounce ambient occlusion"
+msgstr "多次反弹环境光遮蔽"
+
 msgid "Indirect lighting (SSIL)"
 msgstr "间接光照 (SSIL)"
 
 msgid "Reflections (SSR)"
 msgstr "反射 (SSR)"
+
+msgid "Contact shadows (SSCS)"
+msgstr "接触阴影 (SSCS)"
+
+msgid "Contact shadow length"
+msgstr "接触阴影长度"
+
+msgid "Short"
+msgstr "短"
+
+msgid "Medium"
+msgstr "中"
+
+msgid "Long"
+msgstr "长"
+
+msgid "Contact shadow surface thickness"
+msgstr "接触阴影表面厚度"
 
 msgid "Global illumination (SDFGI)"
 msgstr "全局光照 (SDFGI)"
@@ -1576,6 +1597,9 @@ msgstr "泛光强度"
 
 msgid "Gamma"
 msgstr "伽马"
+
+msgid "Texture streaming"
+msgstr "纹理流送"
 
 msgid "Vertical sync"
 msgstr "垂直同步"

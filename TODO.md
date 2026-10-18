@@ -63,6 +63,19 @@
   `release-linux` container.
 * A local install holds the host-built debug export template until `ci/fetch-godot.sh` replaces it.
 
+## Godot 4.8 rendering
+
+* **Lightmap specular** (`LightmapGI.specular_intensity`, GH-109737) is not used: sceneries,
+  vehicles and cabs are built at run time from the original's files, so there is nothing baked to
+  carry it. It waits for a static scene of the game's own (a menu or a depot) with a `LightmapGI`.
+* **Texture streaming**: the original's textures stream - libmaszyna writes each `.dds` once into
+  Godot's streamed texture file (`user://cache/textures`) and hands out `StreamedTexture2D`s - and
+  so does `vfx/smoke_atlas.png`, imported as one. Not measured yet in the running game: VRAM
+  (`TextureStreaming.get_memory_budget_bytes_used()`), pop-in at the default `min_lod`/`max_lod`,
+  and the first start's conversion on the streaming's workers.
+* Contact shadows and multi-bounce AO are Forward+ only; not looked at in the running game yet -
+  a cab, a station roof, under a wagon, day and overcast.
+
 ## CI
 
 * A pull request from a fork has a read-only token: after a `GODOT_VERSION` bump it cannot

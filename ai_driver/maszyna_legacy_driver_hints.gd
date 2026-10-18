@@ -938,7 +938,7 @@ static func is_done(situation:MaszynaLegacyDriverTraction.Situation, hint:Hint, 
         Hint.RADIO_ON, Hint.RADIO_OFF:
             var radio:RailVehicleRadio = VehicleServer.vehicle_component_get(
                     vehicle, VehicleComponentType.COMPONENT_RADIO) as RailVehicleRadio
-            return radio == null or radio.get_enabled() == (hint == Hint.RADIO_ON)
+            return radio == null or radio.get_radio_enabled() == (hint == Hint.RADIO_ON)
         # the cab radio's channel - the original compares the driver's own (iRadioChannel), which a
         # player tuning the radio never changes
         Hint.RADIO_CHANNEL:

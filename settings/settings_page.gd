@@ -226,5 +226,6 @@ func _notification(what: int) -> void:
 ## Folded under a chosen advanced row - a click on the title, the page hidden: the keyboard goes up
 ## to the title
 func _on_advanced_folding_changed(is_folded: bool) -> void:
-    if is_folded and _selected in _advanced_rows:
+    # a typed array takes only its own type to look for: "Advanced" itself, or nothing, is not one
+    if is_folded and _selected is SettingRow and _selected in _advanced_rows:
         _select(%Advanced)

@@ -26,7 +26,7 @@ GODOT?=godot-double
 GODOT_VERSION:=$(shell sed -n 's/^GODOT_VERSION:=//p' $(LIBMASZYNA)/Makefile)
 GODOT_BIN:=$(LIBMASZYNA)/build-godot-$(GODOT_VERSION)/bin
 LINUX_TEMPLATE:=$(GODOT_BIN)/godot.linuxbsd.template_release.double.x86_64
-LINUX_TEMPLATE_INSTALLED:=$(HOME)/.local/share/godot/export_templates/$(GODOT_VERSION).stable.double/linux_release.x86_64
+LINUX_TEMPLATE_INSTALLED:=$(HOME)/.local/share/godot/export_templates/$(GODOT_VERSION).double/linux_release.x86_64
 # The Windows installer is made by NSIS in ci/docker/windows-installer; the checkout is mounted at
 # its own path and the build runs as the host user
 # Published on ghcr.io and tagged by its Dockerfile, as libmaszyna's Linux SDK: the CI pulls it, a

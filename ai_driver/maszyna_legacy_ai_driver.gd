@@ -1263,13 +1263,13 @@ func _control_security_system(situation:MaszynaLegacyDriverTraction.Situation, e
             vehicle, VehicleComponentType.COMPONENT_RADIO) as RailVehicleRadio
     if radio == null:
         return
-    if radio.get_radio_stop_active() and radio.get_enabled() \
+    if radio.get_radio_stop_active() and radio.get_radio_enabled() \
             and VehicleServer.vehicle_get_speed(vehicle) < RADIO_STOP_STANDING_SPEED:
         if state.radio_control_time > RADIO_STOP_DELAY:
             MaszynaLegacyDriverHints.cue(situation, MaszynaLegacyDriverHints.Hint.RADIO_OFF)
         else:
             state.radio_control_time += elapsed
-    if state.engine_active and not radio.get_enabled() and not radio.get_radio_stop_active():
+    if state.engine_active and not radio.get_radio_enabled() and not radio.get_radio_stop_active():
         state.radio_control_time = minf(state.radio_control_time, RADIO_STOP_DELAY)
         if state.radio_control_time < 0.0:
             MaszynaLegacyDriverHints.cue(situation, MaszynaLegacyDriverHints.Hint.RADIO_ON)

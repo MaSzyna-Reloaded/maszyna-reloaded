@@ -19,8 +19,12 @@ var _progressed_msec: int = 0
 
 func _ready() -> void:
     visible = false
-    # sized and scaled by the window below, not by its anchors
+    # sized and scaled by the window below, not by its anchors - and grown from that corner: from
+    # Godot 4.8 a size set grows a control in its grow directions, and the board's own (both) moved
+    # it by half of what it shrank (godotengine/godot#120418)
     %Board.set_anchors_preset(Control.PRESET_TOP_LEFT)
+    %Board.grow_horizontal = Control.GROW_DIRECTION_END
+    %Board.grow_vertical = Control.GROW_DIRECTION_END
     _on_viewport_size_changed()
 
 

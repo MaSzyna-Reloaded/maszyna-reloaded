@@ -231,8 +231,10 @@ func _on_card_changed(vehicle: RID) -> void:
         _card.remove_trainset_requested.connect(_remove_trainset)
         %VehicleCards.add_child(_card)
         if _card_rect.has_area():
-            _card.position = _card_rect.position
+            # the size first: from Godot 4.8 a size set moves the card in its grow direction (up),
+            # and only the position set after it is where it was left (godotengine/godot#120418)
             _card.size = _card_rect.size
+            _card.position = _card_rect.position
         _show_chips()
     %VehicleCards.move_child(_card, -1)
     _card.show_vehicle(vehicle)

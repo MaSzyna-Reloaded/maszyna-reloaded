@@ -71,7 +71,8 @@ SOUND_FORMAT = struct.Struct("<HHIIHH")
 FADE = 0.5
 # Seconds the sound of a shot fades in and out at a hard cut, so the join does not click
 CUT_FADE = 0.05
-# Seconds of the end card - the loading screen's logo alone, in the middle - and the logo's width
+# Seconds of the end card - the loading screen's logo alone, in the middle - and the logo's width;
+# shots.json's "card" gives another
 CARD_SECONDS = 4.0
 CARD_LOGO_WIDTH = round(760 * WIDTH / 1920)
 # The director's line of a recorded shot (trailer_take.gd)
@@ -80,6 +81,11 @@ VIDEO = ["-c:v", "libx264", "-crf", "18", "-preset", "slow", "-pix_fmt", "yuv420
          "-colorspace", "bt709", "-color_primaries", "bt709", "-color_trc", "bt709", "-r", str(FPS)]
 AUDIO = ["-c:a", "pcm_s16le", "-ar", str(AUDIO_RATE), "-ac", "2"]
 TO_BT709 = "scale=out_color_matrix=bt709:out_range=tv"
+# The joined sound held under -1 dB true peak: a take's loudest moments (a cab's relays) go past
+# 0 dB, with edges sharp enough to slip through ffmpeg's limiter at 48 kHz and to peak between the
+# samples - so it limits four times oversampled, with a short attack, and without its delay, so the
+# sound stays on the picture
+LIMITER = "aresample=192000,alimiter=limit=0.8:level=0:latency=1:attack=1,aresample=48000"
 
 
 def run(command, **kwargs):
@@ -227,7 +233,9 @@ def edit(shots_file):
         pictures, sounds, (rate, channels, bits) = indexes[film]
         cut_pictures = segments / "cut.mjpeg"
         cut_sound = segments / "cut.pcm"
-        copy_chunks(film, pictures[first:first + count], cut_pictures)
+        # a slowed cut ends on its last frame held: one frame more, or ffmpeg ends a frame short
+        held = 1 if speed < 1.0 else 0
+        copy_chunks(film, pictures[first:first + count + held], cut_pictures)
         copy_chunks(film, sounds[first:first + shown], cut_sound)
         run(["ffmpeg", "-v", "error", "-y",
              "-f", "mjpeg", "-framerate", FPS, "-i", cut_pictures,
@@ -238,20 +246,21 @@ def edit(shots_file):
         parts.append(part)
     cut_pictures.unlink()
     cut_sound.unlink()
+    card_seconds = shots_file.get("card", CARD_SECONDS)
     card = segments / "card.png"
     run(["magick", "-size", f"{WIDTH}x{HEIGHT}", "xc:black",
          "(", LOGO, "-trim", "+repage", "-resize", f"{CARD_LOGO_WIDTH}x", ")",
          "-gravity", "center", "-composite", card])
     part = segments / f"{len(parts):02d}_card.mkv"
-    run(["ffmpeg", "-v", "error", "-y", "-loop", "1", "-framerate", FPS, "-t", CARD_SECONDS, "-i", card,
-         "-f", "lavfi", "-t", CARD_SECONDS, "-i", f"anullsrc=r={AUDIO_RATE}:cl=stereo",
+    run(["ffmpeg", "-v", "error", "-y", "-loop", "1", "-framerate", FPS, "-t", card_seconds, "-i", card,
+         "-f", "lavfi", "-t", card_seconds, "-i", f"anullsrc=r={AUDIO_RATE}:cl=stereo",
          "-vf", f"{TO_BT709},fade=in:0:{round(FADE * FPS)}", *VIDEO, *AUDIO, part])
     parts.append(part)
     listing = segments / "parts.txt"
     listing.write_text("".join(f"file '{part}'\n" for part in parts))
     result = next_result()
     run(["ffmpeg", "-v", "error", "-y", "-f", "concat", "-safe", "0", "-i", listing,
-         "-c:v", "copy", "-c:a", "aac", "-b:a", "192k", "-movflags", "+faststart", result])
+         "-c:v", "copy", "-af", LIMITER, "-c:a", "aac", "-b:a", "192k", "-movflags", "+faststart", result])
     HISTORY.mkdir(exist_ok=True)
     shutil.copyfile(SHOTS, HISTORY / f"{result.stem}.json")
     print(result)

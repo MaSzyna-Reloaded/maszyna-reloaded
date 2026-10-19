@@ -1,0 +1,217 @@
+{
+    "letterbox": 2.39,
+    "card": 5.2,
+    "sequence": [
+        {"shot": "hw_lamp", "from": 1.5, "length": 2.8},
+        {"shot": "he_rise", "from": 1, "length": 2.8},
+        {"shot": "cz_su45_sweep", "from": 2, "length": 2.4},
+        {"shot": "hw_wide", "from": 1, "length": 3.2},
+        {"shot": "hw_tele", "from": 3.5, "length": 3.2},
+        {"shot": "hw_crane", "from": 0.5, "length": 1.6, "speed": 0.5},
+        {"shot": "sn_desk", "from": 1, "length": 1.6},
+        {"shot": "night_nose", "from": 0.8, "length": 1.6},
+        {"shot": "gold_roof", "from": 0.5, "length": 1.6},
+        {"shot": "gold_crane", "from": 0.2, "length": 1.6},
+        {"shot": "gold_wheels", "from": 0.8, "length": 1.6},
+        {"shot": "rain_pass", "from": 2.6, "length": 3.2},
+        {"shot": "rain_crane", "from": 0.6, "length": 2.4},
+        {"shot": "bz_ep07_nose", "from": 1, "length": 1.6},
+        {"shot": "bz_ep07_cabin", "from": 0.5, "length": 1.6},
+        {"shot": "bz_ep07_pass2", "from": 2.4, "length": 2.4},
+        {"shot": "bz_181_nose", "from": 1, "length": 1.6},
+        {"shot": "bz_181_high", "from": 0.8, "length": 2.4},
+        {"shot": "bz_181_pass", "from": 3.2, "length": 3.2},
+        {"shot": "bz_181_over", "from": 4.6, "length": 3.1},
+        {"shot": "ev_ep09_cabin", "from": 0.6, "length": 1.7},
+        {"shot": "ev_ep09_crane", "from": 0.4, "length": 2.4},
+        {"shot": "ev_en71_nose", "from": 1, "length": 1.6},
+        {"shot": "ev_ep09_pass", "from": 3, "length": 2.4},
+        {"shot": "ev_ep09_over", "from": 3, "length": 2.4},
+        {"shot": "fs_nose2", "from": 1, "length": 1.6},
+        {"shot": "fs_high", "from": 0.5, "length": 2.4},
+        {"shot": "fs_wheels", "from": 0.8, "length": 1.6},
+        {"shot": "fs_station", "from": 5, "length": 2.4},
+        {"shot": "fe_crane", "from": 0.3, "length": 1.6},
+        {"shot": "fe_nose", "from": 1, "length": 1.6},
+        {"shot": "fe_over", "from": 3.8, "length": 2.3},
+        {"shot": "fe_pass", "from": 3.2, "length": 2.5},
+        {"shot": "he_nose", "from": 1.2, "length": 1.1},
+        {"shot": "fs_nose", "from": 1.2, "length": 1.1},
+        {"shot": "bf_ep07_nose", "from": 1.2, "length": 1.1},
+        {"shot": "hw_nose", "from": 1.2, "length": 1.2},
+        {"shot": "gold_over", "from": 2.2, "length": 3.2},
+        {"shot": "bz_ep07_pass", "from": 2.6, "length": 1.9},
+        {"shot": "bf_ep07_pass", "from": 2.2, "length": 1.3},
+        {"shot": "night_pass", "from": 2.1, "length": 1.9}
+    ],
+    "takes": [
+        {
+            "name": "gold", "scenery": "$wrzosy_eie2620.scn", "time_of_day": 18.0, "drive": {"vehicle": "en76-001a", "after": 110.0, "controller": 100},
+            "shots": [
+                {"name": "gold_nose", "vehicle": "en76-001a", "view": "rig", "from": [2.6, 0.5, 22], "to": [3.4, 0.9, 17], "fov": 38, "look": [0, 1.8, 8], "pre_roll": 0.4, "duration": 3.5, "at": 138.0},
+                {"name": "gold_wheels", "vehicle": "en76-001a", "view": "rig", "from": [2.1, 0.35, 6], "fov": 55, "look": [1.3, 0.45, -30], "pre_roll": 0.4, "duration": 3.0},
+                {"name": "gold_pass", "vehicle": "en76-001a", "view": "rig", "from": [4.0, 0.6, 110], "anchor": "ground", "fov": 42, "look": [0, 1.6, 0], "pre_roll": 0.3, "duration": 7.5},
+                {"name": "gold_roof", "vehicle": "en76-001a", "view": "rig", "from": [0, 4.7, 2], "fov": 60, "look": [0, 3.6, 60], "pre_roll": 0.4, "duration": 3.0},
+                {"name": "gold_cabin", "vehicle": "en76-001a", "view": "cabin", "pre_roll": 1.5, "duration": 3.5},
+                {"name": "gold_crane", "vehicle": "en76-001a", "view": "rig", "from": [7, 1.2, 28], "to": [10, 8, 40], "fov": 32, "look": [0, 1.5, 0], "pre_roll": 0.4, "duration": 4.5},
+                {"name": "gold_side", "vehicle": "en76-001a", "view": "rig", "from": [45, 2.5, 0], "fov": 14, "look": [0, 1.8, 0], "pre_roll": 0.4, "duration": 3.5},
+                {"name": "gold_over", "vehicle": "en76-001a", "view": "rig", "from": [1.5, 7.5, 140], "anchor": "ground", "fov": 35, "look": [0, 1, 0], "pre_roll": 0.3, "duration": 7.0}
+            ]
+        },
+        {
+            "name": "rain", "scenery": "$wrzosy_eie2620.scn", "weather": "rain", "drive": {"vehicle": "en76-001a", "after": 110.0, "controller": 100},
+            "shots": [
+                {"name": "rain_pass", "vehicle": "en76-001a", "view": "rig", "from": [-4.0, 0.5, 110], "anchor": "ground", "fov": 42, "look": [0, 1.6, 0], "pre_roll": 0.3, "duration": 7.5, "at": 138.0},
+                {"name": "rain_cabin", "vehicle": "en76-001a", "view": "cabin", "pre_roll": 1.5, "duration": 3.5},
+                {"name": "rain_nose", "vehicle": "en76-001a", "view": "rig", "from": [-2.6, 0.5, 22], "to": [-3.4, 0.9, 17], "fov": 38, "look": [0, 1.8, 8], "pre_roll": 0.4, "duration": 3.5},
+                {"name": "rain_crane", "vehicle": "en76-001a", "view": "rig", "from": [-7, 1.2, 28], "to": [-10, 8, 40], "fov": 32, "look": [0, 1.5, 0], "pre_roll": 0.4, "duration": 4.5},
+                {"name": "rain_wheels", "vehicle": "en76-001a", "view": "rig", "from": [-2.1, 0.35, 6], "fov": 55, "look": [-1.3, 0.45, -30], "pre_roll": 0.4, "duration": 3.0},
+                {"name": "rain_over", "vehicle": "en76-001a", "view": "rig", "from": [-1.5, 7.5, 140], "anchor": "ground", "fov": 35, "look": [0, 1, 0], "pre_roll": 0.3, "duration": 7.0}
+            ]
+        },
+        {
+            "name": "night", "scenery": "$wrzosy_eie2620.scn", "time_of_day": 19.1, "cab_lights": true, "drive": {"vehicle": "en76-001a", "after": 110.0, "controller": 100},
+            "shots": [
+                {"name": "night_nose", "vehicle": "en76-001a", "view": "rig", "from": [2.6, 0.5, 22], "to": [3.4, 0.9, 17], "fov": 38, "look": [0, 1.8, 8], "pre_roll": 0.4, "duration": 3.5, "at": 138.0},
+                {"name": "night_cabin", "vehicle": "en76-001a", "view": "cabin", "pre_roll": 1.5, "duration": 4.0},
+                {"name": "night_pass", "vehicle": "en76-001a", "view": "rig", "from": [4.0, 0.6, 110], "anchor": "ground", "fov": 42, "look": [0, 1.6, 0], "pre_roll": 0.3, "duration": 7.5},
+                {"name": "night_tele", "vehicle": "en76-001a", "view": "rig", "from": [1.9, 1.4, 300], "anchor": "ground", "fov": 9, "look": [0, 2, 0], "pre_roll": 0.3, "duration": 5.0},
+                {"name": "night_crane", "vehicle": "en76-001a", "view": "rig", "from": [7, 1.2, 28], "to": [10, 8, 40], "fov": 32, "look": [0, 1.5, 0], "pre_roll": 0.4, "duration": 4.5}
+            ]
+        },
+        {
+            "name": "eve", "scenery": "baltyk_euro2012.scn", "cab_lights": true,
+            "shots": [
+                {"name": "ev_eu07_nose", "vehicle": "eu07-222", "view": "rig", "from": [2.6, 0.5, 22], "to": [3.4, 0.9, 17], "fov": 38, "look": [0, 1.8, 8], "pre_roll": 0.4, "duration": 3.5, "at": 345.0},
+                {"name": "ev_eu07_pass", "vehicle": "eu07-222", "view": "rig", "from": [4.0, 0.6, 110], "anchor": "ground", "fov": 42, "look": [0, 1.6, 0], "pre_roll": 0.3, "duration": 7.5},
+                {"name": "ev_eu07_crane", "vehicle": "eu07-222", "view": "rig", "from": [-7, 1.2, 28], "to": [-10, 8, 40], "fov": 32, "look": [0, 1.5, 0], "pre_roll": 0.4, "duration": 4.5},
+                {"name": "ev_ep09_nose", "vehicle": "ep09-018", "view": "rig", "from": [-2.6, 0.5, 22], "to": [-3.4, 0.9, 17], "fov": 38, "look": [0, 1.8, 8], "pre_roll": 0.4, "duration": 3.5, "at": 445.0},
+                {"name": "ev_ep09_pass", "vehicle": "ep09-018", "view": "rig", "from": [-4.0, 0.6, 110], "anchor": "ground", "fov": 42, "look": [0, 1.6, 0], "pre_roll": 0.3, "duration": 7.5},
+                {"name": "ev_ep09_cabin", "vehicle": "ep09-018", "view": "cabin", "pre_roll": 1.5, "duration": 3.5},
+                {"name": "ev_ep09_crane", "vehicle": "ep09-018", "view": "rig", "from": [7, 1.2, 28], "to": [10, 8, 40], "fov": 32, "look": [0, 1.5, 0], "pre_roll": 0.4, "duration": 4.5},
+                {"name": "ev_ep09_over", "vehicle": "ep09-018", "view": "rig", "from": [1.5, 7.5, 140], "anchor": "ground", "fov": 35, "look": [0, 1, 0], "pre_roll": 0.3, "duration": 7.0},
+                {"name": "ev_ep09_tele", "vehicle": "ep09-018", "view": "rig", "from": [1.9, 1.4, 300], "anchor": "ground", "fov": 9, "look": [0, 2, 0], "pre_roll": 0.3, "duration": 5.0},
+                {"name": "ev_en71_pass", "vehicle": "en71-052ra", "view": "rig", "from": [4.0, 0.6, 110], "anchor": "ground", "fov": 42, "look": [0, 1.6, 0], "pre_roll": 0.3, "duration": 7.5, "at": 505.0},
+                {"name": "ev_en71_nose", "vehicle": "en71-052ra", "view": "rig", "from": [2.6, 0.5, 22], "to": [3.4, 0.9, 17], "fov": 38, "look": [0, 1.8, 8], "pre_roll": 0.4, "duration": 3.5},
+                {"name": "ev_en71_crane", "vehicle": "en71-052ra", "view": "rig", "from": [7, 1.2, 28], "to": [10, 8, 40], "fov": 32, "look": [0, 1.5, 0], "pre_roll": 0.4, "duration": 4.5}
+            ]
+        },
+        {
+            "name": "bfr", "scenery": "baltyk.scn",
+            "shots": [
+                {"name": "bf_ep07_pass", "vehicle": "ep07-544", "view": "rig", "from": [4.0, 0.6, 110], "anchor": "ground", "fov": 42, "look": [0, 1.6, 0], "pre_roll": 0.3, "duration": 7.5, "at": 140.0},
+                {"name": "bf_ep07_nose", "vehicle": "ep07-544", "view": "rig", "from": [2.6, 0.5, 22], "to": [3.4, 0.9, 17], "fov": 38, "look": [0, 1.8, 8], "pre_roll": 0.4, "duration": 3.5}
+            ]
+        },
+        {
+            "name": "hero_eve", "scenery": "baltyk_euro2012.scn", "cab_lights": true, "fog": {"density": 0.45, "distance": 400.0},
+            "shots": [
+                {"name": "he_sweep", "vehicle": "ep09-018", "view": "rig", "from": [-3.5, 1.0, 17.4], "to": [3.5, 1.0, 17.4], "fov": 28, "look": [0, 1.7, 8.4], "pre_roll": 0.5, "duration": 7.0, "at": 25.0},
+                {"name": "he_lamp", "vehicle": "ep09-018", "view": "rig", "from": [1.9, 1.15, 11.600000000000001], "to": [1.1, 1.45, 10.4], "fov": 22, "look": [0.8, 1.5, 8.4], "pre_roll": 0.5, "duration": 6.0},
+                {"name": "he_rise", "vehicle": "ep09-018", "view": "rig", "from": [0.3, 0.35, 14.4], "to": [0.3, 3.0, 15.4], "fov": 30, "look": [0, 2.2, 8.4], "pre_roll": 0.5, "duration": 6.0},
+                {"name": "he_side", "vehicle": "ep09-018", "view": "rig", "from": [3.0, 1.7, 12.4], "to": [3.0, 1.7, 2.4000000000000004], "look_to": [1.4, 1.8, -7.6], "fov": 35, "look": [1.4, 1.8, 4.4], "pre_roll": 0.5, "duration": 6.0},
+                {"name": "he_wide", "vehicle": "ep09-018", "view": "rig", "from": [9, 1.2, 26.4], "to": [7, 1.6, 22.4], "fov": 24, "look": [0, 2, 4.4], "pre_roll": 0.5, "duration": 6.0},
+                {"name": "he_focus", "vehicle": "ep09-018", "view": "rig", "from": [-3.5, 1.0, 17.4], "to": [3.5, 1.0, 17.4], "fov": 28, "focus": 9.5, "look": [0, 1.7, 8.4], "pre_roll": 0.5, "duration": 7.0},
+                {"name": "he_back", "vehicle": "ep09-018", "view": "rig", "from": [2.5, 1.2, -17.4], "to": [-2.5, 1.2, -17.4], "fov": 28, "look": [0, 1.7, -8.4], "pre_roll": 0.5, "duration": 5.0},
+                {"name": "he_depart", "vehicle": "ep09-018", "view": "rig", "from": [4.0, 0.6, 60], "anchor": "ground", "fov": 42, "look": [0, 1.6, 0], "pre_roll": 0.3, "duration": 12.0, "at": 338.0},
+                {"name": "he_tele", "vehicle": "ep09-018", "view": "rig", "from": [1.9, 1.4, 400], "anchor": "ground", "fov": 6, "look": [0, 2, 0], "pre_roll": 0.3, "duration": 8.0, "at": 445.0},
+                {"name": "he_nose", "vehicle": "ep09-018", "view": "rig", "from": [-2.6, 0.5, 22], "to": [-3.4, 0.9, 17], "fov": 38, "look": [0, 1.8, 8], "pre_roll": 0.4, "duration": 4.0},
+                {"name": "he_pass", "vehicle": "ep09-018", "view": "rig", "from": [-4.0, 0.6, 110], "anchor": "ground", "fov": 42, "look": [0, 1.6, 0], "pre_roll": 0.3, "duration": 8.0}
+            ]
+        },
+        {
+            "name": "hero_wrz", "scenery": "$wrzosy_eie2620.scn", "time_of_day": 19.1, "cab_lights": true, "fog": {"density": 0.6, "distance": 250.0}, "drive": {"vehicle": "en76-001a", "after": 110.0, "controller": 100},
+            "shots": [
+                {"name": "hw_sweep", "vehicle": "e186-244", "view": "rig", "from": [-3.5, 1.0, 18.5], "to": [3.5, 1.0, 18.5], "fov": 28, "look": [0, 1.7, 9.5], "pre_roll": 0.5, "duration": 7.0, "at": 25.0},
+                {"name": "hw_lamp", "vehicle": "e186-244", "view": "rig", "from": [1.9, 1.15, 12.7], "to": [1.1, 1.45, 11.5], "fov": 22, "look": [0.8, 1.5, 9.5], "pre_roll": 0.5, "duration": 6.0},
+                {"name": "hw_rise", "vehicle": "e186-244", "view": "rig", "from": [0.3, 0.35, 15.5], "to": [0.3, 3.0, 16.5], "fov": 30, "look": [0, 2.2, 9.5], "pre_roll": 0.5, "duration": 6.0},
+                {"name": "hw_side", "vehicle": "e186-244", "view": "rig", "from": [3.0, 1.7, 13.5], "to": [3.0, 1.7, 3.5], "look_to": [1.4, 1.8, -6.5], "fov": 35, "look": [1.4, 1.8, 5.5], "pre_roll": 0.5, "duration": 6.0},
+                {"name": "hw_wide", "vehicle": "e186-244", "view": "rig", "from": [9, 1.2, 27.5], "to": [7, 1.6, 23.5], "fov": 24, "look": [0, 2, 5.5], "pre_roll": 0.5, "duration": 6.0},
+                {"name": "hw_focus", "vehicle": "e186-244", "view": "rig", "from": [-3.5, 1.0, 18.5], "to": [3.5, 1.0, 18.5], "fov": 28, "focus": 9.5, "look": [0, 1.7, 9.5], "pre_roll": 0.5, "duration": 7.0},
+                {"name": "hw_back", "vehicle": "e186-244", "view": "rig", "from": [2.5, 1.2, -18.5], "to": [-2.5, 1.2, -18.5], "fov": 28, "look": [0, 1.7, -9.5], "pre_roll": 0.5, "duration": 5.0},
+                {"name": "hw_desk", "vehicle": "e186-244", "view": "cabin", "pitch": -18.0, "fov": 60.0, "pre_roll": 1.5, "duration": 4.0},
+                {"name": "hw_deskwide", "vehicle": "e186-244", "view": "cabin", "pitch": -9.0, "fov": 80.0, "pre_roll": 1.5, "duration": 4.0},
+                {"name": "hw_tele", "vehicle": "en76-001a", "view": "rig", "from": [1.9, 1.4, 400], "anchor": "ground", "fov": 6, "look": [0, 2, 0], "pre_roll": 0.3, "duration": 8.0, "at": 140.0},
+                {"name": "hw_nose", "vehicle": "en76-001a", "view": "rig", "from": [2.6, 0.5, 22], "to": [3.4, 0.9, 17], "fov": 38, "look": [0, 1.8, 8], "pre_roll": 0.4, "duration": 4.0},
+                {"name": "hw_pass", "vehicle": "en76-001a", "view": "rig", "from": [-4.0, 0.6, 110], "anchor": "ground", "fov": 42, "look": [0, 1.6, 0], "pre_roll": 0.3, "duration": 8.0},
+                {"name": "hw_crane", "vehicle": "en76-001a", "view": "rig", "from": [7, 1.2, 28], "to": [10, 8, 40], "fov": 32, "look": [0, 1.5, 0], "pre_roll": 0.4, "duration": 4.5},
+                {"name": "hw_tele2", "vehicle": "en76-001a", "view": "rig", "from": [1.9, 1.4, 300], "anchor": "ground", "fov": 9, "look": [0, 2, 0], "pre_roll": 0.3, "duration": 6.0}
+            ]
+        },
+        {
+            "name": "fast_en76", "scenery": "$wrzosy_eie2620.scn", "drive": {"vehicle": "en76-001a", "after": 28.0, "controller": 100},
+            "shots": [
+                {"name": "fe_pass", "vehicle": "en76-001a", "view": "rig", "from": [4.0, 0.6, 170], "anchor": "ground", "fov": 42, "look": [0, 1.6, 0], "pre_roll": 0.3, "duration": 8.0, "at": 148.0},
+                {"name": "fe_nose", "vehicle": "en76-001a", "view": "rig", "from": [2.6, 0.5, 22], "to": [3.4, 0.9, 17], "fov": 38, "look": [0, 1.8, 8], "pre_roll": 0.3, "duration": 3.5},
+                {"name": "fe_over", "vehicle": "en76-001a", "view": "rig", "from": [-1.5, 7.5, 210], "anchor": "ground", "fov": 35, "look": [0, 1, 0], "pre_roll": 0.3, "duration": 8.0},
+                {"name": "fe_crane", "vehicle": "en76-001a", "view": "rig", "from": [-7, 1.2, 28], "to": [-10, 8, 40], "fov": 32, "look": [0, 1.5, 0], "pre_roll": 0.3, "duration": 4.0}
+            ]
+        },
+        {
+            "name": "fast_es64", "scenery": "$wrzosy_eie2620.scn", "drive": {"vehicle": "es64f4-846", "after": 39.0, "controller": 100},
+            "shots": [
+                {"name": "fs_nose", "vehicle": "es64f4-846", "view": "rig", "from": [2.6, 0.5, 22], "to": [3.4, 0.9, 17], "fov": 38, "look": [0, 1.8, 8], "pre_roll": 0.3, "duration": 3.5, "at": 124.0},
+                {"name": "fs_crane", "vehicle": "es64f4-846", "view": "rig", "from": [7, 1.2, 28], "to": [10, 8, 40], "fov": 32, "look": [0, 1.5, 0], "pre_roll": 0.3, "duration": 4.0},
+                {"name": "fs_station", "vehicle": "es64f4-846", "view": "rig", "from": [-4.0, 0.6, 220], "anchor": "ground", "fov": 42, "look": [0, 1.6, 0], "pre_roll": 0.3, "duration": 9.0},
+                {"name": "fs_over", "vehicle": "es64f4-846", "view": "rig", "from": [1.5, 7.5, 230], "anchor": "ground", "fov": 35, "look": [0, 1, 0], "pre_roll": 0.3, "duration": 8.0},
+                {"name": "fs_wheels", "vehicle": "es64f4-846", "view": "rig", "from": [2.1, 0.35, 6], "fov": 55, "look": [1.3, 0.45, -30], "pre_roll": 0.3, "duration": 3.0},
+                {"name": "fs_pass", "vehicle": "es64f4-846", "view": "rig", "from": [4.0, 0.6, 190], "anchor": "ground", "fov": 42, "look": [0, 1.6, 0], "pre_roll": 0.3, "duration": 8.0},
+                {"name": "fs_high", "vehicle": "es64f4-846", "view": "rig", "from": [25, 18, 60], "to": [30, 24, 80], "fov": 40, "look": [0, 0, -80], "pre_roll": 0.3, "duration": 4.0},
+                {"name": "fs_nose2", "vehicle": "es64f4-846", "view": "rig", "from": [-2.6, 0.5, 22], "to": [-3.4, 0.9, 17], "fov": 38, "look": [0, 1.8, 8], "pre_roll": 0.3, "duration": 3.5},
+                {"name": "fs_desk", "vehicle": "es64f4-846", "view": "cabin", "pitch": -18.0, "fov": 60.0, "pre_roll": 1.5, "duration": 3.5},
+                {"name": "fs_wide", "vehicle": "es64f4-846", "view": "cabin", "pitch": -9.0, "fov": 80.0, "pre_roll": 1.5, "duration": 3.5}
+            ]
+        },
+        {
+            "name": "bzima", "scenery": "baltyk_zima.scn",
+            "shots": [
+                {"name": "bz_ep07_nose", "vehicle": "ep07-365", "view": "rig", "from": [2.6, 0.5, 22], "to": [3.4, 0.9, 17], "fov": 38, "look": [0, 1.8, 8], "pre_roll": 0.4, "duration": 3.5, "at": 165.0},
+                {"name": "bz_ep07_pass", "vehicle": "ep07-365", "view": "rig", "from": [4.0, 0.6, 110], "anchor": "ground", "fov": 42, "look": [0, 1.6, 0], "pre_roll": 0.3, "duration": 7.5},
+                {"name": "bz_ep07_crane", "vehicle": "ep07-365", "view": "rig", "from": [-7, 1.2, 28], "to": [-10, 8, 40], "fov": 32, "look": [0, 1.5, 0], "pre_roll": 0.4, "duration": 4.5},
+                {"name": "bz_ep07_over", "vehicle": "ep07-365", "view": "rig", "from": [1.5, 7.5, 140], "anchor": "ground", "fov": 35, "look": [0, 1, 0], "pre_roll": 0.3, "duration": 7.0},
+                {"name": "bz_ep07_cabin", "vehicle": "ep07-365", "view": "cabin", "pre_roll": 1.5, "duration": 3.5},
+                {"name": "bz_ep07_tele", "vehicle": "ep07-365", "view": "rig", "from": [1.9, 1.4, 350], "anchor": "ground", "fov": 8, "look": [0, 2, 0], "pre_roll": 0.3, "duration": 7.0},
+                {"name": "bz_ep07_wheels", "vehicle": "ep07-365", "view": "rig", "from": [2.1, 0.35, 6], "fov": 55, "look": [1.3, 0.45, -30], "pre_roll": 0.4, "duration": 3.0},
+                {"name": "bz_ep07_pass2", "vehicle": "ep07-365", "view": "rig", "from": [-4.0, 0.6, 110], "anchor": "ground", "fov": 42, "look": [0, 1.6, 0], "pre_roll": 0.3, "duration": 7.5},
+                {"name": "bz_181_nose", "vehicle": "181_106-6'21", "view": "rig", "from": [2.6, 0.5, 22], "to": [3.4, 0.9, 17], "fov": 38, "look": [0, 1.8, 8], "pre_roll": 0.4, "duration": 3.5, "at": 585.0},
+                {"name": "bz_181_pass", "vehicle": "181_106-6'21", "view": "rig", "from": [4.0, 0.6, 110], "anchor": "ground", "fov": 42, "look": [0, 1.6, 0], "pre_roll": 0.3, "duration": 11.0},
+                {"name": "bz_181_high", "vehicle": "181_106-6'21", "view": "rig", "from": [25, 18, 60], "to": [30, 24, 80], "fov": 40, "look": [0, 0, -80], "pre_roll": 0.4, "duration": 4.5},
+                {"name": "bz_181_wagons", "vehicle": "181_106-6'21", "view": "rig", "from": [2.6, 1.0, -12], "fov": 40, "look": [1.6, 1.2, -120], "pre_roll": 0.4, "duration": 3.5},
+                {"name": "bz_181_over", "vehicle": "181_106-6'21", "view": "rig", "from": [1.5, 7.5, 140], "anchor": "ground", "fov": 35, "look": [0, 1, 0], "pre_roll": 0.3, "duration": 11.0},
+                {"name": "bz_181_crane", "vehicle": "181_106-6'21", "view": "rig", "from": [7, 1.2, 28], "to": [10, 8, 40], "fov": 32, "look": [0, 1.5, 0], "pre_roll": 0.4, "duration": 4.5}
+            ]
+        },
+        {
+            "name": "czima", "scenery": "calkowo_retro_zima.scn",
+            "shots": [
+                {"name": "cz_su45_sweep", "vehicle": "su45-115-hist", "view": "rig", "from": [-3.5, 1.0, 18.5], "to": [3.5, 1.0, 18.5], "fov": 28, "look": [0, 1.7, 9.5], "pre_roll": 0.4, "duration": 6.0, "at": 25.0},
+                {"name": "cz_su45_lamp", "vehicle": "su45-115-hist", "view": "rig", "from": [1.9, 1.15, 12.7], "to": [1.1, 1.45, 11.5], "fov": 22, "look": [0.8, 1.5, 9.5], "pre_roll": 0.4, "duration": 5.0},
+                {"name": "cz_su45_wide", "vehicle": "su45-115-hist", "view": "rig", "from": [9, 1.2, 27.5], "to": [7, 1.6, 23.5], "fov": 24, "look": [0, 2, 5.5], "pre_roll": 0.4, "duration": 5.0},
+                {"name": "cz_su42_nose", "vehicle": "su42-508", "view": "rig", "from": [2.6, 0.5, 22], "to": [3.4, 0.9, 17], "fov": 38, "look": [0, 1.8, 8], "pre_roll": 0.4, "duration": 3.5, "at": 425.0},
+                {"name": "cz_su42_pass", "vehicle": "su42-508", "view": "rig", "from": [4.0, 0.6, 110], "anchor": "ground", "fov": 42, "look": [0, 1.6, 0], "pre_roll": 0.3, "duration": 7.5},
+                {"name": "cz_su42_crane", "vehicle": "su42-508", "view": "rig", "from": [-7, 1.2, 28], "to": [-10, 8, 40], "fov": 32, "look": [0, 1.5, 0], "pre_roll": 0.4, "duration": 4.5},
+                {"name": "cz_su42_cabin", "vehicle": "su42-508", "view": "cabin", "pre_roll": 1.5, "duration": 3.5},
+                {"name": "cz_su42_high", "vehicle": "su42-508", "view": "rig", "from": [25, 18, 60], "to": [30, 24, 80], "fov": 40, "look": [0, 0, -80], "pre_roll": 0.4, "duration": 4.5},
+                {"name": "cz_su42_over", "vehicle": "su42-508", "view": "rig", "from": [1.5, 7.5, 140], "anchor": "ground", "fov": 35, "look": [0, 1, 0], "pre_roll": 0.3, "duration": 7.0}
+            ]
+        },
+        {
+            "name": "screens", "scenery": "$wrzosy_eie2620.scn", "time_of_day": 19.1, "cab_lights": true, "drive": {"vehicle": "en76-001a", "after": 110.0, "controller": 100},
+            "shots": [
+                {"name": "sn_desk", "vehicle": "en76-001a", "view": "cabin", "pitch": -18.0, "fov": 60.0, "pre_roll": 1.5, "duration": 4.0, "at": 140.0},
+                {"name": "sn_close", "vehicle": "en76-001a", "view": "cabin", "pitch": -28.0, "fov": 42.0, "pre_roll": 1.5, "duration": 4.0},
+                {"name": "sn_wide", "vehicle": "en76-001a", "view": "cabin", "pitch": -9.0, "fov": 80.0, "pre_roll": 1.5, "duration": 4.0},
+                {"name": "sn_low", "vehicle": "en76-001a", "view": "cabin", "pitch": -38.0, "fov": 55.0, "pre_roll": 1.5, "duration": 4.0}
+            ]
+        },
+        {
+            "name": "screens_day", "scenery": "$wrzosy_eie2620.scn", "drive": {"vehicle": "en76-001a", "after": 110.0, "controller": 100},
+            "shots": [
+                {"name": "sd_desk", "vehicle": "en76-001a", "view": "cabin", "pitch": -18.0, "fov": 60.0, "pre_roll": 1.5, "duration": 4.0, "at": 140.0},
+                {"name": "sd_close", "vehicle": "en76-001a", "view": "cabin", "pitch": -28.0, "fov": 42.0, "pre_roll": 1.5, "duration": 4.0},
+                {"name": "sd_wide", "vehicle": "en76-001a", "view": "cabin", "pitch": -9.0, "fov": 80.0, "pre_roll": 1.5, "duration": 4.0},
+                {"name": "sd_low", "vehicle": "en76-001a", "view": "cabin", "pitch": -38.0, "fov": 55.0, "pre_roll": 1.5, "duration": 4.0}
+            ]
+        }
+    ]
+}

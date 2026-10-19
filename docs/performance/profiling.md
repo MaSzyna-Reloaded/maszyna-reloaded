@@ -147,3 +147,23 @@ Open `main.svg` in a browser; clicking a frame zooms into it.
 * **Split CPU from GPU first.** If the main thread is not busy all the time, the GPU limits the
   frame, and making CPU code faster will not show. Pausing the simulation, or running at a lower
   resolution, tells which one limits it.
+
+## On Fedora
+
+* **Tools:** `sudo dnf install perf`; `gamescope` comes with the desktop. `sudo sysctl
+  kernel.perf_event_paranoid=1` as above.
+* **An engine with symbols:** the packaged `godot` is stripped. Build the same version beside it:
+  `git clone --shared <godot checkout> godot-4.7.2-profiling`, `git checkout 4.7.2-stable`,
+  `scons platform=linuxbsd target=editor precision=double debug_symbols=yes lto=none -j30`
+  (about 8 minutes on 32 threads), and run the game with that binary for `perf`. It runs slower
+  than the packaged one: read shares from it, FPS from the packaged one.
+* **No laptop traps:** a desktop has no battery profile, so the AC check does not apply.
+* **One run at a time:** the headless gamescope is the process `gamescope-wl`; a run script takes
+  a lock (`flock`) so that two runs never share the CPU, and puts the player's `settings.cfg` back
+  when it ends.
+* **Two threads hold the frame** once rendering runs on its own thread: the main thread and
+  `WorkerThread 0` (the rendering thread, `RenderingServerDefault::_thread_loop`). Read both:
+  the busier one limits the frame. The main thread is no longer the one with the most samples.
+* **What the scripts cost:** `perf` shows a script only as `GDScriptFunction::call`. A probe - an
+  autoload with `mark(key)`/`add(key, usec)` and a few lines of `Time.get_ticks_usec()` put into
+  the scripts for one run, marked so that one `sed` takes them out - gives the share of each.

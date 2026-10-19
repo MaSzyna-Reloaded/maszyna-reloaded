@@ -27,6 +27,11 @@ part in its `docs/performance/`.
   stack holds it. How to record and read it: [profiling with perf](profiling.md).
 * **The player's settings** (`settings.cfg`): TAA off, SSIL on, SDFGI, SSAO, SSR, volumetric fog
   and glow off. VSync is on by default.
+* **The second machine** (from 2026-10-19): a desktop, AMD Ryzen 9 5950X (16 cores, 32 threads)
+  with a Radeon RX 9060 XT, Fedora 44 (KDE), Godot 4.7.2 double from `/usr/bin/godot` (a stripped
+  editor build). The same settings and resolution as above, VSync off; the recorder warms up for
+  120 s after the scenery has loaded before it measures 60 s. How it differs from the laptop's
+  method: [profiling with perf](profiling.md), "On Fedora".
 
 ### Traps that cost runs
 
@@ -113,6 +118,65 @@ commands that make them:
 
 The flipping converter and oil pump and the brake buttons are in [findings](findings.md).
 
+## Wrzosy on the Fedora desktop (`wrzosy_eie8310.scn`)
+
+The same place and settings as above, 1920x1080, before the second round of changes (the game at
+`ebe87bf`, libmaszyna at `7f7c833e`). About 743 vehicles, 264 of them driven by the AI, about
+9 200 draw calls and 3.9 M triangles in view.
+
+| Build | FPS | Frame (median, p95, p99) | Render GPU | Render CPU |
+|---|---|---|---|---|
+| `/usr/bin/godot`, single-threaded rendering | **22.1** | 44.4, 55.6, 64.4 ms | 7.6 ms | 7.5 ms |
+
+* **The GPU is idle most of the frame** (7.6 ms of 44): this machine is held by the CPU alone.
+* **The main thread is busy 99%** (9 848 samples of 9 980 in 20 s, the symbol build below):
+
+| Phase | Share of the main thread |
+|---|---|
+| `SimulationServer.simulation_advance` | 48.4% |
+| of it: the Mover step (`MaszynaMoverVehicleServer::stepping_advance`) | 24.2% |
+| of it: the AI drivers (`DriverImplementation::update`, the game's GDScript) | 17.6% |
+| of it: the rest of its listeners (the cab logic of every driven cab, sound's sweep) | 7.7% |
+| `RenderingServerDefault::_draw` (drawing, CPU side) | 31.4% |
+| `SceneTree::_process` (scripts' `_process`, sound's update) | 5.6% |
+
+* **Drawing ran on the main thread** (the project's default `thread_model`), so the frame was the
+  simulation's time plus the drawing's. Moving it to a thread of its own is the largest change of
+  this round ([changes](changes.md)).
+* **What the GDScript on the step is**, from probes put into the scripts for one run (never
+  committed; shares of the main thread's wall time with the rendering thread already separate):
+
+| Probe | Share | Calls a minute |
+|---|---|---|
+| cab lights of every driven cab (`LegacyCabinCabLights`, every step) | 8.5% | 947 000 |
+| main switch of every driven cab (`LegacyCabinMainSwitch`, every step) | 7.8% | 947 000 |
+| AI: traction and braking control | 6.4% | 45 500 |
+| AI: route table | 2.7% | 45 500 |
+| sound's `_process` (59 banks in earshot of 87) | 2.7% | 3 600 |
+| AI: speed pick and the scan behind | 2.5% | 45 500 |
+| door permits of every driven cab | 2.3% | 947 000 |
+| AI: everything else of `_update()` | 6.4% | |
+| `GamePlayLogRecorder` on commands | 0.5% | 16 300 |
+
+* 264 cabs run three cab-logic callables each on every simulation step - the cab of every AI
+  driver, nobody sitting in it.
+
+### After the round
+
+| State | FPS | Frame (median, p95, p99) |
+|---|---|---|
+| before | 22.1 | 44.4, 55.6, 64.4 ms |
+| rendering on its own thread | 56.8 | 16.7, 19.1, 26.7 ms |
+| + libmaszyna's changes of the round | 55.7-56.0 | 17.8-18.2, 20.0, 23.9-30.9 ms |
+
+* With the rendering thread **two threads hold the frame**: the rendering thread is busy 83%
+  (recording the commands of about 9 200 draw calls: `_render_list` 34%, the rendering graph 32%,
+  binding vertex buffers about 12%, the sun's cascades about 15%), the main thread 77% (the
+  simulation 80% of it: the Mover 44%, the AI 23.5%; scripts' `_process` 13%).
+* The changes on the main thread after the first one are within the noise in FPS: the rendering
+  thread is the limit now. They leave the main thread more room, which is what a scene with more
+  trains, or a slower CPU, runs into first.
+
 ## calkowo_v2, forest, day (`calkowo_v2_osoba_wil_dzien1.scn`)
 
 The player's cab at the scenery's start, 1920x1080, on AC, with the libmaszyna changes and the
@@ -164,5 +228,6 @@ memory.
 
 ## Still to measure
 
+* the operator's own settings (2560x1440, MSAA 8x, TAA, SSR, SSAO, SSIL, SDFGI) on the desktop
 * `braniewo_szeroki.scn`; the cab driving (an AI-driven player's trainset); rain on Wrzosy and on
   calkowo_v2

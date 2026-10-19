@@ -94,3 +94,47 @@ come from [baseline](baseline.md).
   after the AI fixes and the libmaszyna changes - road cars (`auto_71x`, `auto_131`, ...) on road
   tracks such as `wolica_przejazd014`, `wol_z_rd005`, `rd_las014`, mostly in the first 20 s.
 * **Not investigated:** recorded only; it is not a cost of this work's changes.
+
+## A run of the same build is not the same run twice
+
+* **Seen** (Wrzosy, the Fedora desktop): the simulation paused when the scenery had loaded, then
+  stepped by hand by 1/30 s 900 times. Two runs of the same build ended with 474 of the 743
+  vehicles at other speeds or places, and with 36 162 against 37 309 commands.
+* **Why:** before the first step the AI and the cab logic already send about 20 000 commands while
+  the scenery streams in, in an order that follows the real time of the loading; and the Mover
+  draws from one random engine for every vehicle (`Random()`, `utilities.cpp`: adhesion, track
+  irregularities, brake delays), so the order the vehicles draw in moves every value after.
+* **What it means:** a change cannot be proven to keep the behaviour by comparing two runs bit by
+  bit. This round's changes keep it by construction (each says why in libmaszyna's `changes.md`),
+  and by the tests of the code they touch.
+* **For later:** a Mover stepped on several threads would change the order of the draws as well -
+  the behaviour the same in distribution, not bit by bit. Not done; for the operator to decide.
+
+## The cab of every AI driver ran its logic on every step
+
+* **Seen:** 264 cabs on Wrzosy - one per AI driver - each ran the cab lights, the main switch and
+  the door permits on every simulation step (`CabinSystem.register_process()`): 2.8 million
+  script calls a minute, 18.5% of the main thread, for cabs nobody sits in.
+* **Decided:** the lights work out what a cab shows - they run for a cab while it is shown, and
+  for a cab not shown when they are read. The main switch and the door permits send commands, so
+  they keep running on every step, cheaper (libmaszyna `changes.md`).
+
+## Traps of the Fedora runs
+
+* **`/usr/bin/godot` is stripped:** `perf` shows the engine as addresses and cannot follow the
+  stacks through it, so a phase of the frame cannot be read. A build of the same version with
+  symbols (`scons platform=linuxbsd target=editor precision=double debug_symbols=yes lto=none`
+  on the `4.7.2-stable` tag) gives the phases; it runs about 20% slower, so FPS is measured on
+  `/usr/bin/godot` and the shares on the symbol build.
+* **The process is `gamescope-wl`**, not `gamescope`: `pgrep -x gamescope` finds nothing, and two
+  runs ran at once until the run script took a lock (`flock`).
+* **The scenery warms up for 30-40 s after it has loaded** (streaming, shader compilation): with
+  30 s of warm-up the first half of a minute measured 5-20 FPS. Runs warm up 120 s.
+* **A recorder that reads the render times on every frame** (`viewport_get_measured_render_time_*`)
+  waits for the rendering thread when it runs on its own; it reads them once a second.
+* **Godot's own script profiler** (`-d` and `EngineDebugger.profiler_enable("scripts", true)`)
+  hung the game while the scenery loaded on worker threads, also with `--ignore-error-breaks`.
+  The scripts' shares came from probes put into the scripts for one run instead.
+* **A material type changed in memory is saved by the editor:** a first version of the material
+  defaults set them on the type's base material, loaded from its `.tres`; an editor open on the
+  project wrote all 13 type files back. The change works on a copy now.

@@ -653,8 +653,11 @@ static func cue(situation:MaszynaLegacyDriverTraction.Situation, hint:Hint, para
                 var power_supply:RailVehiclePowerSupply = _power_supply(vehicle)
                 done = power_supply == null or not power_supply.get_battery_enabled()
             Hint.OIL_PUMP_ON:
+                # a pump that starts on its own takes no switching (start_type != manual,
+                # driverhints.cpp:171)
                 var diesel:RailVehicleDieselEngine = _diesel(vehicle)
-                done = diesel == null or diesel.get_oil_pump_enabled()
+                done = diesel == null or not diesel.oil_pump_start_mode == RailVehicleController.START_MODE_MANUAL \
+                        or diesel.get_oil_pump_enabled()
             Hint.SANDING_ON:
                 var switches:RailVehicleSwitches = _switches(situation.controlling)
                 done = switches == null or switches.get_sand_active()
@@ -988,9 +991,12 @@ static func is_done(situation:MaszynaLegacyDriverTraction.Situation, hint:Hint, 
         Hint.REAR_PANTOGRAPH_VALVE_OFF:
             var power_source:RailVehicleEnginePowerSource = _power_source(unit)
             return power_source == null or not power_source.get_collector_pantograph_second_valve_active()
-        Hint.CONVERTER_ON, Hint.CONVERTER_OFF:
-            var power_supply:RailVehiclePowerSupply = _power_supply(controlling)
-            return power_supply == null or power_supply.get_converter_enabled() == (hint == Hint.CONVERTER_ON)
+        # the converters' switches, not whether they run (driverhints.cpp:315-335): a road car's
+        # converter is switched on and never runs
+        Hint.CONVERTER_ON:
+            return situation.trainset.converter_enabled
+        Hint.CONVERTER_OFF:
+            return not situation.trainset.converter_explicitly_enabled
         Hint.PRIMARY_CONVERTER_OVERLOAD_RESET:
             var electric:RailVehicleElectricEngine = _engine(controlling) as RailVehicleElectricEngine
             return electric == null or not electric.get_converter_overload()

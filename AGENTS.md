@@ -40,6 +40,12 @@ Where the game is not libmaszyna:
 * releases are cut here: `make build-number`, `make release-linux` / `release-windows` /
   `release-android`; the CI workflow builds libmaszyna from the submodule, exports and publishes
   the branch's prerelease
+* performance work - measurements, profiles, changes made for speed with their before/after, what
+  was left out because it would change the picture - goes to `docs/performance/` (`baseline.md`,
+  `changes.md`, `findings.md` - faults of behaviour or data found while measuring -,
+  `out-of-scope.md`) of the repository it concerns, not to `FINDINGS.md`. The rule of
+  that work is no change to the picture: no setting lowered. How to measure and profile:
+  `docs/performance/profiling.md` (gamescope headless, `perf`, on AC, `-r 240`)
 * a log view of many lines is `LogLines` (`hud/log_lines.gd`, `add_line()`): it draws only while
   it is visible and drops the oldest lines in batches. Never `RichTextLabel.remove_paragraph()`
   per line - it walks the whole text, and the Logs panel took 71% of the main thread on Wrzosy

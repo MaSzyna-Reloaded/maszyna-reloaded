@@ -168,13 +168,16 @@ The same place and settings as above, 1920x1080, before the second round of chan
 | before | 22.1 | 44.4, 55.6, 64.4 ms |
 | rendering on its own thread | 56.8 | 16.7, 19.1, 26.7 ms |
 | + libmaszyna's changes of the round | 55.7-56.0 | 17.8-18.2, 20.0, 23.9-30.9 ms |
+| + the Mover on worker threads | 56.1-58.9 | 16.7-17.8, 18.2-20.0, 23.3-25.5 ms |
+| the operator's settings (2560x1440, MSAA 8x, TAA, SSR, SSAO, SSIL, SDFGI), before the Mover's threads | 56.5 | 17.2, 19.1, 24.7 ms |
 
 * With the rendering thread **two threads hold the frame**: the rendering thread is busy 83%
   (recording the commands of about 9 200 draw calls: `_render_list` 34%, the rendering graph 32%,
   binding vertex buffers about 12%, the sun's cascades about 15%), the main thread 77% (the
   simulation 80% of it: the Mover 44%, the AI 23.5%; scripts' `_process` 13%).
-* The changes on the main thread after the first one are within the noise in FPS: the rendering
-  thread is the limit now. They leave the main thread more room, which is what a scene with more
+* The changes on the main thread after the first one show little in FPS: the rendering thread is
+  the limit now (91% busy once the Mover runs on worker threads, the main thread 69%). Even on the
+  operator's settings at 2560x1440 the GPU needs about 8 ms of an 18 ms frame. They leave the main thread more room, which is what a scene with more
   trains, or a slower CPU, runs into first.
 
 ## calkowo_v2, forest, day (`calkowo_v2_osoba_wil_dzien1.scn`)
@@ -228,6 +231,5 @@ memory.
 
 ## Still to measure
 
-* the operator's own settings (2560x1440, MSAA 8x, TAA, SSR, SSAO, SSIL, SDFGI) on the desktop
 * `braniewo_szeroki.scn`; the cab driving (an AI-driven player's trainset); rain on Wrzosy and on
   calkowo_v2

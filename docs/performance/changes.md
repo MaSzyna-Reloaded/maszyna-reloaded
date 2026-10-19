@@ -100,7 +100,21 @@ from the AI on Wrzosy - and made the vehicle's `name#rid` twice.
 | before (game `ebe87bf`, libmaszyna `7f7c833e`) | 22.1 | 44.4, 55.6, 64.4 ms |
 | rendering thread | 56.8 | 16.7, 19.1, 26.7 ms |
 | + libmaszyna's changes (`57b57141`) | 55.7-56.0 | 17.8-18.2, 20.0, 23.9-30.9 ms |
+| + the Mover on worker threads, the AI's cue (libmaszyna `6332aa7a`) | 56.1-58.9 | 16.7-17.8, 18.2-20.0, 23.3-25.5 ms |
 
 libmaszyna's changes of the round - the cab logic of unseen cabs, the material defaults, the Mover's
 controller and component lookups - are in its `docs/performance/changes.md`. They take main-thread
 time off, but the rendering thread is the limit after the first change ([baseline](baseline.md)).
+
+## The AI's cue reads the forces only where it needs them
+
+`MaszynaLegacyDriverHints.cue()` runs dozens of times on every update of every driver (264 on
+Wrzosy, about 760 updates a second). It read the tractive and the braking force for every cue,
+while only the three force hints take them, and made the list of hints it rules out before the
+check that ends most cues.
+
+* **Change:** the forces are read in the three hints' branches; the list is made after the check.
+  Both reads are plain getters, so the result is the same.
+* **Measured:** not separately - the rendering thread limits the frame (baseline). Tests: the
+  driver's braking, door, independent brake, lights, speed, station, timetable and AI tests (53)
+  pass.

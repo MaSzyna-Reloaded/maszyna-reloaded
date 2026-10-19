@@ -101,10 +101,13 @@ from the AI on Wrzosy - and made the vehicle's `name#rid` twice.
 | rendering thread | 56.8 | 16.7, 19.1, 26.7 ms |
 | + libmaszyna's changes (`57b57141`) | 55.7-56.0 | 17.8-18.2, 20.0, 23.9-30.9 ms |
 | + the Mover on worker threads, the AI's cue (libmaszyna `6332aa7a`) | 56.1-58.9 | 16.7-17.8, 18.2-20.0, 23.3-25.5 ms |
+| + materials without RenderingServer waits (libmaszyna `1dc13e87`) | **79.0** | 12.5, 13.3, 16.7 ms |
 
 libmaszyna's changes of the round - the cab logic of unseen cabs, the material defaults, the Mover's
 controller and component lookups - are in its `docs/performance/changes.md`. They take main-thread
-time off, but the rendering thread is the limit after the first change ([baseline](baseline.md)).
+time off; what held the two threads back from working at once was the material factory, which
+made the main thread wait for the rendering thread about 2 300 times a run (its findings, "a
+ShaderMaterial's property list waits for the rendering thread"). Without it Wrzosy runs at 79 FPS.
 
 ## The AI's cue reads the forces only where it needs them
 

@@ -169,6 +169,7 @@ The same place and settings as above, 1920x1080, before the second round of chan
 | rendering on its own thread | 56.8 | 16.7, 19.1, 26.7 ms |
 | + libmaszyna's changes of the round | 55.7-56.0 | 17.8-18.2, 20.0, 23.9-30.9 ms |
 | + the Mover on worker threads | 56.1-58.9 | 16.7-17.8, 18.2-20.0, 23.3-25.5 ms |
+| + materials without RenderingServer waits | **79.0** | 12.5, 13.3, 16.7 ms |
 | the operator's settings (2560x1440, MSAA 8x, TAA, SSR, SSAO, SSIL, SDFGI), before the Mover's threads | 56.5 | 17.2, 19.1, 24.7 ms |
 
 * With the rendering thread **two threads hold the frame**: the rendering thread is busy 83%

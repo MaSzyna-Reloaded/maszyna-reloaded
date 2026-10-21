@@ -4,7 +4,7 @@
     make_trailer.py record [take ...]   each take (all without a name) in a headless gamescope:
                                         Godot's movie writer, an AVI of the frames and the mix
     make_trailer.py edit                the "sequence" of shots.json cut out of the recorded shots and
-                                        joined, the end card added - into a new, numbered file
+                                        joined, the opening and the end card added - into a new, numbered file
     make_trailer.py                     both
 
 Everything lands in bin/trailer/ (not versioned). A take recorded again and the cut segments are
@@ -75,6 +75,17 @@ CUT_FADE = 0.05
 # shots.json's "card" gives another
 CARD_SECONDS = 4.0
 CARD_LOGO_WIDTH = round(760 * WIDTH / 1920)
+# Seconds of the opening card - the engine's logo in the middle with OPENING_TEXT above it, silent,
+# from black and back into it - the logo's width, the text's size and colour and the gap between
+# them; shots.json's "opening" gives other seconds
+OPENING_SECONDS = 3.0
+OPENING_LOGO = TRAILER / "godot_logo_large_color_dark.png"
+OPENING_LOGO_WIDTH = round(720 * WIDTH / 1920)
+OPENING_TEXT = "Made with"
+OPENING_FONT = "Montserrat-Medium"
+OPENING_TEXT_SIZE = round(44 * HEIGHT / 1080)
+OPENING_TEXT_COLOR = "#e0e0e0"
+OPENING_GAP = round(36 * HEIGHT / 1080)
 # The director's line of a recorded shot (trailer_take.gd)
 SHOT_LINE = re.compile(r"^\[Trailer\] (\S+) frames (\d+) (\d+)", re.MULTILINE)
 VIDEO = ["-c:v", "libx264", "-crf", "18", "-preset", "slow", "-pix_fmt", "yuv420p",
@@ -209,7 +220,22 @@ def edit(shots_file):
         picture += (f",drawbox=x=0:y=0:w={WIDTH}:h={bar}:color=black:t=fill"
                     f",drawbox=x=0:y={HEIGHT - bar}:w={WIDTH}:h={bar}:color=black:t=fill")
     sequence = shots_file["sequence"]
-    parts = []
+    opening_seconds = shots_file.get("opening", OPENING_SECONDS)
+    opening = segments / "opening.png"
+    run(["magick", "-size", f"{WIDTH}x{HEIGHT}", "xc:black",
+         "(", "+size", "-background", "none", "-fill", OPENING_TEXT_COLOR, "-font", OPENING_FONT,
+         "-pointsize", OPENING_TEXT_SIZE, f"label:{OPENING_TEXT}",
+         "-size", f"1x{OPENING_GAP}", "xc:none", "+size",
+         "(", OPENING_LOGO, "-trim", "+repage", "-resize", f"{OPENING_LOGO_WIDTH}x", ")",
+         "-gravity", "center", "-append", ")",
+         "-gravity", "center", "-composite", opening])
+    part = segments / "opening.mkv"
+    fade_frames = round(FADE * FPS)
+    run(["ffmpeg", "-v", "error", "-y", "-loop", "1", "-framerate", FPS, "-t", opening_seconds, "-i", opening,
+         "-f", "lavfi", "-t", opening_seconds, "-i", f"anullsrc=r={AUDIO_RATE}:cl=stereo",
+         "-vf", f"{TO_BT709},fade=in:0:{fade_frames},fade=out:{round(opening_seconds * FPS) - fade_frames}:{fade_frames}",
+         *VIDEO, *AUDIO, part])
+    parts = [part]
     for index, cut in enumerate(sequence):
         film, first, last = starts[cut["shot"]]
         first += round(cut.get("from", 0.0) * FPS)

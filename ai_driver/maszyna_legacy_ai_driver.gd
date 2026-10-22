@@ -626,7 +626,7 @@ func _update(driver:RID) -> void:
     # relay a player opened - takes the engine's readiness away, and handle_engine() gets it ready
     # again (determine_consist_state(), Driver.cpp:6100-6104)
     if state.trainset.line_breaker_open or state.trainset.converter_overload_relay_open \
-            or not _converter_enabled(state.trainset.controlling):
+            or (state.trainset.converter_present and not state.trainset.converter_enabled):
         state.engine_active = false
     # what its brakes can do - the table again when the trainset or the kind of order changed
     state.braking.read_trainset(
@@ -971,7 +971,9 @@ func _prepare_engine(situation:MaszynaLegacyDriverTraction.Situation) -> bool:
         MaszynaLegacyDriverHints.cue(situation, MaszynaLegacyDriverHints.Hint.LINE_BREAKER_CLOSE)
     else:
         if not converter_overload:
-            if MaszynaLegacyDriverHints.cue(situation, MaszynaLegacyDriverHints.Hint.CONVERTER_ON):
+            # a converter only where there is one; the compressor once it is on (Driver.cpp:2851-2857)
+            if state.trainset.converter_present \
+                    and MaszynaLegacyDriverHints.cue(situation, MaszynaLegacyDriverHints.Hint.CONVERTER_ON):
                 MaszynaLegacyDriverHints.cue(situation, MaszynaLegacyDriverHints.Hint.COMPRESSOR_ON)
             MaszynaLegacyDriverHints.cue(situation, MaszynaLegacyDriverHints.Hint.WAIT_PRESSURE_TOO_LOW)
             # the traction motors' blowers that run at all (Driver.cpp:2860-2866)
@@ -999,11 +1001,13 @@ func _prepare_engine(situation:MaszynaLegacyDriverTraction.Situation) -> bool:
         missing |= EngineCheck.LINE_BREAKER
     if VehicleServer.vehicle_get_controller(vehicle).get_direction() == VehicleController.DIRECTION_NEUTRAL:
         missing |= EngineCheck.DIRECTION
-    if not _converter_enabled(controlling):
+    if state.trainset.converter_present and not state.trainset.converter_enabled:
         missing |= EngineCheck.CONVERTER
     var brake:RailVehicleBrake = RailVehicleServer.vehicle_component_get(
             controlling, RailVehicleComponentType.COMPONENT_BRAKES) as RailVehicleBrake
-    if (brake.get_compressor_pressure() if brake else 0.0) <= MIN_MAIN_RESERVOIR_PRESSURE:
+    # no air wanted without a main reservoir (VeselVolume == 0.0, Driver.cpp:2897)
+    if brake and not is_zero_approx(brake.tank_volume_main) \
+            and brake.get_compressor_pressure() <= MIN_MAIN_RESERVOIR_PRESSURE:
         missing |= EngineCheck.AIR
     state.engine_missing = missing
     state.engine_active = missing == 0
@@ -1322,13 +1326,6 @@ static func _power24_available(vehicle:RID) -> bool:
     var power_supply:RailVehiclePowerSupply = RailVehicleServer.vehicle_component_get(
             vehicle, RailVehicleComponentType.COMPONENT_POWER_SUPPLY) as RailVehiclePowerSupply
     return power_supply != null and power_supply.get_power24_available()
-
-
-## The vehicle's converter running - none on a vehicle without a power supply
-static func _converter_enabled(vehicle:RID) -> bool:
-    var power_supply:RailVehiclePowerSupply = RailVehicleServer.vehicle_component_get(
-            vehicle, RailVehicleComponentType.COMPONENT_POWER_SUPPLY) as RailVehiclePowerSupply
-    return power_supply != null and power_supply.get_converter_enabled()
 
 
 ## `Timetable:<name> <velocity> <minutes>` (Driver.cpp:4494-4576): the timetable, the first station

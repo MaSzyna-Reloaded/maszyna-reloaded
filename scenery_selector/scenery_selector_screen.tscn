@@ -23,6 +23,7 @@
 [ext_resource type="Texture2D" path="res://ui/reset_icon.svg" id="21_reset"]
 [ext_resource type="Script" path="res://ui/ui_action_buttons.gd" id="22_action_buttons"]
 [ext_resource type="PackedScene" path="res://scenery_selector/vehicle_browser_window.tscn" id="20_vehicle_browser"]
+[ext_resource type="Script" path="res://ui/ui_select.gd" id="23_select"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_background"]
 shader = ExtResource("2_shader")
@@ -170,6 +171,18 @@ theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
 [node name="VBoxContainer" type="VBoxContainer" parent="Content/HBoxContainer/LeftSlot/ListPanel" unique_id=127204725]
 layout_mode = 2
 theme_override_constants/separation = 12
+
+[node name="ProviderFilterSection" type="PanelContainer" parent="Content/HBoxContainer/LeftSlot/ListPanel/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_type_variation = &"FocusSection"
+script = ExtResource("8_focus")
+
+[node name="ProviderFilter" type="OptionButton" parent="Content/HBoxContainer/LeftSlot/ListPanel/VBoxContainer/ProviderFilterSection"]
+unique_name_in_owner = true
+layout_mode = 2
+tooltip_text = "Sceneries of one source only"
+script = ExtResource("23_select")
 
 [node name="SceneryList" parent="Content/HBoxContainer/LeftSlot/ListPanel/VBoxContainer" unique_id=1499469034 instance=ExtResource("6_list")]
 unique_name_in_owner = true
@@ -548,3 +561,12 @@ layout_mode = 1
 [connection signal="closed" from="GameDirWindow" to="." method="show_development_notice"]
 [connection signal="game_dir_chosen" from="GameDirWindow" to="." method="_on_game_dir_window_game_dir_chosen"]
 [connection signal="vehicle_chosen" from="VehicleBrowser" to="." method="_on_vehicle_browser_vehicle_chosen"]
+[connection signal="focus_requested" from="Content/HBoxContainer/LeftSlot/ListPanel/VBoxContainer/ProviderFilterSection" to="." method="focus_provider_filter"]
+[connection signal="navigate_left" from="Content/HBoxContainer/LeftSlot/ListPanel/VBoxContainer/ProviderFilterSection" to="." method="select_previous_provider"]
+[connection signal="navigate_right" from="Content/HBoxContainer/LeftSlot/ListPanel/VBoxContainer/ProviderFilterSection" to="." method="select_next_provider"]
+[connection signal="navigate_down" from="Content/HBoxContainer/LeftSlot/ListPanel/VBoxContainer/ProviderFilterSection" to="." method="focus_scenery_list"]
+[connection signal="activated" from="Content/HBoxContainer/LeftSlot/ListPanel/VBoxContainer/ProviderFilterSection" to="." method="focus_scenery_list"]
+[connection signal="cancelled" from="Content/HBoxContainer/LeftSlot/ListPanel/VBoxContainer/ProviderFilterSection" to="." method="request_quit"]
+[connection signal="pressed" from="Content/HBoxContainer/LeftSlot/ListPanel/VBoxContainer/ProviderFilterSection/ProviderFilter" to="." method="focus_provider_filter"]
+[connection signal="item_selected" from="Content/HBoxContainer/LeftSlot/ListPanel/VBoxContainer/ProviderFilterSection/ProviderFilter" to="." method="_on_provider_filter_item_selected"]
+[connection signal="navigate_up" from="Content/HBoxContainer/LeftSlot/ListPanel/VBoxContainer/SceneryList" to="." method="focus_provider_filter"]

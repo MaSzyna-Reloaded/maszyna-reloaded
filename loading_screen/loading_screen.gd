@@ -32,22 +32,22 @@ func _exit_tree() -> void:
     get_viewport().size_changed.disconnect(_on_viewport_size_changed)
 
 
-## "Galicja · Linia 107 Objazdy" (MaszynaSceneryInfo.read_display_name()): the scenery's name,
-## then what tells the scenario apart
+## "Galicja · Linia 107 Objazdy" (SceneryInfo.title): the scenery's name, then what tells the
+## scenario apart
 func show_loading(display_name: String) -> void:
-    var parts: PackedStringArray = display_name.split(MaszynaSceneryInfo.PART_SEPARATOR, false)
-    %Board.show_title(parts[0] if parts else display_name, MaszynaSceneryInfo.PART_SEPARATOR.join(parts.slice(1)))
+    var parts: PackedStringArray = display_name.split(SceneryInfo.TITLE_PART_SEPARATOR, false)
+    %Board.show_title(parts[0] if parts else display_name, SceneryInfo.TITLE_PART_SEPARATOR.join(parts.slice(1)))
     _progress = 0.0
     _started_msec = Time.get_ticks_msec()
     _progressed_msec = _started_msec
-    %Board.show_progress(0.0, MaszynaIncludeNode.LoadStage.FILES, "")
+    %Board.show_progress(0.0, SceneryContentNode.LoadStage.FILES, "")
     %Board.show_elapsed(0)
     %Board.show_stalled(false)
     visible = true
     %Clock.start()
 
 
-func set_progress(progress: float, stage: MaszynaIncludeNode.LoadStage, message: String) -> void:
+func set_progress(progress: float, stage: SceneryContentNode.LoadStage, message: String) -> void:
     if progress > _progress:
         _progress = progress
         _progressed_msec = Time.get_ticks_msec()

@@ -103,7 +103,7 @@ func test_a_line_below_the_handlers_level_is_left_out() -> void:
 func test_a_main_switch_opening_and_a_pantograph_loss_are_logged() -> void:
     var description: VehicleController = FizVehicleBuilder.build_description_at(MOTOR_CAR_PATH)
     var vehicle: RID = build_vehicle("RecorderMotorCar", description, 0.0,
-            MaszynaDynamicData.DriverType.DRIVER_HEAD).get_rid()
+            MaszynaVehicleData.DriverType.DRIVER_HEAD).get_rid()
     PlayerServer.player_take_over_vehicle(vehicle)
     var engine: RailVehicleEngine = VehicleServer.vehicle_component_get(
             vehicle, VehicleComponentType.COMPONENT_ENGINE) as RailVehicleEngine

@@ -25,7 +25,7 @@ What lives here:
 * **[HUD](hud)** - `hud/`: the top bar and its menus, the driving aid, the hints, the timetable,
   the vehicle card and selector, the transcripts, the logs; the diagnostic windows are
   libmaszyna's `DebugHud`, instanced by the game's HUD.
-* **The sky** - `world/sky/`: the backends drawing libmaszyna's `MaszynaEnvironmentNode`
+* **The sky** - `world/sky/`: the backends drawing libmaszyna's `EnvironmentNode`
   (gnd-skydome with gnd-weather); Tokisan's Sky3D is the separate
   [maszyna-environment-tokisan-sky3d](https://github.com/MaSzyna-Reloaded/maszyna-environment-tokisan-sky3d)
   addon.
@@ -40,7 +40,7 @@ What lives here:
 
 ```
 git submodule update --init --recursive
-make compile-debug        # libmaszyna from vendor/libmaszyna into bin/libmaszyna/
+make compile-debug        # libreloaded with libmaszyna (vendor/) into bin/libreloaded/
 godot-double --path . -e
 ```
 

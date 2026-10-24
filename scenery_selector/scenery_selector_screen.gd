@@ -1,14 +1,16 @@
 extends Control
 
-## Full screen scenario selector: <game_dir>/scenery/*.scn on the left, details of the selected
-## one (MaszynaSceneryInfo) on the right, with the trainsets it declares. The vehicles of the shown
+## Full screen scenario selector: the sceneries of every provider (SceneryServer.scenery_list()) on
+## the left, each labelled with its provider and filtered by them (all by default), details of the
+## selected one (SceneryProvider.describe()) on the right, with the trainsets it declares. The vehicles of the shown
 ## trainset can be changed, taken out, added (VehicleBrowserWindow), moved (Ctrl+Left/Right, a
 ## drag) and turned round (Ctrl+R), and their skins picked - kept while the game runs, until the
 ## trainset is restored. After "Load" the background dissolves into the
 ## loading screen below. Escape asks to quit (quit_requested).
 
-## trainset: the shown trainset as arranged here (MaszynaIncludeNode.trainset_override)
-signal scenery_selected(filename: String, vehicle_id: String, trainset: Array[MaszynaDynamicData])
+## info: the scenery as its provider described it, which loads it (SceneryProvider.create_scenery());
+## trainset: the shown trainset as arranged here (SceneryContentNode.trainset_override)
+signal scenery_selected(info: SceneryInfo, vehicle_id: String, trainset: Array[VehicleData])
 ## Escape - the game fades out and quits
 signal quit_requested
 ## The gear - the settings are the game's, not this screen's
@@ -25,7 +27,7 @@ const UI_SOUNDS: SfxBank = preload("res://startup/ui_sounds.tres")
 const VehicleViewer = preload("res://scenery_selector/vehicle_viewer.gd")
 ## Sections the keyboard walks through with Tab. The focus is virtual - the search field keeps the
 ## Godot focus, so typing filters the list whichever section is current.
-enum Section { SCENERY, TRAINSETS, VEHICLES, TRAINSET_EDIT, VEHICLE_ACTIONS, SKINS, ACTIONS }
+enum Section { PROVIDER_FILTER, SCENERY, TRAINSETS, VEHICLES, TRAINSET_EDIT, VEHICLE_ACTIONS, SKINS, ACTIONS }
 ## What the vehicle chosen in the browser is for: the place of the vehicle open in the viewer, or
 ## a new one after the selected vehicle
 enum VehicleChoice { CHANGE, ADD }
@@ -34,17 +36,21 @@ enum VehicleChoice { CHANGE, ADD }
 ## deeper, the trainsets of the scenery
 const DEFAULT_PREVIOUS_SECTION: int = Section.TRAINSETS
 
-var _files: PackedStringArray = []
-## Title of each scenery and its item on the list, in the order of _files
-var _titles: PackedStringArray = []
+## The sceneries of every provider, by provider and id
+var _sceneries: Array[SceneryInfo] = []
+## The providers the filter offers, in its order: all of them first (&""), then each one listed
+var _filter_providers: Array[StringName] = []
+## The sceneries the list shows, of the provider the filter chose
+var _listed: Array[SceneryInfo] = []
 var _ui_sounds: SfxPlayer
-var _info: MaszynaSceneryInfo = null
+## The scenery selected, as its provider described it
+var _info: SceneryInfo = null
 ## The trainsets of the scenery the list shows, in its order - the occupied ones, or all of them
 ## while the check box asks for those that cannot be driven as well
-var _listed_trainsets: Array[MaszynaSceneryInfo.Trainset] = []
+var _listed_trainsets: Array[TrainsetData] = []
 ## Vehicles of the shown trainset, in the order they run - the arranged ones of _arranged_trainsets
-var _vehicles: Array[MaszynaSceneryInfo.Vehicle] = []
-## The trainsets as the player arranged them - copies of the scenery's vehicles, by scenery file and
+var _vehicles: Array[VehicleData] = []
+## The trainsets as the player arranged them - copies of the scenery's vehicles, by scenery and
 ## trainset (_get_trainset_key()), kept while the game runs, so going to another scenery and back
 ## finds them as they were left
 var _arranged_trainsets: Dictionary[String, Array] = {}
@@ -75,7 +81,7 @@ func _ready() -> void:
     _ui_sounds.bank = UI_SOUNDS
     add_child(_ui_sounds)
     _sections.assign([
-        %SceneryList, %TrainsetList, %TrainsetGrid, %TrainsetEditSection,
+        %ProviderFilterSection, %SceneryList, %TrainsetList, %TrainsetGrid, %TrainsetEditSection,
         %VehicleViewer.get_vehicle_actions_section(), %VehicleViewer.get_skins_section(), %ActionsSection
     ])
     # the viewer's sections live in another scene, so the screen wires them here, and the rows of
@@ -87,40 +93,59 @@ func _ready() -> void:
     %VehicleViewer.get_vehicle_actions_section().focus_taken.connect(_ui_sounds.play.bind(&"change_focus"))
     %ActionsSection.focus_taken.connect(_ui_sounds.play.bind(&"change_focus"))
     %TrainsetEditSection.focus_taken.connect(_ui_sounds.play.bind(&"change_focus"))
-    UserSettings.game_dir_changed.connect(list_sceneries)
-    UserSettings.game_dir_changed.connect(update_game_dir_warning)
+    MaszynaGameDirectory.game_dir_changed.connect(list_sceneries)
+    MaszynaGameDirectory.game_dir_changed.connect(update_game_dir_warning)
     update_game_dir_warning()
     # without the game's data the development notice says nothing yet - the problem goes first
-    if UserSettings.is_maszyna_game_dir_valid():
+    if MaszynaGameDirectory.is_game_dir_valid():
         show_development_notice()
     else:
         %GameDirProblem.ask()
 
 
-## The sceneries of the game directory - read again whenever it changes, the screen opens or the
-## refresh button asks. The search typed and the scenery selected stay, while it is still there.
+## The sceneries of every provider - read again whenever the game directory changes, the screen
+## opens or the refresh button asks. The search typed, the filter and the scenery selected stay,
+## while they are still there.
 func list_sceneries() -> void:
     var selected: int = %SceneryList.get_selected()
-    var selected_file: String = _files[selected] if selected >= 0 else ""
-    _files.clear()
-    _titles.clear()
-    var files: PackedStringArray = DirAccess.get_files_at(UserSettings.get_maszyna_game_dir().path_join("scenery"))
-    files.sort()
-    for file: String in files:
-        # "$" files are not scenarios to start (e.g. $stary_jawor_eszelon.scn)
-        if not file.get_extension().to_lower() == "scn" or file.begins_with("$"):
-            continue
-        _files.append(file)
-        _titles.append(MaszynaSceneryInfo.read_display_name(file))
+    var selected_info: SceneryInfo = _listed[selected] if selected >= 0 else null
+    var filtered: StringName = _filter_providers[%ProviderFilter.selected] if %ProviderFilter.selected >= 0 else &""
+    _sceneries = SceneryServer.scenery_list()
+    _sceneries.sort_custom(func(left: SceneryInfo, right: SceneryInfo) -> bool: return left.id < right.id)
+    _filter_providers.assign([&""])
+    %ProviderFilter.clear()
+    %ProviderFilter.add_item(tr("All sceneries"))
+    for info: SceneryInfo in _sceneries:
+        if not _filter_providers.has(info.provider):
+            _filter_providers.append(info.provider)
+            %ProviderFilter.add_item(_get_provider(info.provider).title)
+    %ProviderFilter.select(maxi(_filter_providers.find(filtered), 0))
+    _show_list(selected_info)
+
+
+## The sceneries of the provider the filter chose on the list, `selected` selected when it is there
+func _show_list(selected: SceneryInfo) -> void:
+    var provider: StringName = _filter_providers[%ProviderFilter.selected]
+    _listed.clear()
+    for info: SceneryInfo in _sceneries:
+        if not provider or info.provider == provider:
+            _listed.append(info)
+    var titles: PackedStringArray = []
     var notes: PackedStringArray = []
-    for file: String in _files:
-        notes.append(file.get_basename().to_upper())
+    var selected_row: int = -1
+    for info: SceneryInfo in _listed:
+        if selected and info.provider == selected.provider and info.id == selected.id:
+            selected_row = titles.size()
+        titles.append(info.title)
+        # the provider's label and the id the provider knows the scenery by
+        notes.append("%s%s%s" % [_get_provider(info.provider).title.to_upper(),
+                SceneryInfo.TITLE_PART_SEPARATOR, info.id.get_basename().to_upper()])
     var groups: PackedStringArray = []
     if ProjectSettings.get_setting(GROUP_SETTING, true):
         # "Bałtyk · SKM1" goes under "Bałtyk"
         var names: PackedStringArray = []
-        for title: String in _titles:
-            names.append(title.get_slice(MaszynaSceneryInfo.PART_SEPARATOR, 0))
+        for title: String in titles:
+            names.append(title.get_slice(SceneryInfo.TITLE_PART_SEPARATOR, 0))
         # and one scenery written as "Całkowo V2 Towarowe" goes under "Całkowo V2" when there is
         # one - the shortest name of the others its own begins with, as whole words
         for scenery_name: String in names:
@@ -129,9 +154,29 @@ func list_sceneries() -> void:
                 if scenery_name.begins_with(other + " ") and other.length() < group_name.length():
                     group_name = other
             groups.append(group_name)
-    %SceneryList.title_separator = MaszynaSceneryInfo.PART_SEPARATOR
+    %SceneryList.title_separator = SceneryInfo.TITLE_PART_SEPARATOR
     # the list selects the scenery and reports it back, so the details follow from here on
-    %SceneryList.set_rows(_titles, notes, groups, _files.find(selected_file))
+    %SceneryList.set_rows(titles, notes, groups, selected_row)
+
+
+## The filter chose another provider - by a click or a key (select_next_provider())
+func _on_provider_filter_item_selected(_index: int) -> void:
+    var selected: int = %SceneryList.get_selected()
+    _show_list(_listed[selected] if selected >= 0 else null)
+
+
+## Left and right on the filter: the provider before or after the chosen one, wrapping around
+func select_previous_provider() -> void:
+    _select_provider(-1)
+
+
+func select_next_provider() -> void:
+    _select_provider(1)
+
+
+func _select_provider(step: int) -> void:
+    %ProviderFilter.select(wrapi(%ProviderFilter.selected + step, 0, _filter_providers.size()))
+    _on_provider_filter_item_selected(%ProviderFilter.selected)
 
 
 ## The build caption is composed, not a msgid a Label translates itself; the tree sends this on
@@ -191,6 +236,7 @@ func _input(event: InputEvent) -> void:
 func _available_sections() -> Array[int]:
     var sections: Array[int] = []
     if %ListPanel.visible:
+        sections.append(Section.PROVIDER_FILTER)
         sections.append(Section.SCENERY)
     if %TrainsetList.visible:
         sections.append(Section.TRAINSETS)
@@ -235,6 +281,10 @@ func activate_section(section: int) -> void:
 
 ## Where the focus can be asked to go - one per section, so a scene can wire a signal straight to
 ## the place it means
+func focus_provider_filter() -> void:
+    activate_section(Section.PROVIDER_FILTER)
+
+
 func focus_scenery_list() -> void:
     activate_section(Section.SCENERY)
 
@@ -294,30 +344,21 @@ func _on_trainset_list_item_selected(index: int) -> void:
 func load_selected_scenery() -> void:
     if %LoadButton.disabled:
         return
-    var index: int = %SceneryList.get_selected()
     _ui_sounds.play(&"load_scenery")
     %Content.visible = false
-    scenery_selected.emit(_files[index], _get_selected_vehicle_id(), _get_arranged_trainset())
+    scenery_selected.emit(_info, _get_selected_vehicle_id(), _get_arranged_trainset())
     var tween: Tween = create_tween()
     tween.tween_property(%Background.material, "shader_parameter/dissolve", 1.0, DISSOLVE_TIME)
     tween.tween_callback(hide)
 
 
-## The scenery is loaded with the trainset as the grid shows it - its vehicles, their order and
-## their skins; a declared vehicle goes with its place in the declared trainset, by which the
-## scenery pairs it (ids repeat), an added one has no place and no name of the scenery
-func _get_arranged_trainset() -> Array[MaszynaDynamicData]:
-    var trainset: Array[MaszynaDynamicData] = []
-    for vehicle: MaszynaSceneryInfo.Vehicle in _vehicles:
-        var dynamic: MaszynaDynamicData = MaszynaDynamicData.new()
-        dynamic.vehicle_id = vehicle.vehicle_id
-        dynamic.trainset_index = vehicle.trainset_index
-        dynamic.name = vehicle.name
-        dynamic.data_path = vehicle.data_path
-        dynamic.file_name = vehicle.file_name
-        dynamic.skin = vehicle.skin
-        dynamic.direction = TrackServer.DIRECTION_REVERSED if vehicle.reversed else TrackServer.DIRECTION_NORMAL
-        trainset.append(dynamic)
+## The scenery is loaded with the trainset as the grid shows it - its vehicles, their order, their
+## liveries and directions; a declared vehicle goes with its place in the declared trainset, by which
+## the scenery pairs it (ids repeat), an added one has no place and no name of the scenery
+func _get_arranged_trainset() -> Array[VehicleData]:
+    var trainset: Array[VehicleData] = []
+    for vehicle: VehicleData in _vehicles:
+        trainset.append(vehicle.duplicate() as VehicleData)
     return trainset
 
 
@@ -326,7 +367,7 @@ func _get_selected_vehicle_id() -> String:
     var index: int = %TrainsetList.get_selected()
     if not _info or index < 0:
         return ""
-    var driver: MaszynaSceneryInfo.Vehicle = _listed_trainsets[index].get_driver_vehicle()
+    var driver: VehicleData = _listed_trainsets[index].get_driver_vehicle()
     return driver.vehicle_id if driver else ""
 
 
@@ -347,9 +388,9 @@ func _show_details(index: int) -> void:
         # an empty list reports no selection, which takes the vehicles and "Load" down with it
         %TrainsetList.set_rows(PackedStringArray(), PackedStringArray())
         return
-    _info = MaszynaSceneryInfo.read(_files[index])
-    %Title.text = _titles[index]
-    %FileName.text = _files[index].get_basename().to_upper()
+    _info = _get_provider(_listed[index].provider).describe(_listed[index])
+    %Title.text = _listed[index].title
+    %FileName.text = _listed[index].id.get_basename().to_upper()
     %Description.text = _info.description
     if _info.image_path:
         var image: Image = Image.load_from_file(_info.image_path)
@@ -369,8 +410,9 @@ func _list_trainsets() -> void:
     _listed_trainsets.clear()
     var names: PackedStringArray = []
     var notes: PackedStringArray = []
-    for trainset: MaszynaSceneryInfo.Trainset in _info.trainsets:
-        if not trainset.is_drivable() and not %AllTrainsetsSwitch.button_pressed:
+    for trainset: TrainsetData in _info.trainsets:
+        # the player drives an occupied trainset the scenario offers
+        if not (trainset.is_occupied() and trainset.player_drivable) and not %AllTrainsetsSwitch.button_pressed:
             continue
         _listed_trainsets.append(trainset)
         names.append(_get_trainset_name(trainset))
@@ -393,10 +435,10 @@ func _show_trainset(index: int) -> void:
     if %VehicleViewer.visible:
         %VehicleViewer.close()
     _shown_index = -1
-    var vehicles: Array[MaszynaSceneryInfo.Vehicle] = []
+    var vehicles: Array[VehicleData] = []
     _vehicles = vehicles
     if _info and index >= 0:
-        var trainset: MaszynaSceneryInfo.Trainset = _listed_trainsets[index]
+        var trainset: TrainsetData = _listed_trainsets[index]
         %Description.text = (
             "%s\n\n%s" % [trainset.description, _info.description]
             if trainset.description
@@ -405,8 +447,8 @@ func _show_trainset(index: int) -> void:
         # copies: the scenery's own vehicles are read again with every scenery shown
         var key: String = _get_trainset_key(trainset)
         if not _arranged_trainsets.has(key):
-            for vehicle: MaszynaSceneryInfo.Vehicle in trainset.vehicles:
-                vehicles.append(vehicle.copy())
+            for vehicle: VehicleData in trainset.vehicles:
+                vehicles.append(vehicle.duplicate() as VehicleData)
             _arranged_trainsets[key] = vehicles
         _vehicles = _arranged_trainsets[key]
     _show_vehicles(0)
@@ -418,12 +460,9 @@ func _show_vehicles(selected: int) -> void:
     # the tiles are built typed: an untyped [] is refused by a typed parameter, and the refusal is
     # a runtime error - the grid would keep the vehicles of the scenery before
     var tiles: Array[TileGrid.Tile] = []
-    for vehicle: MaszynaSceneryInfo.Vehicle in _vehicles:
-        var tile: TileGrid.Tile = TileGrid.Tile.new(
-            vehicle.data_path, vehicle.file_name, vehicle.skin, vehicle.vehicle_id,
-            "%s (%s)" % [vehicle.get_name(), vehicle.data_path.get_file()]
-        )
-        tile.flipped = vehicle.reversed
+    for vehicle: VehicleData in _vehicles:
+        var tile: TileGrid.Tile = TileGrid.Tile.new(vehicle, "%s (%s)" % [_vehicle_name(vehicle), vehicle.vehicle])
+        tile.flipped = vehicle.direction == TrackServer.DIRECTION_REVERSED
         tile.removable = _is_removable(tiles.size())
         tiles.append(tile)
     %TrainsetGrid.set_tiles(tiles)
@@ -450,20 +489,26 @@ func _show_trainset_changes() -> void:
 
 
 ## The trainset's own vehicles and the arranged ones differ in their number, order, files or skins
-func _is_trainset_modified(trainset: MaszynaSceneryInfo.Trainset) -> bool:
+## - the same vehicle is the one of the scenery at the same place in the declared trainset, in the
+## same livery and direction
+func _is_trainset_modified(trainset: TrainsetData) -> bool:
     var arranged: Array = _arranged_trainsets.get(_get_trainset_key(trainset), trainset.vehicles)
     if not arranged.size() == trainset.vehicles.size():
         return true
     for index: int in arranged.size():
-        if not (arranged[index] as MaszynaSceneryInfo.Vehicle).is_same(trainset.vehicles[index]):
+        var vehicle: VehicleData = arranged[index]
+        var declared: VehicleData = trainset.vehicles[index]
+        if not (vehicle.vehicle_id == declared.vehicle_id and vehicle.trainset_index == declared.trainset_index
+                and vehicle.vehicle_provider == declared.vehicle_provider and vehicle.vehicle == declared.vehicle
+                and vehicle.livery == declared.livery and vehicle.direction == declared.direction):
             return true
     return false
 
 
-## A trainset of the scenery shown, as _arranged_trainsets knows it: the scenery file and its place
-## among the scenery's trainsets
-func _get_trainset_key(trainset: MaszynaSceneryInfo.Trainset) -> String:
-    return "%s/%d" % [_files[%SceneryList.get_selected()], _info.trainsets.find(trainset)]
+## A trainset of the scenery shown, as _arranged_trainsets knows it: the scenery's provider and id
+## and its place among the scenery's trainsets
+func _get_trainset_key(trainset: TrainsetData) -> String:
+    return "%s/%s/%d" % [_info.provider, _info.id, _info.trainsets.find(trainset)]
 
 
 ## The restore button asks first - what was arranged goes for good
@@ -482,7 +527,7 @@ func restore_trainset() -> void:
 
 ## The trash takes neither the vehicle with a driver - the player's - nor the last one
 func _is_removable(index: int) -> bool:
-    return _vehicles.size() > 1 and not _vehicles[index].has_driver()
+    return _vehicles.size() > 1 and _vehicles[index].driver_type == VehicleData.DriverType.DRIVER_NOBODY
 
 
 ## "Change vehicle" in the viewer or on a tile: the browser chooses another vehicle for its place
@@ -505,10 +550,7 @@ func ask_remove_vehicle(index: int) -> void:
     if index < 0 or not _is_removable(index):
         return
     _removed_index = index
-    var vehicle: MaszynaSceneryInfo.Vehicle = _vehicles[index]
-    %RemoveVehicleQuestion.message = tr("%s leaves the trainset.") % (
-        vehicle.get_name() if vehicle.get_name() else vehicle.file_name
-    )
+    %RemoveVehicleQuestion.message = tr("%s leaves the trainset.") % _vehicle_name(_vehicles[index])
     %RemoveVehicleQuestion.ask()
 
 
@@ -526,36 +568,34 @@ func open_vehicle_browser_to_add() -> void:
     %VehicleBrowser.open()
 
 
+## The browser chooses among MaSzyna's vehicles (MaszynaVehiclesBank), by their files and skin
 func _on_vehicle_browser_vehicle_chosen(data_path: String, file_name: String, skin: String) -> void:
+    var chosen: VehicleData = SelectorVehicle.of(data_path, file_name, skin, "")
     match _vehicle_choice:
         VehicleChoice.CHANGE:
-            change_vehicle(data_path, file_name, skin)
+            change_vehicle(chosen)
         VehicleChoice.ADD:
-            add_vehicle(data_path, file_name, skin)
+            add_vehicle(chosen)
 
 
-## The vehicle the browser was opened for becomes another one; its place, name, direction and
-## crew stay, and the viewer shows the new one when it was open on it
-func change_vehicle(data_path: String, file_name: String, skin: String) -> void:
+## The vehicle the browser was opened for becomes `chosen`, in its livery; its place, name,
+## direction and crew stay, and the viewer shows the new one when it was open on it
+func change_vehicle(chosen: VehicleData) -> void:
     if _changed_index < 0:
         return
-    var vehicle: MaszynaSceneryInfo.Vehicle = _vehicles[_changed_index]
-    vehicle.data_path = data_path
-    vehicle.file_name = file_name
-    vehicle.skin = skin
+    var vehicle: VehicleData = _vehicles[_changed_index]
+    vehicle.vehicle_provider = chosen.vehicle_provider
+    vehicle.vehicle = chosen.vehicle
+    vehicle.livery = chosen.livery
     _show_vehicles(_changed_index)
     if _changed_index == _shown_index:
-        %VehicleViewer.show_vehicle(vehicle)
+        %VehicleViewer.show_vehicle(vehicle as MaszynaVehicleData)
 
 
-## A vehicle after the selected one, with nobody aboard and no name of the scenery
-func add_vehicle(data_path: String, file_name: String, skin: String) -> void:
+## `chosen` after the selected vehicle, with nobody aboard and no name of the scenery
+func add_vehicle(chosen: VehicleData) -> void:
     var index: int = %TrainsetGrid.get_selected() + 1
-    var vehicle: MaszynaSceneryInfo.Vehicle = MaszynaSceneryInfo.Vehicle.new()
-    vehicle.data_path = data_path
-    vehicle.file_name = file_name
-    vehicle.skin = skin
-    _vehicles.insert(index, vehicle)
+    _vehicles.insert(index, chosen)
     if _shown_index >= index:
         _shown_index += 1
     _show_vehicles(index)
@@ -578,8 +618,9 @@ func remove_vehicle(index: int) -> void:
 func reverse_vehicle(index: int) -> void:
     if index < 0:
         return
-    _vehicles[index].reversed = not _vehicles[index].reversed
-    %TrainsetGrid.set_tile_flipped(index, _vehicles[index].reversed)
+    var reversed: bool = not _vehicles[index].direction == TrackServer.DIRECTION_REVERSED
+    _vehicles[index].direction = TrackServer.DIRECTION_REVERSED if reversed else TrackServer.DIRECTION_NORMAL
+    %TrainsetGrid.set_tile_flipped(index, reversed)
     _show_trainset_changes()
 
 
@@ -597,7 +638,7 @@ func move_vehicle_right(index: int) -> void:
 func move_vehicle(from: int, to: int) -> void:
     if from < 0 or to < 0 or to >= _vehicles.size() or from == to:
         return
-    var shown: MaszynaSceneryInfo.Vehicle = _vehicles[_shown_index] if _shown_index >= 0 else null
+    var shown: VehicleData = _vehicles[_shown_index] if _shown_index >= 0 else null
     _vehicles.insert(to, _vehicles.pop_at(from))
     _shown_index = _vehicles.find(shown) if shown else -1
     # the tile moves as it is - a rebuilt row would render and scroll anew
@@ -611,7 +652,7 @@ func _on_vehicle_viewer_skin_applied(skin: String) -> void:
     _ui_sounds.play(&"apply_skin")
     if _shown_index < 0:
         return
-    _vehicles[_shown_index].skin = skin
+    _vehicles[_shown_index].livery = skin
     %TrainsetGrid.reload_tile(_shown_index, skin)
     _show_trainset_changes()
 
@@ -626,7 +667,7 @@ func _on_trainset_grid_item_activated() -> void:
         _shown_index = index
         %TrainsetGrid.set_marked(index)
         _fade_list_panel(0.0)
-        %VehicleViewer.show_vehicle(_vehicles[index])
+        %VehicleViewer.show_vehicle(_vehicles[index] as MaszynaVehicleData)
         %VehicleViewer.set_removable(_is_removable(index))
     activate_section(Section.SKINS)
 
@@ -657,13 +698,21 @@ func _fade_list_panel(to_alpha: float) -> void:
 
 ## A trainset is named by the vehicle the player starts in - the "trainset" line carries the
 ## starting track, not a name; the vehicles are named in "node <x> <y> <name> dynamic"
-static func _get_trainset_name(trainset: MaszynaSceneryInfo.Trainset) -> String:
-    var driver: MaszynaSceneryInfo.Vehicle = trainset.get_driver_vehicle()
-    return driver.get_name() if driver else ""
+static func _get_trainset_name(trainset: TrainsetData) -> String:
+    var driver: VehicleData = trainset.get_driver_vehicle()
+    return _vehicle_name(driver) if driver else ""
+
+
+## A vehicle's name for the player: as the scenery writes it, else its id, else what the catalogue
+## finds it by
+static func _vehicle_name(vehicle: VehicleData) -> String:
+    if vehicle.name:
+        return vehicle.name
+    return vehicle.vehicle_id if vehicle.vehicle_id else vehicle.vehicle.get_file()
 
 
 ## Its vehicles as arranged, and whether that is not as the scenario gives them
-func _format_trainset_note(trainset: MaszynaSceneryInfo.Trainset) -> String:
+func _format_trainset_note(trainset: TrainsetData) -> String:
     var arranged: Array = _arranged_trainsets.get(_get_trainset_key(trainset), trainset.vehicles)
     var note: String = "%d POJAZDÓW" % arranged.size()
     if _is_trainset_modified(trainset):
@@ -673,21 +722,21 @@ func _format_trainset_note(trainset: MaszynaSceneryInfo.Trainset) -> String:
 
 ## The warning stays over the screen while the game directory holds no game data
 func update_game_dir_warning() -> void:
-    %GameDirWarning.visible = not UserSettings.is_maszyna_game_dir_valid()
-    %WarningDir.text = UserSettings.get_maszyna_game_dir()
+    %GameDirWarning.visible = not MaszynaGameDirectory.is_game_dir_valid()
+    %WarningDir.text = MaszynaGameDirectory.get_game_dir()
 
 
 ## The directory was changed in a game, which ended for it - the data is the new one's now
 func show_game_dir_changed() -> void:
     %GameDirChangedNotice.message = (
-        tr("The game's data is now read from %s.") % UserSettings.get_maszyna_game_dir()
+        tr("The game's data is now read from %s.") % MaszynaGameDirectory.get_game_dir()
     )
     %GameDirChangedNotice.ask()
 
 
 ## Chosen here, the directory is the game's at once - saved, as the settings' "Save" would
 func _on_game_dir_window_game_dir_chosen(path: String) -> void:
-    UserSettings.save_maszyna_game_dir(path)
+    MaszynaGameDirectory.save_game_dir(path)
 
 
 ## Shown over the screen once on every launch, until the player acknowledges it - after the game
@@ -702,3 +751,8 @@ func show_development_notice() -> void:
 ## The development notice is acknowledged - its button, Enter or Escape
 func _on_development_notice_acknowledged() -> void:
     _ui_sounds.play(&"notice_acknowledged")
+
+
+## The provider of the sceneries listed as [param provider_name]
+func _get_provider(provider_name:StringName) -> SceneryProvider:
+    return instance_from_id(SceneryServer.provider_get(provider_name)) as SceneryProvider

@@ -123,7 +123,7 @@ func test_a_directory_endpoint_saves_the_report_instead_of_sending_it() -> void:
 
 ## Linux, macOS and Windows set one of each pair; the test sets them all, to a home and a login of
 ## its own, and puts back what there was - one that was not set is unset again: an empty USERPROFILE
-## left behind changed the home find_maszyna_game_dirs() searches, and the next test's game
+## left behind changed the home MaszynaGameDirectory.find_game_dirs() searches, and the next test's game
 ## directory became the installation found there
 func test_the_home_directory_and_the_login_leave_no_trace_in_what_is_sent() -> void:
     var variables: PackedStringArray = BugReportSender.HOME_VARIABLES + BugReportSender.USER_VARIABLES

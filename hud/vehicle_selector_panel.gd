@@ -2,7 +2,8 @@ extends PanelContainer
 
 ## The vehicle selector: every vehicle with a driver, AI or player, as the original's vehicle list
 ## (vehiclelist.cpp:28-44), and the player's own vehicle when it has none - of a scenario, only the
-## vehicles of the trainsets the player can drive (MaszynaSceneryInfo.Trainset.is_drivable()) until
+## vehicles of the trainsets the player can drive (RailVehicleServer.trainset_is_player_drivable(),
+## with a driver) until
 ## the switch shows all of them, as the scenario selector does. Each row shows how its
 ## train is going and opens its card and the operator's actions. The rows follow the persons
 ## getting on and off and the drivers freed; what they show is refreshed by one Timer while the
@@ -54,15 +55,19 @@ func show_active_vehicle(vehicle:RID) -> void:
 
 
 ## The scenario played: its trainsets the player cannot drive are listed only with the switch on
-func show_scenario(info:MaszynaSceneryInfo) -> void:
+func show_scenario(info:SceneryInfo) -> void:
     _drivable_vehicle_ids.clear()
     _has_scenario = info != null
     if info:
-        for trainset:MaszynaSceneryInfo.Trainset in info.trainsets:
-            if not trainset.is_drivable():
+        for trainset:RID in RailVehicleServer.trainset_list():
+            var vehicles:Array[RID] = []
+            vehicles.assign(RailVehicleServer.trainset_get_vehicles(trainset))
+            # offered by the scenario, and with a driver aboard for the player to take over
+            if not RailVehicleServer.trainset_is_player_drivable(trainset) \
+                    or not vehicles.any(func(vehicle:RID) -> bool: return DriverServer.vehicle_get_driver(vehicle).is_valid()):
                 continue
-            for vehicle:MaszynaSceneryInfo.Vehicle in trainset.vehicles:
-                _drivable_vehicle_ids[vehicle.vehicle_id] = true
+            for vehicle:RID in vehicles:
+                _drivable_vehicle_ids[VehicleServer.vehicle_get_id(vehicle)] = true
     %AllTrainsetsSwitch.visible = _has_scenario
     _update_rows()
 

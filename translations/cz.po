@@ -1,5 +1,5 @@
 # Strings of the demo's own interface that the game's catalogue (lang/*.po) does not have.
-# MaszynaTranslationServer merges them under the game's catalogue (maszyna/locale/translations).
+# ReloadedTranslationServer merges them under the game's catalogue (reloaded/locale/translations).
 # template.po lists every msgid, as the game's lang/template.po does, for a new language to start from.
 msgid ""
 msgstr ""
@@ -380,8 +380,8 @@ msgstr "Kamera"
 msgid "Camera chunk"
 msgstr "Blok kamery"
 
-msgid "Draw distance"
-msgstr "Dohlednost"
+msgid "Tracks and traction distance"
+msgstr "Dosah kolejí a trakce"
 
 msgid "Chunks"
 msgstr "Bloky"
@@ -1391,6 +1391,12 @@ msgstr "Vzdálenost detailů vozidel"
 msgid "Real mirrors"
 msgstr "Skutečná zrcátka"
 
+msgid "Road traffic density"
+msgstr "Hustota silničního provozu"
+
+msgid "Road traffic vehicles"
+msgstr "Vozidla silničního provozu"
+
 msgid "Smoke"
 msgstr "Kouř"
 
@@ -2086,3 +2092,9 @@ msgstr "Obrazovky kabiny kreslené skripty Pythonu se nepodařilo spustit a zůs
 
 msgid "Lazy loading (experimental)"
 msgstr "Líné načítání (experimentální)"
+
+msgid "All sceneries"
+msgstr "Všechny scenérie"
+
+msgid "Sceneries of one source only"
+msgstr "Scenérie jen z jednoho zdroje"

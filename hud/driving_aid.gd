@@ -25,19 +25,15 @@ const DIRECTION_SYMBOLS:Dictionary[VehicleController.Direction, String] = {
     VehicleController.DIRECTION_NEUTRAL: "—",
     VehicleController.DIRECTION_BACKWARD: "▼",
 }
-## A train keeps under its timetable's speed; any other order under the shunting speed
-## (driveruipanels.cpp:78-81)
-const TRAIN_ORDERS:int = MaszynaLegacyAIDriver.Order.OBEY_TRAIN | MaszynaLegacyAIDriver.Order.BANK
-const NO_LIMIT:float = MaszynaLegacyDriverSpeed.NO_LIMIT
 ## The vigilance lamp is lit and dark this long in turn while it blinks [s] (fCzuwakBlink, Train.h:27)
 const VIGILANCE_BLINK:float = 0.15
-## What keeps the vehicle from being ready, as the stop reason's detail
-const ENGINE_CHECK_NAMES:Dictionary[int, String] = {
-    MaszynaLegacyAIDriver.EngineCheck.CONVERTER_OVERLOAD: "converter overload",
-    MaszynaLegacyAIDriver.EngineCheck.LINE_BREAKER: "line breaker",
-    MaszynaLegacyAIDriver.EngineCheck.DIRECTION: "reverser",
-    MaszynaLegacyAIDriver.EngineCheck.CONVERTER: "converter",
-    MaszynaLegacyAIDriver.EngineCheck.AIR: "main reservoir below %.1f bar",
+## Why the driver keeps the train standing, shown beside the stop sign; a stop ahead needs no words -
+## the sign says it
+const STOP_REASON_NAMES:Dictionary[DriverState.StopReason, String] = {
+    DriverState.STOP_REASON_NOT_READY: "Vehicle not ready",
+    DriverState.STOP_REASON_WAITING_FOR_ORDERS: "Waiting for orders",
+    DriverState.STOP_REASON_SIGNAL: "Signal at stop",
+    DriverState.STOP_REASON_DISPATCH: "Station dispatch",
 }
 
 ## Why a vehicle of the trainset left the rails, as the stop reason's detail
@@ -141,53 +137,15 @@ func _on_refresh_timer_timeout() -> void:
         _light_lamp(%VigilanceLamp, false)
     _light_lamp(%CabSignalLamp, security and security.get_cabsignal_blinking())
 
+    # the speed allowed and the next limit (driveruipanels.cpp:73-122), of a driver that shows them
     var driver:RID = DriverServer.vehicle_get_driver(vehicle)
-    %LimitTile.visible = driver.is_valid()
-    if not driver.is_valid():
+    var driver_state:DriverState = DriverServer.driver_get_state(driver) if driver.is_valid() else null
+    %LimitTile.visible = not driver_state == null
+    if not driver_state:
         return
-    # the speed allowed and the next limit (driveruipanels.cpp:73-122)
-    var driver_state:Dictionary = DriverServer.driver_get_state(driver)
-    var velocity_desired:float = driver_state.get("velocity_desired", 0.0)
-    var limit:float = floorf(velocity_desired)
-    var next_limit:float = limit
-    var next_distance:float = INF
-    # not allowed to move, any next limit is irrelevant
-    if not limit == 0.0:
-        var order:int = driver_state.get("order", 0)
-        var timetable_velocity:float = driver_state.get("timetable_velocity", NO_LIMIT)
-        var schedule_limit:float = NO_LIMIT
-        if order & TRAIN_ORDERS and timetable_velocity > 0.0:
-            schedule_limit = floorf(timetable_velocity)
-        elif not order & TRAIN_ORDERS:
-            schedule_limit = floorf(driver_state.get("shunt_velocity", NO_LIMIT))
-        # first the change after the current limit is passed
-        var last_distance:float = driver_state.get("velocity_limit_last_distance", MaszynaLegacyDriverRoute.NO_DISTANCE)
-        if last_distance > 0.0:
-            next_limit = MaszynaLegacyDriverSpeed.min_speed(
-                    schedule_limit, floorf(driver_state.get("velocity_limit_last", NO_LIMIT)))
-            next_distance = last_distance
-        # then the change ahead: the lower of the two, else the current limit lasts until it is passed
-        var no_active_limit:bool = last_distance < 0.0
-        var proximity:float = driver_state.get("proximity_distance", 0.0)
-        var proximity_limit:float = MaszynaLegacyDriverSpeed.min_speed(
-                schedule_limit, floorf(driver_state.get("speed_velocity_next", NO_LIMIT)))
-        var take_proximity:bool = no_active_limit
-        if proximity_limit < next_limit:
-            take_proximity = proximity_limit < velocity_desired or proximity > next_distance
-        # nothing read ahead (VelNext -1, the proximity the reach) is no new limit
-        if proximity_limit < 0.0:
-            take_proximity = false
-        if take_proximity:
-            next_limit = proximity_limit
-            next_distance = proximity
-        # a limit reaching past the reading tells nothing of its length, and a vehicle ahead is no
-        # limit - the proximity is its distance, less the gap a train keeps (speed.gd, Driver.cpp:7371)
-        var obstacle:float = driver_state.get("obstacle_distance", NO_LIMIT)
-        if next_distance >= MaszynaLegacyDriverRoute.LIMIT_BEYOND_RANGE:
-            next_limit = limit
-        elif obstacle >= 0.0 and (proximity == obstacle
-                or proximity == obstacle - MaszynaLegacyDriverSpeed.DRIVER_DISTANCE):
-            next_limit = limit
+    var limit:float = driver_state.speed_limit
+    var next_limit:float = driver_state.next_speed_limit
+    var next_distance:float = driver_state.next_speed_limit_distance
     # told to stand (VelDesired 0 - not ready, waiting for orders or for the way out): a stop sign,
     # not a limit of 0; standing, there is no next limit (driveruipanels.cpp:76)
     var stop:bool = limit == 0.0
@@ -195,11 +153,7 @@ func _on_refresh_timer_timeout() -> void:
     %LimitValue.theme_type_variation = &"SpeedStopSignText" if stop else &"SpeedLimitSignDigits"
     %LimitValue.text = tr("STOP") if stop else "%d" % limit
     # why it stands, on the left of the sign where the next limit is otherwise
-    var stop_reason:MaszynaLegacyDriverSpeed.StopReason = driver_state.get(
-            "stop_reason", MaszynaLegacyDriverSpeed.StopReason.NONE)
-    # a stop ahead needs no words - the sign says it
-    %StopReason.visible = stop and not stop_reason in [
-            MaszynaLegacyDriverSpeed.StopReason.NONE, MaszynaLegacyDriverSpeed.StopReason.AHEAD]
+    %StopReason.visible = stop and STOP_REASON_NAMES.has(driver_state.stop_reason)
     # a derailed vehicle of the trainset says so whatever the driver wants - it stands for good
     var derailed:PackedStringArray = []
     for car:RID in RailVehicleServer.vehicle_get_coupled(
@@ -212,25 +166,10 @@ func _on_refresh_timer_timeout() -> void:
         %StopReasonValue.text = tr("Vehicle derailed")
         %StopReasonDetail.text = ", ".join(derailed)
         %StopReasonDetail.visible = true
-    elif stop:
-        var detail:PackedStringArray = []
-        match stop_reason:
-            MaszynaLegacyDriverSpeed.StopReason.NOT_READY:
-                %StopReasonValue.text = tr("Vehicle not ready")
-                var missing:int = driver_state.get("engine_missing", 0)
-                for check:int in ENGINE_CHECK_NAMES:
-                    if missing & check:
-                        var name:String = tr(ENGINE_CHECK_NAMES[check])
-                        detail.append(name % MaszynaLegacyAIDriver.MIN_MAIN_RESERVOIR_PRESSURE
-                                if check == MaszynaLegacyAIDriver.EngineCheck.AIR else name)
-            MaszynaLegacyDriverSpeed.StopReason.WAITING_FOR_ORDERS:
-                %StopReasonValue.text = tr("Waiting for orders")
-            MaszynaLegacyDriverSpeed.StopReason.SIGNAL:
-                %StopReasonValue.text = tr("Signal at stop")
-            MaszynaLegacyDriverSpeed.StopReason.DISPATCH:
-                %StopReasonValue.text = tr("Station dispatch")
-        %StopReasonDetail.text = ", ".join(detail)
-        %StopReasonDetail.visible = detail.size() > 0
+    elif %StopReason.visible:
+        %StopReasonValue.text = tr(STOP_REASON_NAMES[driver_state.stop_reason])
+        %StopReasonDetail.text = ", ".join(driver_state.stop_reason_details)
+        %StopReasonDetail.visible = driver_state.stop_reason_details.size() > 0
     # the next limit only when there is a change; the sign stays put, the tile narrows on its left
     %NextLimit.visible = not next_limit == limit
     if next_limit == limit:

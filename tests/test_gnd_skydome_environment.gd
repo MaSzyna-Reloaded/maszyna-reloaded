@@ -1,12 +1,12 @@
 extends GutTest
 
 ## The environment drawn by gnd-skydome and gnd-weather (GndSkydomeMaszynaEnvironment) from the
-## state of a MaszynaEnvironmentNode. Each test applies the environment's configuration and then
+## state of a EnvironmentNode. Each test applies the environment's configuration and then
 ## the sky's, as the scene's [connection] of configuration_changed and the next frame do.
 
 
 func test_maps_cloudiness_and_wind_to_weather() -> void:
-    var environment_node: MaszynaEnvironmentNode = _create_environment_node()
+    var environment_node: EnvironmentNode = _create_environment_node()
     var sky: GndSkydomeMaszynaEnvironment = _create_sky(environment_node)
 
     environment_node.cloudiness = 0.8
@@ -23,20 +23,20 @@ func test_maps_cloudiness_and_wind_to_weather() -> void:
 
 func test_applies_rendering_light_settings_on_ready() -> void:
     var settings: Dictionary = {
-        MaszynaSkyEnvironment.SHADOW_SCENERY_ENABLED_SETTING: false,
-        MaszynaSkyEnvironment.SHADOW_SCENERY_MODE_SETTING: DirectionalLight3D.SHADOW_ORTHOGONAL,
-        MaszynaSkyEnvironment.SHADOW_SCENERY_BLUR_SETTING: 0.5,
-        MaszynaSkyEnvironment.SHADOW_SCENERY_BIAS_SETTING: 0.2,
-        MaszynaSkyEnvironment.SHADOW_SCENERY_NORMAL_BIAS_SETTING: 1.5,
-        MaszynaSkyEnvironment.SHADOW_SCENERY_MAX_DISTANCE_SETTING: 250.0,
-        MaszynaSkyEnvironment.VOLUMETRIC_FOG_ENERGY_SETTING: 12.5,
+        SkyEnvironment.SHADOW_SCENERY_ENABLED_SETTING: false,
+        SkyEnvironment.SHADOW_SCENERY_MODE_SETTING: DirectionalLight3D.SHADOW_ORTHOGONAL,
+        SkyEnvironment.SHADOW_SCENERY_BLUR_SETTING: 0.5,
+        SkyEnvironment.SHADOW_SCENERY_BIAS_SETTING: 0.2,
+        SkyEnvironment.SHADOW_SCENERY_NORMAL_BIAS_SETTING: 1.5,
+        SkyEnvironment.SHADOW_SCENERY_MAX_DISTANCE_SETTING: 250.0,
+        SkyEnvironment.VOLUMETRIC_FOG_ENERGY_SETTING: 12.5,
     }
     var previous: Dictionary = {}
     for setting: StringName in settings:
         previous[setting] = ProjectSettings.get_setting(setting)
         ProjectSettings.set_setting(setting, settings[setting])
 
-    var environment_node: MaszynaEnvironmentNode = _create_environment_node()
+    var environment_node: EnvironmentNode = _create_environment_node()
     var sky: GndSkydomeMaszynaEnvironment = _create_sky(environment_node)
     sky._process(0.0)
     var sun_light: DirectionalLight3D = sky.sun_light
@@ -53,7 +53,7 @@ func test_applies_rendering_light_settings_on_ready() -> void:
     assert_almost_eq(sun_light.light_volumetric_fog_energy, 12.5, 0.000001)
 
 func test_maps_rain_intensity_to_storm_overcast_and_rainbow() -> void:
-    var environment_node: MaszynaEnvironmentNode = _create_environment_node()
+    var environment_node: EnvironmentNode = _create_environment_node()
     var sky: GndSkydomeMaszynaEnvironment = _create_sky(environment_node)
 
     environment_node.fog_enabled = false
@@ -70,7 +70,7 @@ func test_maps_rain_intensity_to_storm_overcast_and_rainbow() -> void:
 
 
 func test_maps_wind_strength_to_weather_global_wind() -> void:
-    var environment_node: MaszynaEnvironmentNode = _create_environment_node()
+    var environment_node: EnvironmentNode = _create_environment_node()
     var sky: GndSkydomeMaszynaEnvironment = _create_sky(environment_node)
     var weather: WeatherNode = sky.weather
 
@@ -83,7 +83,7 @@ func test_maps_wind_strength_to_weather_global_wind() -> void:
 
 
 func test_applies_skydome_and_weather_project_settings() -> void:
-    var environment_node: MaszynaEnvironmentNode = _create_environment_node()
+    var environment_node: EnvironmentNode = _create_environment_node()
     var sky: GndSkydomeMaszynaEnvironment = _create_sky(environment_node)
     sky._process(0.0)
     var skydome: Skydome = sky.skydome
@@ -97,7 +97,7 @@ func test_applies_skydome_and_weather_project_settings() -> void:
 
 
 func test_maps_fog_controls_to_skydome_and_weather() -> void:
-    var environment_node: MaszynaEnvironmentNode = _create_environment_node()
+    var environment_node: EnvironmentNode = _create_environment_node()
     var sky: GndSkydomeMaszynaEnvironment = _create_sky(environment_node)
     var skydome: Skydome = sky.skydome
     var weather: WeatherNode = sky.weather
@@ -124,8 +124,8 @@ func test_maps_fog_controls_to_skydome_and_weather() -> void:
     assert_almost_eq(
         skydome.night_fog_distance,
         235.0 * float(ProjectSettings.get_setting(
-            MaszynaSkyEnvironment.FOG_NIGHT_DISTANCE_FACTOR_SETTING,
-            MaszynaSkyEnvironment.FOG_NIGHT_DISTANCE_FACTOR_DEFAULT)),
+            SkyEnvironment.FOG_NIGHT_DISTANCE_FACTOR_SETTING,
+            SkyEnvironment.FOG_NIGHT_DISTANCE_FACTOR_DEFAULT)),
         0.000001,
     )
     assert_eq(
@@ -141,7 +141,7 @@ func test_maps_fog_controls_to_skydome_and_weather() -> void:
 
 
 func test_fog_switch_disables_all_fog_layers() -> void:
-    var environment_node: MaszynaEnvironmentNode = _create_environment_node()
+    var environment_node: EnvironmentNode = _create_environment_node()
     var sky: GndSkydomeMaszynaEnvironment = _create_sky(environment_node)
 
     environment_node.fog_enabled = false
@@ -153,7 +153,7 @@ func test_fog_switch_disables_all_fog_layers() -> void:
 
 
 func test_applies_time_and_location_as_solar_time() -> void:
-    var environment_node: MaszynaEnvironmentNode = _create_environment_node()
+    var environment_node: EnvironmentNode = _create_environment_node()
     var sky: GndSkydomeMaszynaEnvironment = _create_sky(environment_node)
 
     environment_node.latitude = 50.271
@@ -181,12 +181,12 @@ func _skydome_default(property: StringName) -> float:
         SkydomeSettings.PREFIX + property, skydome_script.get_property_default_value(property)))
 
 
-func _create_environment_node() -> MaszynaEnvironmentNode:
-    return add_child_autofree(MaszynaEnvironmentNode.new()) as MaszynaEnvironmentNode
+func _create_environment_node() -> EnvironmentNode:
+    return add_child_autofree(EnvironmentNode.new()) as EnvironmentNode
 
 
 ## The sky drawing `environment_node`, wired as a scene wires it
-func _create_sky(environment_node: MaszynaEnvironmentNode) -> GndSkydomeMaszynaEnvironment:
+func _create_sky(environment_node: EnvironmentNode) -> GndSkydomeMaszynaEnvironment:
     var sky: GndSkydomeMaszynaEnvironment = GndSkydomeMaszynaEnvironment.new()
     # both children of the test
     sky.environment_node_path = NodePath("../%s" % environment_node.name)

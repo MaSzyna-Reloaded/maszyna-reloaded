@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://dacvr0rfpjx5a"]
 
-[ext_resource type="PackedScene" uid="uid://dgm10m7u26drx" path="res://addons/libmaszyna/console/developer_console.tscn" id="4_console"]
+[ext_resource type="PackedScene" uid="uid://dgm10m7u26drx" path="res://addons/libreloaded/console/developer_console.tscn" id="4_console"]
 [ext_resource type="Script" uid="uid://bdukhyjwpbfvl" path="res://game.gd" id="7_game"]
 [ext_resource type="PackedScene" uid="uid://bwculmebf7bqm" path="res://scenery_selector/scenery_selector_screen.tscn" id="10_scenery_selector"]
 [ext_resource type="PackedScene" uid="uid://1djubq5jy2wx" path="res://loading_screen/loading_screen.tscn" id="11_loading_screen"]

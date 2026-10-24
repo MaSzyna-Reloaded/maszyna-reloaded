@@ -5,8 +5,13 @@
 # stamped by make build-number, never by a build
 /build_number.txt
 /test_results.xml
-# make libmaszyna-local
+# make libreloaded-local
+/.libreloaded-local
+# make plugin-local
 /.libmaszyna-local
+# the links to the libreloaded and plugin checkouts in use (make links)
+/addons/libreloaded
+/addons/libmaszyna
 
 # Documentation site
 /docs/_site/
@@ -16,3 +21,4 @@
 __pycache__/
 # GIMP writes a sidecar next to an edited image; it is not project data
 .comments/
+/addons/terrain_3d

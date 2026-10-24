@@ -9,8 +9,6 @@ extends Control
 ## driver, the tile says so. Read on a Timer while shown and the player has a vehicle; without one
 ## the tile is hidden, as the driving aid's (show_vehicle()).
 
-## The hint whose text has a place for its parameter (`%.0f`)
-const PARAMETER_MARK:String = "%"
 const ROW:PackedScene = preload("driver_hint_row.tscn")
 
 ## The vehicle the player drives; an invalid RID while none
@@ -39,8 +37,9 @@ func _on_visibility_changed() -> void:
 func _on_refresh_timer_timeout() -> void:
     var hints:Array = []
     var driver:RID = DriverServer.vehicle_get_driver(vehicle)
-    if driver.is_valid():
-        hints = DriverServer.driver_get_state(driver).get("hints", [])
+    var driver_state:DriverState = DriverServer.driver_get_state(driver) if driver.is_valid() else null
+    if driver_state:
+        hints = driver_state.hints
     var cab_logic:CabinLogic = CabinSystem.vehicle_get_cab_logic(vehicle)
     var rows:Array[Node] = %HintList.get_children()
     for index:int in hints.size():
@@ -50,14 +49,13 @@ func _on_refresh_timer_timeout() -> void:
         else:
             row = ROW.instantiate()
             %HintList.add_child(row)
-        var hint:Dictionary = hints[index]
+        var hint:DriverHint = hints[index]
         var event:InputEvent = null
-        if cab_logic and hint["control"]:
-            var action:StringName = cab_logic.get_action(hint["control"], hint["gesture"])
+        if cab_logic and hint.control:
+            var action:StringName = cab_logic.get_action(hint.control, hint.gesture)
             if action and InputMap.has_action(action) and InputMap.action_get_events(action):
                 event = InputMap.action_get_events(action)[0]
-        var text:String = tr(hint["text"])
-        row.show_hint(event, text % hint["parameter"] if text.contains(PARAMETER_MARK) else text, hint["done"])
+        row.show_hint(event, hint.text, hint.done)
         row.visible = true
     for index:int in range(hints.size(), rows.size()):
         (rows[index] as Control).visible = false

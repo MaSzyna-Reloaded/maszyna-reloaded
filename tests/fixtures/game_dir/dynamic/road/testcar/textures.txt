@@ -1,0 +1,4 @@
+!=o,Cars
+red=testcar,Test car
+blue=testcar,Test car
+green=nofiz,A car of no .fiz

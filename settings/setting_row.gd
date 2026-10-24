@@ -39,7 +39,7 @@ var title: String = ""
 var store: Store = Store.PROJECT
 ## UserSettings section of a USER setting; a PROJECT setting has none of its own
 var section: String = ""
-## Full name of a PROJECT setting ("maszyna/scenery/draw_distance"), the key of a USER one
+## Full name of a PROJECT setting ("reloaded/scenery/lights/distance"), the key of a USER one
 var key: String = ""
 ## What the game uses when the setting was never set - the value its reader falls back to
 var default_value: Variant = null

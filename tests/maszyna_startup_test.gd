@@ -2,7 +2,7 @@ extends MaszynaGutTest
 class_name MaszynaStartupTest
 
 ## A vehicle of a scenery fixture started from cold and moved off the way a player does it: the
-## player in its cab, every step a key of the project's input map (MaszynaPlayer._unhandled_input),
+## player in its cab, every step a key of the project's input map (Player._unhandled_input),
 ## every step checked on the car it acts on through the components' getters. The first step that
 ## does not come about fails the test with what the three cars show - the step the start stopped at.
 ## A test of one vehicle is a script of its own (test_zzz_startup_<vehicle>.gd) calling
@@ -48,11 +48,11 @@ const MANUAL_STARTS:Array[int] = [
 const PANTOGRAPH_SWITCH_HOLD:float = 2.0
 ## Presets the selector is turned through at most to find one raising a pantograph
 const MAX_PANTOGRAPH_PRESETS:int = 8
-## The pantograph controls of a selector cab (LegacyCabinPantographPresets)
+## The pantograph controls of a selector cab (MaszynaCabinPantographPresets)
 const VALVES_LEVER:StringName = &"pantvalves_sw"
 ## The kinds driven as a unit (FIZ Type=ezt, dmu)
 const UNIT_KINDS:Array[Kind] = [Kind.ELECTRIC_MULTIPLE_UNIT, Kind.DIESEL_MULTIPLE_UNIT]
-const UNIT_TRAIN_TYPES:int = RailVehicleController.TRAIN_TYPE_EZT | RailVehicleController.TRAIN_TYPE_DMU
+const UNIT_TRAIN_TYPES:int = MaszynaMoverRailVehicleController.TRAIN_TYPE_EZT | MaszynaMoverRailVehicleController.TRAIN_TYPE_DMU
 ## Simulated seconds a driver gives each notch of a controller without resistor steps
 const CONTROLLER_NOTCH_SECONDS:float = 1.0
 ## Simulated seconds the line contactors may take beyond the controller's InitialCtrlDelay at its
@@ -66,7 +66,7 @@ const STEP_TIMEOUT:float = 120.0
 ## compressor driven by an idling diesel is slow (EngineRPMRatio, Mover.cpp:4424)
 const AIR_TIMEOUT:float = 300.0
 ## Simulated seconds main_switch_toggle (M) is held beyond the line breaker's InitialCtrlDelay
-## (LegacyCabinMainSwitch closes it on the release once the delay has run)
+## (MaszynaCabinMainSwitch closes it on the release once the delay has run)
 const MAIN_SWITCH_HOLD_MARGIN:float = 1.0
 ## The main reservoir the driver waits for before releasing the brakes (Driver.cpp PrepareEngine
 ## ready check, maszyna_legacy_ai_driver.gd EngineCheck.AIR) [bar]
@@ -88,7 +88,7 @@ const MAX_CONTROLLER_STEPS:int = 10
 
 var _previous_game_dir:String = ""
 var _scenery:MaszynaSceneryNode
-var _player:MaszynaPlayer
+var _player:Player
 ## The car whose cab the player sits in
 var occupied:RID
 ## The car whose engine it controls (RailVehicleServer.vehicle_find_powered)
@@ -105,7 +105,7 @@ func after_each() -> void:
         get_tree().process_frame.disconnect(_acknowledge_security)
         _scenery.free()
         _scenery = null
-        UserSettings.save_maszyna_game_dir(_previous_game_dir)
+        MaszynaGameDirectory.save_game_dir(_previous_game_dir)
         # at once, not running down - the next start-up begins from the clock a lone one finds
         SimulationServer.simulation_reset_speed()
 
@@ -189,7 +189,7 @@ func run_startup(scenery:String, vehicle:String, kind:Kind, pantographs:Pantogra
         if not await _until("line breaker", func() -> bool: return _engine(powered).get_main_switch_enabled()):
             return
     else:
-        var diesel:RailVehicleDieselEngine = _engine(powered) as RailVehicleDieselEngine
+        var diesel:MaszynaMoverRailVehicleDieselEngine = _engine(powered) as MaszynaMoverRailVehicleDieselEngine
         # only a pump the driver starts has its switch worked - an automatic one starts with the engine
         # (the FIZ's OilPump/FuelPump start), one the vehicle has not (disabled) not at all
         var oil_ready:Callable = func() -> bool:
@@ -221,7 +221,7 @@ func run_startup(scenery:String, vehicle:String, kind:Kind, pantographs:Pantogra
         # idle is the first position with a clutch engaged (Mn > 0), not position 0: that one gives
         # no fuel (R = 0) and the engine dies (driverhints.cpp:489, Driver.cpp:5778)
         if sn61:
-            while diesel.get_clutch_desired() == RailVehicleThrottlePositionItem.CLUTCH_BEHAVIOR_NONE:
+            while diesel.get_clutch_desired() == MaszynaMoverThrottlePositionItem.CLUTCH_BEHAVIOR_NONE:
                 await key_tap(&"main_controller_increase")
     # once the line breaker or the engine is on: the converter, then the compressor - for an
     # electric and a diesel alike (Driver.cpp:2799-2806)
@@ -334,9 +334,9 @@ func run_startup(scenery:String, vehicle:String, kind:Kind, pantographs:Pantogra
 ## Loads the scenery fixture and puts the player in `vehicle`'s cab, as the game does - nothing of
 ## the vehicle touched; false when it never came
 func enter_vehicle(scenery:String, vehicle:String) -> bool:
-    _previous_game_dir = UserSettings.get_maszyna_game_dir()
-    UserSettings.save_maszyna_game_dir(FIXTURES_GAME_DIR)
-    _player = load("res://addons/libmaszyna/player/player.tscn").instantiate()
+    _previous_game_dir = MaszynaGameDirectory.get_game_dir()
+    MaszynaGameDirectory.save_game_dir(FIXTURES_GAME_DIR)
+    _player = load("res://addons/libreloaded/player/player.tscn").instantiate()
     _player.start_vehicle_id = vehicle
     add_child(_player)
     _scenery = MaszynaSceneryNode.new()
@@ -509,7 +509,7 @@ func _master(car:RID) -> RailVehicleMasterController:
 
 func _sn61() -> bool:
     return bool((VehicleServer.vehicle_get_controller(powered) as RailVehicleController).train_type
-            & RailVehicleController.TRAIN_TYPE_SN61)
+            & MaszynaMoverRailVehicleController.TRAIN_TYPE_SN61)
 
 
 func _security(car:RID) -> RailVehicleSecuritySystem:

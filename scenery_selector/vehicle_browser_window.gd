@@ -55,7 +55,7 @@ var _category: int = ALL_CATEGORIES
 ## Shown as it was left - the search, the page, the selected vehicle and the scroll stay; only
 ## another game directory has other vehicles to read and search anew
 func open() -> void:
-    var game_dir: String = UserSettings.get_maszyna_game_dir()
+    var game_dir: String = MaszynaGameDirectory.get_game_dir()
     if not game_dir == _vehicles_game_dir:
         _vehicles = MaszynaVehiclesBank.scan(game_dir)
         _vehicles_game_dir = game_dir
@@ -126,7 +126,7 @@ func show_page(page: int) -> void:
     var tiles: Array[TileGrid.Tile] = []
     for vehicle: MaszynaVehiclesBank.Vehicle in _found.slice(_page * PAGE_SIZE, (_page + 1) * PAGE_SIZE):
         tiles.append(TileGrid.Tile.new(
-            vehicle.data_path, vehicle.file_name, vehicle.skins[0] if vehicle.skins else "", "",
+            SelectorVehicle.of(vehicle.data_path, vehicle.file_name, vehicle.skins[0] if vehicle.skins else "", ""),
             vehicle.data_path.path_join(vehicle.file_name), vehicle.file_name
         ))
     # an empty grid hides itself; the column keeps its room and says so, with the way back from a

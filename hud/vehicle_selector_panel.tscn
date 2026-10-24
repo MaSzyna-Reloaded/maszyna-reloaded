@@ -2,8 +2,8 @@
 
 [ext_resource type="Script" path="res://hud/vehicle_selector_panel.gd" id="1_panel"]
 [ext_resource type="Theme" path="res://hud/timetable_theme.tres" id="2_theme"]
-[ext_resource type="Script" path="res://addons/libmaszyna/debug_hud/window_move_handle.gd" id="3_move"]
-[ext_resource type="Script" path="res://addons/libmaszyna/debug_hud/window_resize_corner.gd" id="4_resize"]
+[ext_resource type="Script" path="res://addons/libreloaded/debug_hud/window_move_handle.gd" id="3_move"]
+[ext_resource type="Script" path="res://addons/libreloaded/debug_hud/window_resize_corner.gd" id="4_resize"]
 [ext_resource type="Script" path="res://ui/ui_switch.gd" id="5_switch"]
 
 [node name="VehicleSelectorPanel" type="PanelContainer"]

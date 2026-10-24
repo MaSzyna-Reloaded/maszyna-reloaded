@@ -45,6 +45,8 @@ const VEHICLE_CARD:PackedScene = preload("vehicle_card.tscn")
 
 ## The "Diagnostics" entry of the frame time statistics (DebugMenu), after the DebugHud's
 var _frame_times_index: int = -1
+## The windows of a game built on this one (GameExtensions.hud_extension_register())
+var _extensions: Array[GameHudExtension] = []
 ## The vehicle card, while HUDServer has one open
 var _card: VehicleCard = null
 ## Where the card was when it was last closed; it opens there again (no area until then)
@@ -63,6 +65,14 @@ func _ready() -> void:
     %Diagnostics.add_item("Frame time statistics")
     _frame_times_index = %Diagnostics.item_count - 1
     %Diagnostics.set_item_shortcut(_frame_times_index, ActionShortcut.create(&"cycle_debug_menu"))
+    # the windows of a game built on this one after them: the DebugHud takes no other's windows
+    for scene: PackedScene in GameExtensions.hud_extension_get_all():
+        var extension: GameHudExtension = scene.instantiate() as GameHudExtension
+        add_child(extension)
+        _extensions.append(extension)
+        extension.fill_menu(%Diagnostics)
+        %Diagnostics.index_pressed.connect(extension.menu_index_pressed)
+        %DebugHud.windows_visibility_changed.connect(extension.set_windows_shown)
     # the menus show their keys and handle them: a key picks its entry as a click would
     %Simulator.set_item_shortcut(
         %Simulator.get_item_index(SimulatorItem.EXIT_TO_MENU), ActionShortcut.create(&"menu_back")
@@ -75,8 +85,10 @@ func _ready() -> void:
     %View.set_item_shortcut(ViewItem.TIMETABLE, ActionShortcut.create(&"timetable_toggle"))
     # Shift+F2 - free in the original, whose F-keys ignore modifiers (driveruilayer.cpp:115)
     %View.set_item_shortcut(ViewItem.SCENARIO, ActionShortcut.create(&"scenario_toggle"))
-    # F12 - free in the original without Shift (driveruilayer.cpp:174)
+    # F12 - free in the original without Shift (driveruilayer.cpp:174); the key only shown:
+    # DebugHud takes hud_toggle itself
     %View.set_item_shortcut(ViewItem.CONTROLS, ActionShortcut.create(&"hud_toggle"))
+    %View.set_item_shortcut_disabled(ViewItem.CONTROLS, true)
     # F1, as the original's driving aid (driveruilayer.cpp:76)
     %View.set_item_shortcut(ViewItem.DRIVING_AID, ActionShortcut.create(&"driving_aid_toggle"))
     # F3, as the original's scenario window with its hints (driveruilayer.cpp:168)
@@ -129,10 +141,14 @@ func _on_view_menu_index_pressed(index: int) -> void:
         HUDServer.card_open(PlayerServer.player_get_vehicle())
         return
     if index == ViewItem.CONTROLS:
-        %View.toggle_item_checked(index)
-        %DebugHud.windows_set_visible(%View.is_item_checked(index))
+        %DebugHud.windows_toggle()
         return
     HUDServer.panel_toggle(VIEW_PANELS[index])
+
+
+## The DebugHud's windows shown or hidden all at once: the View menu's "Controls" ticked
+func _on_debug_hud_windows_visibility_changed(shown: bool) -> void:
+    %View.set_item_checked(ViewItem.CONTROLS, shown)
 
 
 ## A HUD element opened or closed in HUDServer: its View menu entry ticked, the element shown
@@ -247,17 +263,17 @@ func _show_chips() -> void:
 
 
 ## Every vehicle of the trainset freed; a player in its cab steps out first, as before a scenery
-## is freed - the camera lives in the vehicle's cabin (MaszynaPlayer.clear_start_train())
+## is freed - the camera lives in the vehicle's cabin (Player.clear_start_train())
 func _remove_trainset(vehicle: RID) -> void:
     var trainset: Array[RID] = RailVehicleServer.vehicle_get_coupled(
             vehicle, RailVehicleController.COUPLER_END_FRONT, RailVehicleController.COUPLING_FLAG_COUPLER)
     if trainset.has(PlayerServer.player_get_vehicle()):
         PlayerServer.player_leave_vehicle()
-    # a vehicle built from MaSzyna data is freed where it was made; one assembled by hand goes
+    # a vehicle of the catalogue is freed by its provider, which made it; one assembled by hand goes
     # with its nodes, and stays (TODO.md)
     for trainset_vehicle: RID in trainset:
-        if MaszynaLegacyVehicleSystem.vehicle_exists(trainset_vehicle):
-            MaszynaLegacyVehicleSystem.vehicle_free(trainset_vehicle)
+        if VehicleCatalogServer.vehicle_get_data(trainset_vehicle):
+            VehicleCatalogServer.vehicle_free(trainset_vehicle)
 
 
 ## The script context of the scenario being played, for the Lua editor; an invalid RID while none is
@@ -267,13 +283,20 @@ func attach_script_context(context: RID) -> void:
 
 ## The environment of the world being shown, for the weather and time window; null while there is
 ## no world (the menu)
-func attach_environment(environment: MaszynaEnvironmentNode) -> void:
-    %DebugHud.attach_environment(environment)
+func attach_environment(environment: EnvironmentNode) -> void:
+    %DebugHud.environment = environment
+
+
+## The world being shown, once its scenery has loaded, for the windows of a game built on this one
+## (GameHudExtension)
+func attach_world(world: SceneryWorld) -> void:
+    for extension: GameHudExtension in _extensions:
+        extension.attach_world(world)
 
 
 ## The scenario the player has started, for the "Scenario" entry of the View menu - hidden until
 ## the player opens it
-func show_scenario(info: MaszynaSceneryInfo, vehicle_id: String) -> void:
+func show_scenario(info: SceneryInfo, vehicle_id: String) -> void:
     %ScenarioPanel.show_scenario(info, vehicle_id)
     %VehicleSelectorPanel.show_scenario(info)
 

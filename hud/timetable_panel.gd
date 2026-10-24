@@ -3,9 +3,9 @@ extends PanelContainer
 
 ## The timetable of the player's train: the train, its relation, the clock and the delay, and every
 ## station with the times it is due - the original's timetable panel (timetable_panel::update(),
-## driveruipanels.cpp:300-472; F2, driveruilayer.cpp:155) laid out anew. It shows the timetable of
-## the trainset the player's vehicle belongs to: the scenario gives it to one driver of the
-## trainset only, not necessarily the one of the vehicle the player sits in.
+## driveruipanels.cpp:300-472; F2, driveruilayer.cpp:155) laid out anew. It shows the run of the
+## trainset the player's vehicle is in (StationServer): the timetable, where the train is in it and
+## how late it is.
 
 ## The close button asks the owner of the View menu to hide the panel and untick its entry
 signal close_requested
@@ -17,29 +17,37 @@ const ROW:PackedScene = preload("timetable_row.tscn")
 const MINUTES_PER_HOUR:float = 60.0
 const SECONDS_PER_MINUTE:float = 60.0
 const HOURS_PER_DAY:int = 24
+const KILOGRAMS_PER_TONNE:float = 1000.0
 const ON_TIME_COLOR:Color = Color(0.4, 0.85, 0.55)
 const LATE_COLOR:Color = Color(1.0, 0.45, 0.4)
 const EARLY_COLOR:Color = Color(0.45, 0.72, 1.0)
 
-## The vehicle the player drives, and the driver of its trainset that follows a timetable
+## The vehicle the player drives, the run of its trainset (StationServer) and its timetable
 var _vehicle:RID = RID()
-var _driver:RID = RID()
-var _timetable:Timetable = null
-## How far the driver got through the timetable (DriverServer.driver_get_timetable_state())
-var _state:Dictionary = {}
-## The row shown as the train's station: the one it has left until it has driven clear of it
-## (StationStart), else the one it drives to
+var _run:RID = RID()
+var _timetable:RID = RID()
+## The row shown as the train's station: the run's current entry, the one it drives to or stands at
 var _current:int = 0
 var _rows:Array[TimetableRow] = []
 
 
 func _ready() -> void:
-    DriverServer.driver_timetable_changed.connect(_on_driver_timetable_changed)
+    StationServer.run_created.connect(_on_run)
+    StationServer.run_freed.connect(_on_run)
+    for progress:Signal in [StationServer.run_entry_changed, StationServer.run_arrived,
+            StationServer.run_departed, StationServer.run_passed]:
+        progress.connect(_on_run_progress)
+    RailVehicleServer.vehicle_trainset_changed.connect(_on_vehicle_trainset_changed)
     _follow_trainset()
 
 
 func _exit_tree() -> void:
-    DriverServer.driver_timetable_changed.disconnect(_on_driver_timetable_changed)
+    StationServer.run_created.disconnect(_on_run)
+    StationServer.run_freed.disconnect(_on_run)
+    for progress:Signal in [StationServer.run_entry_changed, StationServer.run_arrived,
+            StationServer.run_departed, StationServer.run_passed]:
+        progress.disconnect(_on_run_progress)
+    RailVehicleServer.vehicle_trainset_changed.disconnect(_on_vehicle_trainset_changed)
 
 
 ## The player drives another vehicle, or none
@@ -48,78 +56,74 @@ func follow_vehicle(vehicle:RID) -> void:
     _follow_trainset()
 
 
-## The driver followed moved on through its timetable; without one, any driver may be the one of
-## the player's trainset that has just been given a timetable
-func _on_driver_timetable_changed(driver:RID) -> void:
-    if driver == _driver or not _driver.is_valid():
+## A run began or ended: it may be the one of the player's trainset
+func _on_run(_changed:RID) -> void:
+    _follow_trainset()
+
+
+## The run followed moved on, its train arrived, left or passed
+func _on_run_progress(run:RID, _entry:int) -> void:
+    if run == _run:
         _follow_trainset()
 
 
-## The first driver of the player's trainset with a timetable, and how far it got through it:
-## the train and its stations rebuilt for a new timetable, the progress and the delay shown
+## The player's vehicle was coupled or uncoupled: its trainset, and the run, may be another one
+func _on_vehicle_trainset_changed(vehicle:RID) -> void:
+    if vehicle == _vehicle:
+        _follow_trainset()
+
+
+## The run of the player's trainset: the train and its stations rebuilt for a new timetable, the
+## progress and the delay shown
 func _follow_trainset() -> void:
-    _driver = RID()
-    _state = {}
-    var trainset:Array[RID] = []
-    if _vehicle.is_valid():
-        trainset = RailVehicleServer.vehicle_get_coupled(
-                _vehicle, RailVehicleController.COUPLER_END_FRONT, RailVehicleController.COUPLING_FLAG_COUPLER)
-    for vehicle:RID in trainset:
-        var driver:RID = DriverServer.vehicle_get_driver(vehicle)
-        var driver_state:Dictionary = DriverServer.driver_get_timetable_state(driver) if driver.is_valid() else {}
-        if driver_state.get("timetable"):
-            _driver = driver
-            _state = driver_state
-            break
-    var timetable:Timetable = _state.get("timetable")
-    var station_index:int = _state.get("station_index", 0)
-    var station_start:int = _state.get("station_start", 0)
-    # a stop left stays the train's station until it has driven clear of it (driveruipanels.cpp:392)
-    var leaving:bool = station_start < station_index and (timetable.entries[station_start] as TimetableEntry).is_stop()
-    _current = station_start if leaving else station_index
+    _run = TrainRun.of_vehicle(_vehicle)
+    var timetable:RID = StationServer.run_get_timetable(_run) if _run.is_valid() else RID()
+    _current = StationServer.run_get_current_entry(_run) if _run.is_valid() else 0
     if not timetable == _timetable:
         _timetable = timetable
         # the train and a row for each of its stations
         for row:TimetableRow in _rows:
             row.queue_free()
         _rows.clear()
-        if timetable:
+        var known:bool = timetable.is_valid()
+        if known:
             timetable_received.emit()
-        %Train.text = "%s %s" % [timetable.train_category, timetable.train_name] if timetable else tr("No timetable")
-        %TrainLabel.text = timetable.train_label if timetable else ""
+        %Train.text = TrainRun.train_title(timetable) if known else tr("No timetable")
+        %TrainLabel.text = StationServer.timetable_get_train_label(timetable) if known else ""
         %TrainLabel.visible = not %TrainLabel.text == ""
-        %Relation.text = "%s  →  %s" % [
-            timetable.relation_from.replace("_", " "), timetable.relation_to.replace("_", " ")
-        ] if timetable and (timetable.relation_from or timetable.relation_to) else ""
+        %Relation.text = TrainRun.relation(timetable) if known else ""
         %Relation.visible = not %Relation.text == ""
+        # what the train is to be, its mass beside the trainset's own (driveruipanels.cpp:376-381)
         var details:PackedStringArray = []
-        if timetable and timetable.locomotive_series:
-            details.append(timetable.locomotive_series)
-        if timetable and timetable.locomotive_load > 0.0:
-            details.append("%d t" % timetable.locomotive_load)
-        if timetable and timetable.brake_ratio > 0.0:
-            details.append(tr("braked %d%%") % timetable.brake_ratio)
+        if known and StationServer.timetable_get_required_locomotive(timetable):
+            details.append(StationServer.timetable_get_required_locomotive(timetable))
+        if known and StationServer.timetable_get_required_mass(timetable) > 0.0:
+            details.append(tr("%d t, actual %d t") % [StationServer.timetable_get_required_mass(timetable),
+                    roundi(RailVehicleServer.trainset_get_mass(StationServer.run_get_trainset(_run)) / KILOGRAMS_PER_TONNE)])
+        if known and StationServer.timetable_get_required_brake_ratio(timetable) > 0.0:
+            details.append(tr("braked %d%%") % StationServer.timetable_get_required_brake_ratio(timetable))
         %Details.text = "  ·  ".join(details)
         %Details.visible = details.size() > 0
-        var entries:Array = timetable.entries if timetable else []
-        # a number in place of a timetable is only the speed (mtable.cpp:279)
-        %NoStations.text = tr("Line speed %d km/h, no stations") % timetable.velocity \
-                if timetable and timetable.velocity > 0.0 else tr("The train follows no timetable")
-        %NoStations.visible = not entries
-        %Delay.visible = entries.size() > 0
-        %StationsScroll.visible = entries.size() > 0
+        var count:int = StationServer.timetable_get_entry_count(timetable) if known else 0
+        # a timetable of no stations is only the train's speed limit (mtable.cpp:279)
+        var speed_limit:float = StationServer.timetable_get_speed_limit(timetable) if known else 0.0
+        %NoStations.text = tr("Line speed %d km/h, no stations") % speed_limit \
+                if speed_limit > 0.0 else tr("The train follows no timetable")
+        %NoStations.visible = count == 0
+        %Delay.visible = count > 0
+        %StationsScroll.visible = count > 0
         var velocity:float = TimetableRow.NO_SPEED
-        for index:int in entries.size():
-            var entry:TimetableEntry = entries[index]
+        for index:int in count:
             var row:TimetableRow = ROW.instantiate()
             %Stations.add_child(row)
             var place:TimetableRow.Place = TimetableRow.Place.BETWEEN
             if index == 0:
                 place = TimetableRow.Place.FIRST
-            elif index == entries.size() - 1:
+            elif index == count - 1:
                 place = TimetableRow.Place.LAST
-            row.show_entry(entry, place, entry.velocity if not entry.velocity == velocity else TimetableRow.NO_SPEED)
-            velocity = entry.velocity
+            var entry_velocity:float = StationServer.timetable_entry_get_speed_limit(timetable, index)
+            row.show_entry(_run, index, place, entry_velocity if not entry_velocity == velocity else TimetableRow.NO_SPEED)
+            velocity = entry_velocity
             _rows.append(row)
         # a new timetable fits the card to what it shows; its size is the player's until the next.
         # The card stands in the bottom right corner, above the vehicle chips, and grows up and
@@ -131,7 +135,7 @@ func _follow_trainset() -> void:
         var progress:TimetableRow.Progress = TimetableRow.Progress.AHEAD
         if index == _current:
             progress = TimetableRow.Progress.NEXT
-        elif index < station_index:
+        elif index < _current:
             progress = TimetableRow.Progress.PASSED
         _rows[index].show_progress(progress)
     _scroll_to_next_station()
@@ -155,18 +159,17 @@ func _tick() -> void:
         (seconds / seconds_per_hour) % HOURS_PER_DAY, (seconds / int(SECONDS_PER_MINUTE)) % int(MINUTES_PER_HOUR),
         seconds % int(SECONDS_PER_MINUTE)
     ]
-    var late_minutes:int = MaszynaLegacyDriverTimetable.state_delay_minutes(_state, hours)
+    var late_minutes:int = TrainRun.delay_minutes(_run) if _run.is_valid() else 0
     %DelayText.text = tr("On time") if late_minutes == 0 else "%+d min" % late_minutes
     %DelayText.add_theme_color_override(&"font_color",
             ON_TIME_COLOR if late_minutes == 0 else (LATE_COLOR if late_minutes > 0 else EARLY_COLOR))
     if _current >= _rows.size():
         return
-    var entry:TimetableEntry = _timetable.entries[_current]
     var row:TimetableRow = _rows[_current]
-    # the train's dispatch at the stop, kept under the vehicle its driver drives
-    var vehicle:RID = VehicleServer.person_get_vehicle(_driver)
+    # the train's dispatch at the stop, kept under the vehicle its train is driven from
+    var vehicle:RID = _driven_vehicle()
     var dispatch_step:StationServer.DispatchStep = StationServer.dispatch_get_step(vehicle)
-    if not MaszynaLegacyDriverTimetable.state_is_standing(_state) or not entry.is_stop():
+    if not TrainRun.is_standing(_run) or not StationServer.timetable_entry_is_stop(_timetable, _current):
         row.show_status(tr("Next station"), TimetableRow.Tone.NEUTRAL)
     elif _current == _rows.size() - 1:
         row.show_status(tr("Terminus"), TimetableRow.Tone.NEUTRAL)
@@ -176,7 +179,7 @@ func _tick() -> void:
     elif dispatch_step == StationServer.DISPATCH_STEP_CLOSE_DOORS:
         row.show_status(tr("Closing doors"), TimetableRow.Tone.WAIT)
     else:
-        var minutes:float = MaszynaLegacyDriverTimetable.compare_time(hours, entry.departure)
+        var minutes:float = StationServer.run_get_time_to_departure(_run, hours)
         if minutes > 0.0:
             var wait:int = ceili(minutes * SECONDS_PER_MINUTE)
             row.show_status(tr("Stop · departure in %d:%02d") % [
@@ -184,6 +187,15 @@ func _tick() -> void:
             ], TimetableRow.Tone.WAIT)
         else:
             row.show_status(tr("Departure"), TimetableRow.Tone.GO)
+
+
+## The vehicle of the trainset somebody drives it from - its driver's - RID() for none
+func _driven_vehicle() -> RID:
+    for vehicle:RID in RailVehicleServer.trainset_get_vehicles(StationServer.run_get_trainset(_run)):
+        var driver:RID = DriverServer.vehicle_get_driver(vehicle)
+        if driver.is_valid():
+            return VehicleServer.person_get_vehicle(driver)
+    return RID()
 
 
 ## The clock runs only while the panel is shown

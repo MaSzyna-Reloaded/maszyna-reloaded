@@ -1,0 +1,14 @@
+[remap]
+
+importer="libmaszyna.fiz"
+type="Resource"
+uid="uid://bupg27e2s45uy"
+path="res://.godot/imported/testcar.fiz-efbadcfd1b0fe182edfff76992917b47.res"
+
+[deps]
+
+source_file="res://tests/fixtures/game_dir/dynamic/road/testcar/testcar.fiz"
+dest_files=["res://.godot/imported/testcar.fiz-efbadcfd1b0fe182edfff76992917b47.res"]
+
+[params]
+

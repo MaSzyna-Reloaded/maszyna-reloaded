@@ -59,7 +59,7 @@ static func hardware() -> Dictionary:
         "window_size": vector_to_array(DisplayServer.window_get_size()),
         "window_mode": enum_name(&"DisplayServer", &"WindowMode", DisplayServer.window_get_mode()),
         "locale": OS.get_locale(),
-        "language": MaszynaTranslationServer.language,
+        "language": ReloadedTranslationServer.language,
     }
 
 
@@ -71,9 +71,9 @@ static func scenario(world: SceneryWorld) -> Dictionary:
                 RailVehicleServer.cabin_get_kind(RailVehicleServer.vehicle_get_driver_cabin(vehicle))),
     }
     if world:
-        var scenery: MaszynaSceneryNode = world.get_scenery()
+        var scenery: SceneryContentNode = world.get_scenery()
         result.merge({
-            "filename": scenery.filename,
+            "filename": scenery.get_scenery_name(),
             "title": scenery.title,
             "start_time": scenery.start_time,
             "first_vehicle_id": scenery.first_vehicle_id,
@@ -91,11 +91,11 @@ static func simulation(world: SceneryWorld, started_msec: int) -> Dictionary:
         "light_level": SimulationServer.get_light_level(),
     }
     if world:
-        var environment: MaszynaEnvironmentNode = world.get_environment()
+        var environment: EnvironmentNode = world.get_environment()
         result["date"] = "%04d-%02d-%02d" % [environment.year, environment.month, environment.day]
         result["weather"] = {
             "weather": ClassDB.class_get_enum_constants(&"SimulationServer", &"Weather")[environment.weather],
-            "season": MaszynaEnvironment.Season.find_key(environment.season),
+            "season": ClassDB.class_get_enum_constants(&"SimulationServer", &"Season")[SimulationServer.get_season()],
             "cloudiness": environment.cloudiness,
             "precipitation": environment.precipitation,
             "temperature": environment.temperature,
@@ -171,8 +171,11 @@ static func vehicles(origin: Vector3) -> Dictionary:
 static func signal_heads(origin: Vector3) -> PackedStringArray:
     var nearby: Array[Array] = []
     for head: RID in SignallingServer.signal_head_get_rids():
-        var position: Vector3 = E3DRenderingServer.instance_get_transform(
-                SignallingServer.signal_head_get_instance(head)).origin
+        # a head no model draws has no place
+        var instance: RID = ModelRenderingServer.signal_head_get_instance(head)
+        if not instance.is_valid():
+            continue
+        var position: Vector3 = ModelRenderingServer.instance_get_transform(instance).origin
         var distance: float = position.distance_to(origin)
         if distance > NEARBY_RADIUS:
             continue

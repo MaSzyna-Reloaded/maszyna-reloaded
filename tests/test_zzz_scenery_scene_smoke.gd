@@ -10,12 +10,12 @@ var _previous_game_dir:String = ""
 
 
 func before_each() -> void:
-    _previous_game_dir = UserSettings.get_maszyna_game_dir()
-    UserSettings.save_maszyna_game_dir(FIXTURES_GAME_DIR)
+    _previous_game_dir = MaszynaGameDirectory.get_game_dir()
+    MaszynaGameDirectory.save_game_dir(FIXTURES_GAME_DIR)
 
 
 func after_each() -> void:
-    UserSettings.save_maszyna_game_dir(_previous_game_dir)
+    MaszynaGameDirectory.save_game_dir(_previous_game_dir)
 
 
 func test_game_scene_instantiates() -> void:

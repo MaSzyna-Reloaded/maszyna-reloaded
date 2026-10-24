@@ -268,7 +268,7 @@ func _on_section_list_item_selected(index: int) -> void:
 
 
 ## The Graphics section's values that live on the viewport, not in a reader of their own (the
-## window's are GameWindow's) - the sky takes its own from UserSettings (MaszynaSkyEnvironment). The defaults
+## window's are GameWindow's) - the sky takes its own from UserSettings (SkyEnvironment). The defaults
 ## are the project's own, so nothing changes until the player sets it.
 func _apply_graphics() -> void:
     var viewport: Viewport = get_tree().root.get_viewport()

@@ -26,7 +26,7 @@ func set_selected(p_selected: bool) -> void:
 ## The directory in use, not the stored value - the game's own directory takes over from one that
 ## holds no game data
 func _show(_value: Variant) -> void:
-    %WarningIcon.visible = not UserSettings.is_maszyna_game_dir_valid()
+    %WarningIcon.visible = not MaszynaGameDirectory.is_game_dir_valid()
     %GameDirPanel.show_game_dir()
 
 

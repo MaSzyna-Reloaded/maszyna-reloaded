@@ -1,8 +1,8 @@
 extends MaszynaGutTest
 
-const PLAYER_SCENE:PackedScene = preload("res://addons/libmaszyna/player/player.tscn")
+const PLAYER_SCENE:PackedScene = preload("res://addons/libreloaded/player/player.tscn")
 const WORLD_SCENE:PackedScene = preload("res://world/world.tscn")
-const STREAMER_SCRIPT:Script = preload("res://addons/libmaszyna/scenery/scenery_streamer.gd")
+const STREAMER_SCRIPT:Script = preload("res://addons/libreloaded/scenery/scenery_streamer.gd")
 const TRACK_NAME:String = "initialization_track"
 const TRACK_LENGTH:float = 200.0
 const VEHICLE_OFFSET:float = 100.0
@@ -11,7 +11,7 @@ const PLAYER_POSITION:Vector3 = Vector3(30.0, 3.0, 615.0)
 class ScenerySource extends Node:
     signal scenery_loaded(first_vehicle_id:String)
 
-var _player:MaszynaPlayer
+var _player:Player
 var _streamer:Node
 var _source:ScenerySource
 var _world:SceneryWorld
@@ -21,7 +21,7 @@ var _previous_game_dir:String
 
 
 func before_each() -> void:
-    _previous_game_dir = UserSettings.get_maszyna_game_dir()
+    _previous_game_dir = MaszynaGameDirectory.get_game_dir()
     UserSettings.set_setting("maszyna", "game_dir", "res://tests/fixtures")
     _streamer = STREAMER_SCRIPT.new()
     add_child(_streamer)
@@ -172,11 +172,14 @@ func test_first_streaming_camera_is_already_in_the_selected_cabin() -> void:
 func test_world_initializes_on_each_scenery_load_and_detaches_on_unload() -> void:
     _world = WORLD_SCENE.instantiate()
     add_child(_world)
-    _player = _world.get_node("Player") as MaszynaPlayer
+    _player = _world.get_node("Player") as Player
     watch_signals(_player)
     assert_false(SceneryStreamingServer.streaming_has_camera())
-    var trainset:Array[MaszynaDynamicData] = []
-    _world.load_scenery("ep07.scn", trainset)
+    var trainset:Array[VehicleData] = []
+    var ep07:SceneryInfo = SceneryInfo.new()
+    ep07.provider = MaszynaSceneryProvider.NAME
+    ep07.id = "ep07.scn"
+    _world.load_scenery(ep07, trainset)
     assert_true(await wait_until(func() -> bool:
         return get_signal_emit_count(_player, "initialization_ready") == 1, LOAD_TIMEOUT))
     assert_eq(PlayerServer.player_get_vehicle(), VehicleServer.vehicle_get_rid_by_id("ep07-424"))
@@ -184,7 +187,7 @@ func test_world_initializes_on_each_scenery_load_and_detaches_on_unload() -> voi
     await _world.unload_scenery()
     assert_false(SceneryStreamingServer.streaming_has_camera())
     assert_false(PlayerServer.player_get_vehicle().is_valid())
-    _world.load_scenery("ep07.scn", trainset, "NoSuchVehicle")
+    _world.load_scenery(ep07, trainset, "NoSuchVehicle")
     assert_true(await wait_until(func() -> bool:
         return get_signal_emit_count(_player, "initialization_ready") == 2, LOAD_TIMEOUT))
     assert_false(PlayerServer.player_get_vehicle().is_valid())

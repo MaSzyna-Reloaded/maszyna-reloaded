@@ -91,4 +91,4 @@ func _apply_settings() -> void:
     if not window.hdr_output_requested == hdr:
         window.hdr_output_requested = hdr
         # what reads the screen behind it (the HUD tiles' contrast) reads it linear then
-        RenderingServer.global_shader_parameter_set(&"maszyna_hdr_output", hdr)
+        RenderingServer.global_shader_parameter_set(&"reloaded_hdr_output", hdr)

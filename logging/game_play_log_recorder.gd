@@ -68,7 +68,7 @@ func _ready() -> void:
     _repeat_timer = Timer.new()
     _repeat_timer.one_shot = true
     add_child(_repeat_timer)
-    _repeat_timer.timeout.connect(_write_repeated)
+    _repeat_timer.timeout.connect(_on_repeat_timer_timeout)
     for constant: String in ClassDB.class_get_enum_constants(&"VehiclePersonRole", &"Role"):
         _role_names[ClassDB.class_get_integer_constant(&"VehiclePersonRole", constant)] = \
                 constant.trim_prefix(ROLE_PREFIX).to_lower()
@@ -146,7 +146,8 @@ func _close(subject: String, what: String) -> void:
 
 
 func _on_vehicle_command_received(vehicle_rid: RID, command: String, p1: Variant, p2: Variant) -> void:
-    var key: String = "%s %s" % [_named(vehicle_rid, VehicleServer.vehicle_get_id(vehicle_rid)), command]
+    var named: String = _named(vehicle_rid, VehicleServer.vehicle_get_id(vehicle_rid))
+    var key: String = "%s %s" % [named, command]
     var now: int = Time.get_ticks_msec()
     if key == _repeated_key and now - _repeated_msec <= REPEAT_GAP_MSEC:
         _repeats += 1
@@ -155,11 +156,22 @@ func _on_vehicle_command_received(vehicle_rid: RID, command: String, p1: Variant
         _write_repeated()
         _repeated_log = _gameplay_log if vehicle_rid == PlayerServer.player_get_vehicle() else _ai_log
         _repeated_key = key
-        _repeated_line = _entry("command", _named(vehicle_rid, VehicleServer.vehicle_get_id(vehicle_rid)),
-                "%s p1=%s p2=%s" % [command, p1, p2])
+        _repeated_line = _entry("command", named, "%s p1=%s p2=%s" % [command, p1, p2])
         _repeats = 1
     _repeated_msec = now
-    _repeat_timer.start(REPEAT_GAP_MSEC / 1000.0)
+    # started once, not by every command: the AI's commands come by the thousand
+    # (_on_repeat_timer_timeout() waits out the rest of the gap since the last one)
+    if _repeat_timer.is_stopped():
+        _repeat_timer.start(REPEAT_GAP_MSEC / 1000.0)
+
+
+## The gap is counted from the last command: one that came since the timer started puts it off
+func _on_repeat_timer_timeout() -> void:
+    var left: int = REPEAT_GAP_MSEC - (Time.get_ticks_msec() - _repeated_msec)
+    if _repeated_line and left > 0:
+        _repeat_timer.start(left / 1000.0)
+        return
+    _write_repeated()
 
 
 func _on_event_launched(event: RID, activator: RID) -> void:

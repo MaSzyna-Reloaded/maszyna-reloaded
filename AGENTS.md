@@ -49,6 +49,10 @@ Where the game is not libmaszyna:
 * releases are cut here: `make build-number`, `make release-linux` / `release-windows` /
   `release-android`; the CI workflow builds libmaszyna from the submodule, exports and publishes
   the branch's prerelease
+* a log view of many lines is `LogLines` (`hud/log_lines.gd`, `add_line()`): it draws only while
+  it is visible and drops the oldest lines in batches. Never `RichTextLabel.remove_paragraph()`
+  per line - it walks the whole text, and the Logs panel took 71% of the main thread on Wrzosy
+  that way
 * documentation of the game is the Jekyll site in `docs/` (UI components, HUD, problem reports);
   libmaszyna documents itself
 * `make install-git-hooks` once per clone: the pre-commit hook runs libmaszyna's

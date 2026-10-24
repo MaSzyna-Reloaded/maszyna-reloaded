@@ -1,8 +1,8 @@
 ### Content
 
 **Read @AGENTS.md before doing anything in this repository.** It is the working agreement of the
-game and leans on libmaszyna's: read `vendor/libmaszyna/AGENTS.md` and
-`vendor/libmaszyna/CODE_STYLE.md` in full as well - every rule there binds here, with the
+game and leans on libreloaded's: read `vendor/libreloaded/AGENTS.md` and
+`vendor/libreloaded/CODE_STYLE.md` in full as well - every rule there binds here, with the
 substitutions `AGENTS.md` lists.
 
 **Never add `Co-Authored-By: Claude ...` or any other AI attribution to a commit or a pull

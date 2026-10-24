@@ -15,7 +15,7 @@ signal close_requested
 signal remove_trainset_requested(vehicle:RID)
 
 const KILOGRAMS_PER_TONNE:float = 1000.0
-## A driver's speed below zero is no limit (VelNext = -1, Driver.h)
+## A driver's speed limit below zero is none (StationServer.NO_SPEED_LIMIT)
 const NO_VELOCITY:float = 0.0
 ## What the train's dispatch at a stop is doing (StationServer)
 const DISPATCH_STEP_NAMES:Dictionary[StationServer.DispatchStep, String] = {
@@ -80,14 +80,13 @@ func _show_trainset() -> void:
     _coupled.assign(RailVehicleServer.vehicle_get_coupled(
             vehicle, RailVehicleController.COUPLER_END_FRONT, RailVehicleController.COUPLING_FLAG_COUPLER))
     for trainset_vehicle:RID in _coupled:
-        # a vehicle of MaszynaLegacyVehicleSystem keeps the data path, file and skin it was made of
-        if not MaszynaLegacyVehicleSystem.vehicle_exists(trainset_vehicle):
+        # a vehicle of the catalogue keeps what it was made of - the vehicle and its livery
+        var made_of:VehicleData = VehicleCatalogServer.vehicle_get_data(trainset_vehicle)
+        if not made_of:
             continue
-        var dynamic:MaszynaDynamicData = MaszynaLegacyVehicleSystem.vehicle_get_dynamic(trainset_vehicle)
         _trainset.append(trainset_vehicle)
-        tiles.append(TileGrid.Tile.new(dynamic.data_path, dynamic.file_name, dynamic.skin,
-                VehicleServer.vehicle_get_id(trainset_vehicle), "%s (%s)" % [
-                    VehicleServer.vehicle_get_name(trainset_vehicle), dynamic.data_path.get_file()]))
+        tiles.append(TileGrid.Tile.new(made_of, "%s (%s)" % [
+                VehicleServer.vehicle_get_name(trainset_vehicle), made_of.vehicle]))
     %Trainset.set_tiles(tiles)
 
 
@@ -108,10 +107,10 @@ func _show_trainset_vehicle(p_vehicle:RID) -> void:
     %TypeName.text = RailVehicleServer.vehicle_get_type_name(_shown)
     var brake:Object = RailVehicleServer.vehicle_component_get(_shown, RailVehicleComponentType.COMPONENT_BRAKES)
     var data:Dictionary[String, String] = {}
-    if MaszynaLegacyVehicleSystem.vehicle_exists(_shown):
-        var dynamic:MaszynaDynamicData = MaszynaLegacyVehicleSystem.vehicle_get_dynamic(_shown)
-        data[tr("File")] = "%s/%s" % [dynamic.data_path, dynamic.file_name]
-        data[tr("Skin")] = dynamic.skin
+    var made_of:VehicleData = VehicleCatalogServer.vehicle_get_data(_shown)
+    if made_of:
+        data[tr("Vehicle")] = made_of.vehicle
+        data[tr("Livery")] = made_of.livery
     data[tr("Length")] = "%.2f m" % config.get("length", 0.0)
     data[tr("Mass")] = "%.1f t" % (state.get("mass_total", 0.0) / KILOGRAMS_PER_TONNE)
     data[tr("Axle arrangement")] = config.get("axle_arrangement", "")
@@ -261,46 +260,46 @@ func _on_refresh_timer_timeout() -> void:
     # takes it back
     %AIButton.visible = driver.is_valid() and _shown == PlayerServer.player_get_vehicle()
     %AIButton.text = tr("Disable AI") if driving else tr("Enable AI")
-    var driver_state:Dictionary = DriverServer.driver_get_state(driver) if driver.is_valid() else {}
+    var driver_state:DriverState = DriverServer.driver_get_state(driver) if driver.is_valid() else null
+    var run:RID = TrainRun.of_vehicle(_shown)
     var driver_data:Dictionary[String, String] = {}
     if driver_state:
-        driver_data[tr("Order")] = driver_state.get("order_text", "")
-        driver_data[tr("Direction")] = tr(DIRECTION_NAMES[driver_state.get("direction", VehicleController.DIRECTION_FORWARD)])
-        driver_data[tr("Speed allowed")] = _format_velocity(driver_state.get("velocity", NO_VELOCITY))
-        driver_data[tr("Speed ahead")] = _format_velocity(driver_state.get("velocity_next", NO_VELOCITY))
-        if driver_state.get("next_stop", ""):
-            driver_data[tr("Next stop")] = (driver_state["next_stop"] as String).replace("_", " ")
-        if driver_state.get("at_passenger_stop", false):
+        driver_data[tr("Order")] = driver_state.task
+        driver_data[tr("Direction")] = tr(DIRECTION_NAMES[driver_state.direction])
+        driver_data[tr("Speed allowed")] = _format_velocity(driver_state.speed_limit)
+        driver_data[tr("Speed ahead")] = _format_velocity(driver_state.next_speed_limit)
+        var next_stop:int = TrainRun.next_stop(run) if run.is_valid() else -1
+        if next_stop >= 0:
+            driver_data[tr("Next stop")] = TrainRun.station_name(StationServer.run_get_timetable(run), next_stop)
+        if driver_state.at_stop:
             driver_data[tr("At the platform")] = tr("Yes")
-        if driver_state.get("stop_time", 0.0) > 0.0:
-            driver_data[tr("Stop time")] = "%d s" % driver_state["stop_time"]
+        if driver_state.stop_time_left > 0.0:
+            driver_data[tr("Stop time")] = "%d s" % driver_state.stop_time_left
         var dispatch_step:StationServer.DispatchStep = StationServer.dispatch_get_step(VehicleServer.person_get_vehicle(driver))
         if DISPATCH_STEP_NAMES.has(dispatch_step):
             driver_data[tr("Dispatch")] = tr(DISPATCH_STEP_NAMES[dispatch_step])
     _show_values(%DriverData, driver_data)
 
-    # the timetable of the driver: the train, its relation, the delay and the station passed last,
-    # the one it drives to and the one after
-    var timetable_state:Dictionary = DriverServer.driver_get_timetable_state(driver) if driver.is_valid() else {}
-    var timetable:Timetable = timetable_state.get("timetable")
-    %TrainLabel.text = "%s %s" % [timetable.train_category, timetable.train_name] if timetable else ""
-    %TrainLabel.visible = not timetable == null
+    # the run of the vehicle's trainset: the train, its relation, the delay and the station passed
+    # last, the one it drives to or stands at and the one after
+    var timetable:RID = StationServer.run_get_timetable(run) if run.is_valid() else RID()
+    %TrainLabel.text = TrainRun.train_title(timetable) if timetable.is_valid() else ""
+    %TrainLabel.visible = timetable.is_valid()
     var data:Dictionary[String, String] = {}
-    if timetable:
-        data[tr("Train")] = "%s %s" % [timetable.train_category, timetable.train_name]
-        if timetable.relation_from or timetable.relation_to:
-            data[tr("Relation")] = "%s  →  %s" % [
-                timetable.relation_from.replace("_", " "), timetable.relation_to.replace("_", " ")]
-        var late_minutes:int = MaszynaLegacyDriverTimetable.state_delay_minutes(timetable_state, SimulationServer.time_of_day)
+    if timetable.is_valid():
+        data[tr("Train")] = TrainRun.train_title(timetable)
+        if TrainRun.relation(timetable):
+            data[tr("Relation")] = TrainRun.relation(timetable)
+        var late_minutes:int = TrainRun.delay_minutes(run)
         data[tr("Delay")] = tr("On time") if late_minutes == 0 else "%+d min" % late_minutes
-        var entries:Array = timetable.entries
-        var index:int = timetable_state.get("station_index", 0)
-        if index > 0 and index - 1 < entries.size():
-            data[tr("Last station")] = (entries[index - 1] as TimetableEntry).station_name.replace("_", " ")
-        if index < entries.size():
-            data[tr("Next station")] = (entries[index] as TimetableEntry).station_name.replace("_", " ")
-        if index + 1 < entries.size():
-            data[tr("Then")] = (entries[index + 1] as TimetableEntry).station_name.replace("_", " ")
+        var count:int = StationServer.timetable_get_entry_count(timetable)
+        var index:int = StationServer.run_get_current_entry(run)
+        if index > 0 and index - 1 < count:
+            data[tr("Last station")] = TrainRun.station_name(timetable, index - 1)
+        if index < count:
+            data[tr("Next station")] = TrainRun.station_name(timetable, index)
+        if index + 1 < count:
+            data[tr("Then")] = TrainRun.station_name(timetable, index + 1)
     else:
         data[tr("Train")] = tr("No timetable")
     _show_values(%TimetableData, data)

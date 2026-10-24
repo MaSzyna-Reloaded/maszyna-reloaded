@@ -38,27 +38,47 @@ const TONE_COLORS:Dictionary[Tone, Color] = {
 ## A pass-through station is named in the muted colour
 const PASS_THROUGH_COLOR:Color = Color(0.72, 0.77, 0.85)
 
-var _entry:TimetableEntry = null
+## Whether the train stops at the station, and the line's track count on the way to it - what the
+## line drawn shows
+var _stop:bool = false
+var _track_count:int = 1
 var _place:Place = Place.BETWEEN
 var _progress:Progress = Progress.AHEAD
 
 
-## The station, its place in the timetable and the speed shown beside it, or NO_SPEED
-func show_entry(entry:TimetableEntry, place:Place, velocity:float) -> void:
-    _entry = entry
+## The entry of the run's timetable, its place in the timetable and the speed shown beside it, or
+## NO_SPEED; the times as the run's
+func show_entry(run:RID, entry:int, place:Place, velocity:float) -> void:
+    var timetable:RID = StationServer.run_get_timetable(run)
+    _stop = StationServer.timetable_entry_is_stop(timetable, entry)
+    _track_count = StationServer.timetable_entry_get_track_count(timetable, entry)
     _place = place
-    %StationName.text = entry.station_name.replace("_", " ")
-    if not entry.is_stop():
+    %StationName.text = TrainRun.station_name(timetable, entry)
+    if not _stop:
         %StationName.add_theme_color_override(&"font_color", PASS_THROUGH_COLOR)
-    %Kilometre.text = "%.2f km" % entry.kilometre
-    %Facilities.text = entry.facilities.replace(",", " · ")
+    var kilometre:float = StationServer.timetable_entry_get_kilometre(timetable, entry)
+    %Kilometre.text = "%.2f km" % kilometre
+    %Kilometre.visible = kilometre >= 0.0
+    # what the station and the stop are, as the timetable says
+    var marks:PackedStringArray = []
+    if StationServer.station_get_type(StationServer.timetable_entry_get_station(timetable, entry)) \
+            == StationServer.STATION_TYPE_PASSENGER_STOP:
+        marks.append(tr("Passenger stop"))
+    if StationServer.timetable_entry_is_technical_stop(timetable, entry):
+        marks.append(tr("Technical stop"))
+    if StationServer.timetable_entry_is_direction_change(timetable, entry):
+        marks.append(tr("Change of direction"))
+    %Facilities.text = " · ".join(marks)
+    %Facilities.visible = not marks.is_empty()
     %Speed.text = "%d" % velocity
     %SpeedChip.visible = velocity > 0.0
-    %Arrival.text = format_time(entry.arrival)
-    %Arrival.visible = entry.is_stop() and entry.arrival >= 0.0
-    %Departure.text = format_time(entry.departure)
-    %Departure.visible = entry.departure >= 0.0
-    if not entry.is_stop():
+    var arrival:float = TrainRun.arrival(run, entry)
+    var departure:float = TrainRun.departure(run, entry)
+    %Arrival.text = format_time(arrival)
+    %Arrival.visible = _stop and arrival >= 0.0
+    %Departure.text = format_time(departure)
+    %Departure.visible = departure >= 0.0
+    if not _stop:
         %Departure.theme_type_variation = &"TimetableMuted"
     %Line.queue_redraw()
 
@@ -90,11 +110,11 @@ func _draw_line() -> void:
     var bottom:float = middle.y if _place == Place.LAST else line.size.y + panel.get_margin(SIDE_BOTTOM)
     var color:Color = ACCENT if _progress == Progress.PASSED else LINE_AHEAD
     var offsets:Array[float] = [0.0]
-    if _entry and _entry.track_count > 1:
+    if _track_count > 1:
         offsets = [-DOUBLE_TRACK_GAP / 2.0, DOUBLE_TRACK_GAP / 2.0]
     for offset:float in offsets:
         line.draw_line(Vector2(middle.x + offset, top), Vector2(middle.x + offset, bottom), color, LINE_WIDTH)
-    var radius:float = STOP_RADIUS if _entry and _entry.is_stop() else PASS_RADIUS
+    var radius:float = STOP_RADIUS if _stop else PASS_RADIUS
     match _progress:
         Progress.PASSED:
             line.draw_circle(middle, radius, ACCENT)

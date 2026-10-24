@@ -23,11 +23,11 @@ const FADE_TIME: float = 0.5
 ## Distance of the camera from the model, in model lengths
 const CAMERA_DISTANCE: float = 1.15
 
-var _vehicle: MaszynaSceneryInfo.Vehicle = null
+var _vehicle: MaszynaVehicleData = null
 var _data_path: String = ""
-var _model: E3DModelInstance = null
+var _model: MaszynaE3DModelInstance = null
 ## The vehicle's attachments, children of _model
-var _attachments: Array[E3DModelInstance] = []
+var _attachments: Array[MaszynaE3DModelInstance] = []
 ## Skin of the model, the one the trainset gives the vehicle until another is picked
 var _skin: String = ""
 ## Skins of the vehicle, in the order the grid shows them
@@ -48,12 +48,14 @@ func _process(delta: float) -> void:
         %ModelRoot.rotate_y(delta * ROTATION_SPEED)
 
 
-func show_vehicle(vehicle: MaszynaSceneryInfo.Vehicle) -> void:
+## MaSzyna's vehicle on the turntable, with its skins - the model and the skins are MaSzyna's files
+## (MaszynaRailVehicle3DInstancer, MaszynaVehicleSkins)
+func show_vehicle(vehicle: MaszynaVehicleData) -> void:
     _vehicle = vehicle
     # every vehicle path is used with a leading slash (see maszyna_rail_vehicle_3d_instancer.gd)
     _data_path = "/" + vehicle.data_path
     %Name.text = vehicle.file_name if vehicle.file_name else vehicle.data_path.get_file()
-    %Subtitle.text = "%s - %s" % [vehicle.get_name(), vehicle.data_path]
+    %Subtitle.text = "%s - %s" % [vehicle.name if vehicle.name else vehicle.vehicle_id, vehicle.data_path]
     %ModelRoot.rotation = Vector3.ZERO
     _build_model(vehicle.skin)
     _build_skin_grid()
@@ -76,7 +78,7 @@ func _build_model(skin: String) -> void:
     _model = MaszynaRailVehicle3DInstancer.build_exterior(_data_path, _vehicle.file_name, skin, _vehicle.vehicle_id)
     _attachments.clear()
     for attachment:Node in _model.get_children():
-        _attachments.append(attachment as E3DModelInstance)
+        _attachments.append(attachment as MaszynaE3DModelInstance)
     %ModelRoot.add_child(_model)
     _frame_model()
 
@@ -84,7 +86,7 @@ func _build_model(skin: String) -> void:
 ## Puts the model in the middle of the turntable and pulls the camera back to fit it
 func _frame_model() -> void:
     var bounds: AABB = _model.submodels_aabb
-    for attachment: E3DModelInstance in _attachments:
+    for attachment: MaszynaE3DModelInstance in _attachments:
         bounds = bounds.merge(attachment.submodels_aabb)
     _model.position = -bounds.get_center()
     var radius: float = maxf(bounds.size.length() * 0.5, 1.0)
@@ -99,13 +101,14 @@ func _build_skin_grid() -> void:
     # first, so it is the one the grid selects
     if _skin:
         _skins.append(_skin)
-    var vehicle_dir: String = UserSettings.get_maszyna_game_dir().path_join(_data_path)
+    var vehicle_dir: String = MaszynaGameDirectory.get_game_dir().path_join(_data_path)
     for skin: String in MaszynaVehicleSkins.list_skins(vehicle_dir, _vehicle.file_name):
         if not skin == _skin.to_lower():
             _skins.append(skin)
     var tiles: Array[TileGrid.Tile] = []
     for skin: String in _skins:
-        tiles.append(TileGrid.Tile.new(_data_path, _vehicle.file_name, skin, _vehicle.vehicle_id, skin, skin))
+        tiles.append(TileGrid.Tile.new(SelectorVehicle.of(_data_path, _vehicle.file_name, skin, _vehicle.vehicle_id),
+                skin, skin))
     %SkinsGrid.set_tiles(tiles)
 
 

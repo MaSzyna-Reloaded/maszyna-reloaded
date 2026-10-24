@@ -285,19 +285,18 @@
             "title": "Scenery",
             "settings": [
                 {
-                    "title": "Draw distance",
+                    "title": "Tracks and traction distance",
                     "store": "project",
-                    "key": "maszyna/scenery/draw_distance",
+                    "key": "reloaded/scenery/tracks/distance",
                     "type": "float",
                     "hint": "range",
                     "hint_string": "100,20000,10,suffix:m",
-                    "default": 3000.0,
-                    "advanced": true
+                    "default": 2000.0
                 },
                 {
                     "title": "Lazy loading (experimental)",
                     "store": "project",
-                    "key": "maszyna/resources/lazy_loading",
+                    "key": "reloaded/resources/lazy_loading",
                     "type": "bool",
                     "default": false,
                     "restart_required": true
@@ -371,14 +370,14 @@
                 {
                     "title": "Shadows",
                     "store": "project",
-                    "key": "maszyna/scenery/shadows/enabled",
+                    "key": "reloaded/scenery/shadows/enabled",
                     "type": "bool",
                     "default": true
                 },
                 {
                     "title": "Shadow mode",
                     "store": "project",
-                    "key": "maszyna/scenery/shadows/mode",
+                    "key": "reloaded/scenery/shadows/mode",
                     "type": "int",
                     "hint": "enum",
                     "hint_string": "Orthogonal:0,PSSM 2 Splits:1,PSSM 4 Splits:2",
@@ -387,7 +386,7 @@
                 {
                     "title": "Shadow distance",
                     "store": "project",
-                    "key": "maszyna/scenery/shadows/max_distance",
+                    "key": "reloaded/scenery/shadows/max_distance",
                     "type": "float",
                     "hint": "range",
                     "hint_string": "0,10000,1,suffix:m",
@@ -397,7 +396,7 @@
                 {
                     "title": "Shadow blur",
                     "store": "project",
-                    "key": "maszyna/scenery/shadows/blur",
+                    "key": "reloaded/scenery/shadows/blur",
                     "type": "float",
                     "hint": "range",
                     "hint_string": "0,10,0.01,or_greater",
@@ -407,7 +406,7 @@
                 {
                     "title": "Shadow opacity",
                     "store": "project",
-                    "key": "maszyna/scenery/shadows/opacity",
+                    "key": "reloaded/scenery/shadows/opacity",
                     "type": "float",
                     "hint": "range",
                     "hint_string": "0,1,0.01",
@@ -417,7 +416,7 @@
                 {
                     "title": "Shadow bias",
                     "store": "project",
-                    "key": "maszyna/scenery/shadows/bias",
+                    "key": "reloaded/scenery/shadows/bias",
                     "type": "float",
                     "hint": "range",
                     "hint_string": "0,10,0.001,or_greater",
@@ -427,7 +426,7 @@
                 {
                     "title": "Shadow normal bias",
                     "store": "project",
-                    "key": "maszyna/scenery/shadows/normal_bias",
+                    "key": "reloaded/scenery/shadows/normal_bias",
                     "type": "float",
                     "hint": "range",
                     "hint_string": "0,32,0.001,or_greater",
@@ -437,7 +436,7 @@
                 {
                     "title": "Blend shadow splits",
                     "store": "project",
-                    "key": "maszyna/scenery/shadows/blend_splits",
+                    "key": "reloaded/scenery/shadows/blend_splits",
                     "type": "bool",
                     "default": true,
                     "advanced": true
@@ -445,7 +444,7 @@
                 {
                     "title": "Shadow split 1",
                     "store": "project",
-                    "key": "maszyna/scenery/shadows/split_1",
+                    "key": "reloaded/scenery/shadows/split_1",
                     "type": "float",
                     "hint": "range",
                     "hint_string": "0,1,0.001",
@@ -455,7 +454,7 @@
                 {
                     "title": "Shadow split 2",
                     "store": "project",
-                    "key": "maszyna/scenery/shadows/split_2",
+                    "key": "reloaded/scenery/shadows/split_2",
                     "type": "float",
                     "hint": "range",
                     "hint_string": "0,1,0.001",
@@ -465,7 +464,7 @@
                 {
                     "title": "Shadow split 3",
                     "store": "project",
-                    "key": "maszyna/scenery/shadows/split_3",
+                    "key": "reloaded/scenery/shadows/split_3",
                     "type": "float",
                     "hint": "range",
                     "hint_string": "0,1,0.001",
@@ -484,7 +483,7 @@
                 {
                     "title": "Scenery lights distance",
                     "store": "project",
-                    "key": "maszyna/scenery/lights/distance",
+                    "key": "reloaded/scenery/lights/distance",
                     "type": "float",
                     "hint": "range",
                     "hint_string": "10,1000,5,suffix:m",
@@ -595,7 +594,7 @@
                 {
                     "title": "Improved cabin shadows",
                     "store": "project",
-                    "key": "maszyna/cabin/improve_shadows_quality",
+                    "key": "reloaded/cabin/improve_shadows_quality",
                     "type": "bool",
                     "default": true
                 },
@@ -683,25 +682,25 @@
                 {
                     "title": "Shadows",
                     "store": "project",
-                    "key": "maszyna/cabin/shadows/enabled",
+                    "key": "reloaded/cabin/shadows/enabled",
                     "type": "bool",
                     "default": true,
-                    "depends_on": "maszyna/cabin/improve_shadows_quality"
+                    "depends_on": "reloaded/cabin/improve_shadows_quality"
                 },
                 {
                     "title": "Shadow mode",
                     "store": "project",
-                    "key": "maszyna/cabin/shadows/mode",
+                    "key": "reloaded/cabin/shadows/mode",
                     "type": "int",
                     "hint": "enum",
                     "hint_string": "Orthogonal:0,PSSM 2 Splits:1,PSSM 4 Splits:2",
                     "default": 1,
-                    "depends_on": "maszyna/cabin/improve_shadows_quality"
+                    "depends_on": "reloaded/cabin/improve_shadows_quality"
                 },
                 {
                     "title": "Shadow distance",
                     "store": "project",
-                    "key": "maszyna/cabin/shadows/max_distance",
+                    "key": "reloaded/cabin/shadows/max_distance",
                     "type": "float",
                     "hint": "range",
                     "hint_string": "0,10000,1,suffix:m",
@@ -711,7 +710,7 @@
                 {
                     "title": "Shadow blur",
                     "store": "project",
-                    "key": "maszyna/cabin/shadows/blur",
+                    "key": "reloaded/cabin/shadows/blur",
                     "type": "float",
                     "hint": "range",
                     "hint_string": "0,10,0.01,or_greater",
@@ -721,7 +720,7 @@
                 {
                     "title": "Shadow opacity",
                     "store": "project",
-                    "key": "maszyna/cabin/shadows/opacity",
+                    "key": "reloaded/cabin/shadows/opacity",
                     "type": "float",
                     "hint": "range",
                     "hint_string": "0,1,0.01",
@@ -731,7 +730,7 @@
                 {
                     "title": "Shadow bias",
                     "store": "project",
-                    "key": "maszyna/cabin/shadows/bias",
+                    "key": "reloaded/cabin/shadows/bias",
                     "type": "float",
                     "hint": "range",
                     "hint_string": "0,10,0.001,or_greater",
@@ -741,7 +740,7 @@
                 {
                     "title": "Shadow normal bias",
                     "store": "project",
-                    "key": "maszyna/cabin/shadows/normal_bias",
+                    "key": "reloaded/cabin/shadows/normal_bias",
                     "type": "float",
                     "hint": "range",
                     "hint_string": "0,32,0.001,or_greater",
@@ -751,7 +750,7 @@
                 {
                     "title": "Blend shadow splits",
                     "store": "project",
-                    "key": "maszyna/cabin/shadows/blend_splits",
+                    "key": "reloaded/cabin/shadows/blend_splits",
                     "type": "bool",
                     "default": true,
                     "advanced": true
@@ -759,7 +758,7 @@
                 {
                     "title": "Shadow split 1",
                     "store": "project",
-                    "key": "maszyna/cabin/shadows/split_1",
+                    "key": "reloaded/cabin/shadows/split_1",
                     "type": "float",
                     "hint": "range",
                     "hint_string": "0,1,0.001",
@@ -769,7 +768,7 @@
                 {
                     "title": "Shadow split 2",
                     "store": "project",
-                    "key": "maszyna/cabin/shadows/split_2",
+                    "key": "reloaded/cabin/shadows/split_2",
                     "type": "float",
                     "hint": "range",
                     "hint_string": "0,1,0.001",
@@ -779,7 +778,7 @@
                 {
                     "title": "Shadow split 3",
                     "store": "project",
-                    "key": "maszyna/cabin/shadows/split_3",
+                    "key": "reloaded/cabin/shadows/split_3",
                     "type": "float",
                     "hint": "range",
                     "hint_string": "0,1,0.001",
@@ -794,7 +793,7 @@
                 {
                     "title": "Vehicle detail distance",
                     "store": "project",
-                    "key": "maszyna/vehicles/detail_distance",
+                    "key": "reloaded/vehicles/detail_distance",
                     "type": "float",
                     "hint": "range",
                     "hint_string": "50,10000,10,suffix:m",
@@ -815,7 +814,7 @@
                 {
                     "title": "Smoke enabled",
                     "store": "project",
-                    "key": "maszyna/smoke/enabled",
+                    "key": "reloaded/smoke/enabled",
                     "type": "bool",
                     "default": true
                 },
@@ -831,7 +830,7 @@
                 {
                     "title": "Vehicle smoke distance",
                     "store": "project",
-                    "key": "maszyna/smoke/dynamic/distance",
+                    "key": "reloaded/smoke/dynamic/distance",
                     "type": "float",
                     "hint": "range",
                     "hint_string": "100,10000,10,suffix:m",
@@ -840,7 +839,7 @@
                 {
                     "title": "Vehicle smoke density",
                     "store": "project",
-                    "key": "maszyna/smoke/dynamic/density",
+                    "key": "reloaded/smoke/dynamic/density",
                     "type": "float",
                     "hint": "range",
                     "hint_string": "0.25,8,0.25",
@@ -849,7 +848,7 @@
                 {
                     "title": "Vehicle smoke lifetime",
                     "store": "project",
-                    "key": "maszyna/smoke/dynamic/lifetime",
+                    "key": "reloaded/smoke/dynamic/lifetime",
                     "type": "float",
                     "hint": "range",
                     "hint_string": "0.1,4,0.05",
@@ -859,7 +858,7 @@
                 {
                     "title": "Vehicle smoke particles",
                     "store": "project",
-                    "key": "maszyna/smoke/dynamic/max_particles",
+                    "key": "reloaded/smoke/dynamic/max_particles",
                     "type": "int",
                     "hint": "range",
                     "hint_string": "16,8000,1",
@@ -869,7 +868,7 @@
                 {
                     "title": "Scenery smoke distance",
                     "store": "project",
-                    "key": "maszyna/smoke/static/distance",
+                    "key": "reloaded/smoke/static/distance",
                     "type": "float",
                     "hint": "range",
                     "hint_string": "100,10000,10,suffix:m",
@@ -878,7 +877,7 @@
                 {
                     "title": "Scenery smoke density",
                     "store": "project",
-                    "key": "maszyna/smoke/static/density",
+                    "key": "reloaded/smoke/static/density",
                     "type": "float",
                     "hint": "range",
                     "hint_string": "0.25,8,0.25",
@@ -887,7 +886,7 @@
                 {
                     "title": "Scenery smoke lifetime",
                     "store": "project",
-                    "key": "maszyna/smoke/static/lifetime",
+                    "key": "reloaded/smoke/static/lifetime",
                     "type": "float",
                     "hint": "range",
                     "hint_string": "0.1,4,0.05",
@@ -897,7 +896,7 @@
                 {
                     "title": "Scenery smoke particles",
                     "store": "project",
-                    "key": "maszyna/smoke/static/max_particles",
+                    "key": "reloaded/smoke/static/max_particles",
                     "type": "int",
                     "hint": "range",
                     "hint_string": "16,8000,1",
@@ -912,7 +911,7 @@
                 {
                     "title": "Wind turbulence",
                     "store": "project",
-                    "key": "maszyna/weather/wind_turbulence",
+                    "key": "reloaded/weather/wind_turbulence",
                     "type": "float",
                     "hint": "range",
                     "hint_string": "0,4,0.01,or_greater",
@@ -921,7 +920,7 @@
                 {
                     "title": "Fog curve",
                     "store": "project",
-                    "key": "maszyna/weather/fog/curve",
+                    "key": "reloaded/weather/fog/curve",
                     "type": "float",
                     "hint": "range",
                     "hint_string": "0.01,8,0.01",
@@ -931,7 +930,7 @@
                 {
                     "title": "Fog sky height",
                     "store": "project",
-                    "key": "maszyna/weather/fog/sky_height",
+                    "key": "reloaded/weather/fog/sky_height",
                     "type": "float",
                     "hint": "range",
                     "hint_string": "10,5000,10,or_greater,suffix:m",
@@ -941,7 +940,7 @@
                 {
                     "title": "Aerial perspective",
                     "store": "project",
-                    "key": "maszyna/weather/fog/aerial_perspective",
+                    "key": "reloaded/weather/fog/aerial_perspective",
                     "type": "float",
                     "hint": "range",
                     "hint_string": "0,1,0.01",
@@ -951,7 +950,7 @@
                 {
                     "title": "Fog scenery distance factor",
                     "store": "project",
-                    "key": "maszyna/weather/fog/scenery_distance_factor",
+                    "key": "reloaded/weather/fog/scenery_distance_factor",
                     "type": "float",
                     "hint": "range",
                     "hint_string": "0.1,4,0.01,or_greater",
@@ -961,7 +960,7 @@
                 {
                     "title": "Fog day distance factor",
                     "store": "project",
-                    "key": "maszyna/weather/fog/day_distance_factor",
+                    "key": "reloaded/weather/fog/day_distance_factor",
                     "type": "float",
                     "hint": "range",
                     "hint_string": "0.01,4,0.0001,or_greater",
@@ -971,7 +970,7 @@
                 {
                     "title": "Fog night distance factor",
                     "store": "project",
-                    "key": "maszyna/weather/fog/night_distance_factor",
+                    "key": "reloaded/weather/fog/night_distance_factor",
                     "type": "float",
                     "hint": "range",
                     "hint_string": "0.01,4,0.0001,or_greater",
@@ -981,7 +980,7 @@
                 {
                     "title": "Volumetric fog energy",
                     "store": "project",
-                    "key": "maszyna/weather/fog/volumetric_energy",
+                    "key": "reloaded/weather/fog/volumetric_energy",
                     "type": "float",
                     "hint": "range",
                     "hint_string": "0,16,0.001,or_greater",
@@ -990,7 +989,7 @@
                 {
                     "title": "Volumetric fog length scale",
                     "store": "project",
-                    "key": "maszyna/weather/fog/volumetric_length_scale",
+                    "key": "reloaded/weather/fog/volumetric_length_scale",
                     "type": "float",
                     "hint": "range",
                     "hint_string": "1,64,0.5",
@@ -1000,7 +999,7 @@
                 {
                     "title": "Volumetric fog minimum",
                     "store": "project",
-                    "key": "maszyna/weather/fog/volumetric_minimum",
+                    "key": "reloaded/weather/fog/volumetric_minimum",
                     "type": "float",
                     "hint": "range",
                     "hint_string": "0,1,0.01",
@@ -1010,7 +1009,7 @@
                 {
                     "title": "Volumetric fog far falloff",
                     "store": "project",
-                    "key": "maszyna/weather/fog/volumetric_far_falloff",
+                    "key": "reloaded/weather/fog/volumetric_far_falloff",
                     "type": "float",
                     "hint": "range",
                     "hint_string": "1,4,0.05",
@@ -1020,7 +1019,7 @@
                 {
                     "title": "Rain fog distance",
                     "store": "project",
-                    "key": "maszyna/weather/rain/fog_distance",
+                    "key": "reloaded/weather/rain/fog_distance",
                     "type": "float",
                     "hint": "range",
                     "hint_string": "10,5000,10,or_greater,suffix:m",
@@ -1030,7 +1029,7 @@
                 {
                     "title": "Rain fog density",
                     "store": "project",
-                    "key": "maszyna/weather/rain/fog_density",
+                    "key": "reloaded/weather/rain/fog_density",
                     "type": "float",
                     "hint": "range",
                     "hint_string": "0,1,0.01",
@@ -1180,7 +1179,7 @@
                 {
                     "title": "Sun altitude of full night",
                     "store": "project",
-                    "key": "maszyna/lights/night_altitude",
+                    "key": "reloaded/lights/night_altitude",
                     "type": "float",
                     "hint": "range",
                     "hint_string": "-18,0,0.5,suffix:°",
@@ -1190,7 +1189,7 @@
                 {
                     "title": "Sun altitude of full day",
                     "store": "project",
-                    "key": "maszyna/lights/day_altitude",
+                    "key": "reloaded/lights/day_altitude",
                     "type": "float",
                     "hint": "range",
                     "hint_string": "0,15,0.5,suffix:°",
@@ -1238,7 +1237,7 @@
                 {
                     "title": "External view minimum distance",
                     "store": "project",
-                    "key": "maszyna/camera/external_view_min_distance",
+                    "key": "reloaded/camera/external_view_min_distance",
                     "type": "float",
                     "hint": "range",
                     "hint_string": "0.1,20,0.1,suffix:m",
@@ -1247,7 +1246,7 @@
                 {
                     "title": "External view maximum distance",
                     "store": "project",
-                    "key": "maszyna/camera/external_view_max_distance",
+                    "key": "reloaded/camera/external_view_max_distance",
                     "type": "float",
                     "hint": "range",
                     "hint_string": "10,2000,10,suffix:m",
@@ -1256,7 +1255,7 @@
                 {
                     "title": "Follow jump distance",
                     "store": "project",
-                    "key": "maszyna/camera/follow_jump_distance",
+                    "key": "reloaded/camera/follow_jump_distance",
                     "type": "float",
                     "hint": "range",
                     "hint_string": "100,100000,100,suffix:m",
@@ -1270,7 +1269,7 @@
                 {
                     "title": "Simulation speed change time",
                     "store": "project",
-                    "key": "maszyna/simulation/speed_change_time",
+                    "key": "reloaded/simulation/speed_change_time",
                     "type": "float",
                     "hint": "range",
                     "hint_string": "0,5,0.05,suffix:s",
@@ -1298,7 +1297,7 @@
                 {
                     "title": "Nick",
                     "store": "project",
-                    "key": "maszyna/player/nick",
+                    "key": "reloaded/player/nick",
                     "type": "String",
                     "default": ""
                 }

@@ -9,9 +9,9 @@ var _previous_game_dir: String
 
 
 func before_each() -> void:
-    _previous_game_dir = UserSettings.get_maszyna_game_dir()
-    UserSettings.save_maszyna_game_dir(FIXTURES_GAME_DIR)
-    var environment_node: MaszynaEnvironmentNode = add_child_autofree(MaszynaEnvironmentNode.new())
+    _previous_game_dir = MaszynaGameDirectory.get_game_dir()
+    MaszynaGameDirectory.save_game_dir(FIXTURES_GAME_DIR)
+    var environment_node: EnvironmentNode = add_child_autofree(EnvironmentNode.new())
     var sky: GndSkydomeMaszynaEnvironment = GndSkydomeMaszynaEnvironment.new()
     # both children of the test
     sky.environment_node_path = NodePath("../%s" % environment_node.name)
@@ -19,7 +19,7 @@ func before_each() -> void:
 
 
 func after_each() -> void:
-    UserSettings.save_maszyna_game_dir(_previous_game_dir)
+    MaszynaGameDirectory.save_game_dir(_previous_game_dir)
 
 
 func test_vehicle_keeps_no_rain_volume_of_its_own() -> void:

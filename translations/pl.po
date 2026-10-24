@@ -1,5 +1,5 @@
 # Strings of the demo's own interface that the game's catalogue (lang/*.po) does not have.
-# MaszynaTranslationServer merges them under the game's catalogue (maszyna/locale/translations).
+# ReloadedTranslationServer merges them under the game's catalogue (reloaded/locale/translations).
 # template.po lists every msgid, as the game's lang/template.po does, for a new language to start from.
 msgid ""
 msgstr ""
@@ -380,8 +380,8 @@ msgstr "Kamera"
 msgid "Camera chunk"
 msgstr "Fragment kamery"
 
-msgid "Draw distance"
-msgstr "Zasięg widoczności"
+msgid "Tracks and traction distance"
+msgstr "Zasięg torów i trakcji"
 
 msgid "Chunks"
 msgstr "Fragmenty"
@@ -824,6 +824,9 @@ msgstr "Brak rozkładu jazdy"
 msgid "braked %d%%"
 msgstr "hamowanie %d%%"
 
+msgid "%d t, actual %d t"
+msgstr "%d t, rzeczywiście %d t"
+
 msgid "Line speed %d km/h, no stations"
 msgstr "Vmax %d km/h, bez stacji"
 
@@ -835,6 +838,15 @@ msgstr "Punktualnie"
 
 msgid "Next station"
 msgstr "Następna stacja"
+
+msgid "Passenger stop"
+msgstr "Przystanek osobowy"
+
+msgid "Technical stop"
+msgstr "Postój techniczny"
+
+msgid "Change of direction"
+msgstr "Zmiana kierunku"
 
 msgid "Terminus"
 msgstr "Stacja końcowa"
@@ -912,6 +924,9 @@ msgid "File"
 msgstr "Plik"
 
 msgid "Skin"
+msgstr "Malowanie"
+
+msgid "Livery"
 msgstr "Malowanie"
 
 msgid "Length"
@@ -1390,6 +1405,12 @@ msgstr "Zasięg szczegółów pojazdów"
 
 msgid "Real mirrors"
 msgstr "Prawdziwe lusterka"
+
+msgid "Road traffic density"
+msgstr "Natężenie ruchu ulicznego"
+
+msgid "Road traffic vehicles"
+msgstr "Pojazdy ruchu ulicznego"
 
 msgid "Smoke"
 msgstr "Dym"
@@ -2113,3 +2134,9 @@ msgstr "nieodpowiedni tor"
 
 msgid "collision"
 msgstr "zderzenie"
+
+msgid "All sceneries"
+msgstr "Wszystkie scenerie"
+
+msgid "Sceneries of one source only"
+msgstr "Scenerie tylko z jednego źródła"

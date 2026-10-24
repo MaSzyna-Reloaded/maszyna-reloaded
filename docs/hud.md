@@ -16,7 +16,9 @@ change; it keeps no state of its own about the simulation.
   holds the HUD (`game.tscn`) answers the signals `settings_requested`,
   `problem_report_requested` and `exit_to_menu_requested`.
 * **View** - the HUD's panels, each opened and closed through `HUDServer.panel_toggle()`, and
-  "Controls", showing all diagnostic windows at once.
+  "Controls", showing all diagnostic windows at once - `DebugHud.windows_toggle()`; the key
+  (F12, `hud_toggle`) is taken by `DebugHud` itself, the entry only shows it and is ticked on
+  `DebugHud.windows_visibility_changed`.
 * **Diagnostics** - filled by libmaszyna's `DebugHud` (`fill_menu()`): one entry per diagnostic
   window and the developer console; the game adds "Frame time statistics" (the `debug_menu`
   addon, F3) after them.

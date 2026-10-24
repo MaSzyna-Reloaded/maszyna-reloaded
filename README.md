@@ -1,23 +1,34 @@
 # MaSzyna Reloaded
 
 The game - its screens, HUD, settings, problem reports and releases - built on
-[libmaszyna](https://github.com/MaSzyna-Reloaded/libmaszyna), the `vendor/libmaszyna` submodule.
+[libreloaded](https://github.com/MaSzyna-Reloaded/libreloaded), the `vendor/libreloaded`
+submodule, with its plugin [libmaszyna](https://github.com/MaSzyna-Reloaded/libmaszyna), the
+`vendor/libmaszyna` submodule.
 
 ## Building
 
 ```bash
 git submodule update --init --recursive
-make compile-debug      # libmaszyna into bin/libmaszyna/, for the editor and the tests
+make links              # addons/libreloaded and addons/libmaszyna, not versioned
+make terrain3d          # addons/terrain_3d, not versioned
+make compile-debug      # libreloaded with libmaszyna into bin/libreloaded/, for the editor and the tests
 make run-tests
 make release-linux      # bin/linux/maszyna-reloaded-linux64.zip
 make release-windows    # bin/windows/maszyna-reloaded-win64.zip and -setup.exe
 make release-android    # bin/android/maszyna-reloaded-android-arm64.apk
 ```
 
-The game needs the double precision Godot libmaszyna is built for (`godot-double`); libmaszyna's
-`ci/fetch-godot.sh` fetches it and its export templates from libmaszyna's release
-`godot-<version>-double`. To build against a local libmaszyna checkout:
-`make libmaszyna-local LIBMASZYNA_LOCAL=<path>` (back: `make libmaszyna-submodule`).
+After a pull or a change of branch, run `git submodule update --init --recursive` and `make links`
+again: a submodule moved by the pull stays at its old commit, and libreloaded's own submodules
+(`godot-cpp`, `vendor/lua`, ...) are checked out only with `--recursive`. `git clean -dff` removes
+`addons/terrain_3d` as well - `make terrain3d` brings it back.
+
+The game needs the double precision Godot libreloaded is built for (`godot-double`); libreloaded's
+`ci/fetch-godot.sh` fetches it and its export templates from libreloaded's release
+`godot-<version>-double`. To build against a local checkout:
+`make libreloaded-local LIBRELOADED_LOCAL=<path>` (back: `make libreloaded-submodule`),
+`make plugin-local PLUGIN=libmaszyna PLUGIN_LOCAL=<path>` (back:
+`make plugin-submodule PLUGIN=libmaszyna`).
 
 ## CI
 

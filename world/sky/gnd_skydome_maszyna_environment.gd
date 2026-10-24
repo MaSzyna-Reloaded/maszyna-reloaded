@@ -1,5 +1,5 @@
 @tool
-extends MaszynaSkyEnvironment
+extends SkyEnvironment
 class_name GndSkydomeMaszynaEnvironment
 
 ## The environment drawn by gnd-skydome (Skydome) with gnd-weather (WeatherNode) - rain, clouds,
@@ -21,7 +21,7 @@ const RAIN_EXCLUSION_NAME: StringName = &"RainExclusion"
 const RAIN_EXCLUSION_PRECIPITATION_DELTA: float = -1.0
 const SUN_LIGHT_NAME: StringName = &"SunLight"
 const WEATHER_NAME: StringName = &"Weather"
-const WIND_TURBULENCE_SETTING: StringName = &"maszyna/weather/wind_turbulence"
+const WIND_TURBULENCE_SETTING: StringName = &"reloaded/weather/wind_turbulence"
 # Weather response to rain and wind strength, as in forest-test-scene ui/WeatherControlsCanvas.gd.
 const WIND_STRENGTH_MIN: float = 0.4
 const WIND_STRENGTH_MAX: float = 5.0

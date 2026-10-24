@@ -52,12 +52,16 @@ var _derail_cause_names: Dictionary[int, String] = {}
 var _engines: Dictionary[RID, RailVehicleEngine] = {}
 ## The last command, not written yet while it may repeat: its line, the logger it goes to, what
 ## tells a repeat (vehicle and command), how many times it came, the last one's time and values and
-## when it came
+## when it came. The texts are made only when the line is written: the AI's commands come by the
+## hundred a second, and a repeat is told by the vehicle and the command alone
 var _repeated_line: String = ""
 var _repeated_log: GameLogger = null
-var _repeated_key: String = ""
+var _repeated_vehicle: RID = RID()
+var _repeated_command: String = ""
 var _repeats: int = 0
-var _repeated_last: String = ""
+var _repeated_until: float = 0.0
+var _repeated_p1: Variant = null
+var _repeated_p2: Variant = null
 var _repeated_msec: int = 0
 ## Writes the command being counted once it has not come again for REPEAT_GAP_MSEC - the file
 ## reads the same as when the next command wrote it, but the line is out at once
@@ -146,17 +150,20 @@ func _close(subject: String, what: String) -> void:
 
 
 func _on_vehicle_command_received(vehicle_rid: RID, command: String, p1: Variant, p2: Variant) -> void:
-    var named: String = _named(vehicle_rid, VehicleServer.vehicle_get_id(vehicle_rid))
-    var key: String = "%s %s" % [named, command]
     var now: int = Time.get_ticks_msec()
-    if key == _repeated_key and now - _repeated_msec <= REPEAT_GAP_MSEC:
+    if _repeated_line and vehicle_rid == _repeated_vehicle and command == _repeated_command \
+            and now - _repeated_msec <= REPEAT_GAP_MSEC:
         _repeats += 1
-        _repeated_last = "until=%.3f last=%s,%s" % [SimulationServer.simulation_get_time(), p1, p2]
+        _repeated_until = SimulationServer.simulation_get_time()
+        _repeated_p1 = p1
+        _repeated_p2 = p2
     else:
         _write_repeated()
         _repeated_log = _gameplay_log if vehicle_rid == PlayerServer.player_get_vehicle() else _ai_log
-        _repeated_key = key
-        _repeated_line = _entry("command", named, "%s p1=%s p2=%s" % [command, p1, p2])
+        _repeated_vehicle = vehicle_rid
+        _repeated_command = command
+        _repeated_line = _entry("command", _named(vehicle_rid, VehicleServer.vehicle_get_id(vehicle_rid)),
+                "%s p1=%s p2=%s" % [command, p1, p2])
         _repeats = 1
     _repeated_msec = now
     # started once, not by every command: the AI's commands come by the thousand
@@ -341,11 +348,12 @@ func _write_repeated() -> void:
         return
     _repeated_log.info(_repeated_text())
     _repeated_line = ""
-    _repeated_key = ""
+    _repeated_vehicle = RID()
+    _repeated_command = ""
 
 
 func _repeated_text() -> String:
     if _repeats == 1:
         return _repeated_line
-    return "%s repeats=%d %s" % [_repeated_line, _repeats, _repeated_last]
+    return "%s repeats=%d until=%.3f last=%s,%s" % [_repeated_line, _repeats, _repeated_until, _repeated_p1, _repeated_p2]
 

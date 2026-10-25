@@ -35,6 +35,12 @@ ANDROID_APK:=bin/android/maszyna-reloaded-android-arm64.apk
 WINDOWS_ZIP:=bin/windows/maszyna-reloaded-win64.zip
 WINDOWS_SETUP:=bin/windows/maszyna-reloaded-win64-setup.exe
 BUILD_NUMBER_FILE:=$(PROJECT_DIR)/build_number.txt
+# The branch the build is made from, which a problem report names (bug_report_snapshot.gd); the CI,
+# whose checkout of a pull request is detached, sets it in the environment. It reaches the recipes
+# only as an environment variable, never as recipe text: a branch name may hold quotes or $(...)
+BUILD_BRANCH_FILE:=$(PROJECT_DIR)/build_branch.txt
+BUILD_BRANCH?=$(shell git -C $(PROJECT_DIR) rev-parse --abbrev-ref HEAD)
+export BUILD_BRANCH
 # The extension is built against double precision godot-cpp, so only a Godot built the same way
 # can load it (libreloaded's Makefile). Override when your double precision build is named
 # differently: make release-linux GODOT=godot-double
@@ -89,7 +95,7 @@ plugin-submodule:
 	$(MAKE) links
 
 
-compile-debug compile-release compile-profiling compile-release-symbols compile-release-linux compile-windows-release compile-android-release: $(BUILD_NUMBER_FILE) links
+compile-debug compile-release compile-profiling compile-release-symbols compile-release-linux compile-windows-release compile-android-release: $(BUILD_NUMBER_FILE) $(BUILD_BRANCH_FILE) links
 	$(LIBRELOADED_MAKE) $@
 
 
@@ -109,12 +115,18 @@ terrain3d:
 # a release rather than the last time somebody compiled anything. Bump it deliberately: `make
 # build-number` - the game directory's `upgrade-linux.sh` and `upgrade-windows.sh` do, unless run
 # with KEEP_BUILD_NUMBER=1 to ship another platform with the number already stamped.
+# The branch is stamped with it.
 build-number:
 	cmake -DOUT=$(BUILD_NUMBER_FILE) -P $(LIBRELOADED)/cmake/write_build_number.cmake
+	printf '%s' "$$BUILD_BRANCH" > $(BUILD_BRANCH_FILE)
 
-# A checkout that has never been stamped gets a number on its first build, and keeps it.
+# A checkout that has never been stamped gets a number on its first build, and keeps it - and a
+# branch, which a checkout stamped before the branch was gets on its own.
 $(BUILD_NUMBER_FILE):
 	$(MAKE) build-number
+
+$(BUILD_BRANCH_FILE):
+	printf '%s' "$$BUILD_BRANCH" > $(BUILD_BRANCH_FILE)
 
 
 # The export keeps each scene converted to binary and converts it again only when that scene's own

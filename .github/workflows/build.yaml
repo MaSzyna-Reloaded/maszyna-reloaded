@@ -30,18 +30,23 @@ jobs:
     runs-on: ubuntu-24.04
     outputs:
       build_number: ${{ steps.build-number.outputs.value }}
+      build_branch: ${{ steps.build-number.outputs.branch }}
     steps:
       - name: Checkout
         uses: actions/checkout@v7
         with:
           submodules: recursive
 
-      # cmake/write_build_number.cmake
+      # cmake/write_build_number.cmake, and the branch a problem report names: a pull request's
+      # own, a tag's name for a tag (its checkout is detached either way)
       - name: Build number
         id: build-number
+        env:
+          BUILD_BRANCH: ${{ github.head_ref || github.ref_name }}
         run: |
           make build-number
           echo "value=$(cat build_number.txt)" >> "$GITHUB_OUTPUT"
+          echo "branch=$(cat build_branch.txt)" >> "$GITHUB_OUTPUT"
 
       - name: Fetch the double precision Godot
         run: |
@@ -150,11 +155,15 @@ jobs:
           ref: ${{ github.event.pull_request.head.sha || github.sha }}
           submodules: recursive
 
-      # the build number the game shows and the installer carries, the one build-host stamped
+      # the build number the game shows and the installer carries, and the branch, the ones
+      # build-host stamped
       - name: Build number
         env:
           BUILD_NUMBER: ${{ needs.build-host.outputs.build_number }}
-        run: printf '%s' "$BUILD_NUMBER" > build_number.txt
+          BUILD_BRANCH: ${{ needs.build-host.outputs.build_branch }}
+        run: |
+          printf '%s' "$BUILD_NUMBER" > build_number.txt
+          printf '%s' "$BUILD_BRANCH" > build_branch.txt
 
       - uses: actions/download-artifact@v8
         with:

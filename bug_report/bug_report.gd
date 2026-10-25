@@ -3,11 +3,11 @@ extends CanvasLayer
 ## Reporting a problem or a suggestion from the scenery selector or a running scenery, as a GitHub
 ## issue through the reporting endpoint (BugReportSender). The top bar's entry and the button at
 ## the right edge both open it; the game shows that button wherever a report can be made
-## (game.gd). The report pauses the simulation while its form is open and resumes
-## it on closing, unless it was paused already. It is the one owner of that state - the form and
-## its buttons only ask (bug_report.tscn). What happened before the report was opened is in the
-## logs it attaches: the engine's (app.log) and the game's log files of the running scenery
-## (attach_world()).
+## (game.gd), always out at the edge until the game is stable (TODO.md). The report pauses the
+## simulation while its form is open and resumes it on closing, unless it was paused already. It
+## is the one owner of that state - the form and its buttons only ask (bug_report.tscn). What
+## happened before the report was opened is in the logs it attaches: the engine's (app.log) and
+## the game's log files of the running scenery (attach_world()).
 
 ## Characters of the description that go into the issue's title
 const TITLE_DESCRIPTION_LENGTH: int = 80
@@ -17,6 +17,10 @@ const LOG_PATH_SETTING: String = "debug/file_logging/log_path"
 const LOG_TAIL_BYTES: int = 4 * 1024 * 1024
 ## How much of the end of each of the game's log files goes with a report - they compress well
 const GAME_LOG_TAIL_BYTES: int = 50 * 1024 * 1024
+
+## The game's settings definition (settings/settings.json), whose every setting's value the report
+## carries (BugReportSnapshot.settings())
+@export var settings_definition: JSON = null
 
 ## The running scenery, null in the menu
 var _world: SceneryWorld = null
@@ -47,17 +51,19 @@ func open_report() -> void:
         return
     _paused_by_report = not SimulationServer.simulation_is_paused()
     SimulationServer.simulation_pause()
-    # the screenshot is the frame the player saw, without the edge button that opened the report
-    %EdgeButton.retract()
+    # the screenshot is the frame the player saw, without the edge button that opened the report;
+    # the button comes back with the form closed
+    %EdgeButton.visible = false
     await RenderingServer.frame_post_draw
     var screenshot: Image = get_viewport().get_texture().get_image()
-    _snapshot = BugReportSnapshot.collect(_world, _started_msec)
+    _snapshot = BugReportSnapshot.collect(_world, _started_msec, settings_definition)
     %ReportDialog.begin(screenshot)
 
 
 ## The form and the confirmation of a sent report are gone, the simulation resumes
 func close_report() -> void:
     %ReportDialog.hide()
+    %EdgeButton.visible = true
     if _paused_by_report:
         SimulationServer.simulation_unpause()
     _paused_by_report = false
@@ -75,12 +81,17 @@ func send_report() -> void:
     var title: String = "[%s] " % GameDataServer.build_get_number()
     if subject:
         title += " / ".join(subject) + ": "
+    var hardware: Dictionary = _snapshot["hardware"]
     var report: Dictionary = {
         "title": title + description.get_slice("\n", 0).left(TITLE_DESCRIPTION_LENGTH),
         "description": description,
         "build": GameDataServer.build_get_number(),
+        "branch": hardware["branch"],
         "scenery": scenario.get("filename", ""),
         "vehicle": vehicle,
+        # the issue shows them without unpacking the archive
+        "hardware": JSON.stringify(hardware),
+        "settings": JSON.stringify(_snapshot["settings"]),
     }
     # the log of this session, its last part - only while it is written: with file logging off the
     # file is an earlier session's (EngineOverrides, the Debug settings), and there are no game logs
@@ -122,7 +133,6 @@ func show_edge_button() -> void:
 
 ## ...and none while a scenery loads or unloads
 func hide_edge_button() -> void:
-    %EdgeButton.retract()
     %EdgeButton.visible = false
 
 

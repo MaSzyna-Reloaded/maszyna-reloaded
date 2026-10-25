@@ -6,6 +6,10 @@ const MARK: Rect2 = Rect2(10.0, 10.0, 30.0, 20.0)
 const BOUNDARY: String = "TestBoundary"
 ## Where the test saves its reports
 const REPORTS_DIRECTORY: String = "user://test_bug_reports"
+## A UserSettings section and key nobody sets, and what the definition gives as its default
+const UNSET_SECTION: String = "test_bug_report"
+const UNSET_KEY: String = "never_set"
+const UNSET_DEFAULT: int = 7
 
 var _endpoint: Variant = null
 
@@ -39,16 +43,17 @@ func test_hardware_names_the_build_and_the_graphics_adapter() -> void:
     var hardware: Dictionary = BugReportSnapshot.hardware()
 
     assert_eq(hardware["build"], GameDataServer.build_get_number())
-    for key: String in ["os", "cpu", "cpu_threads", "memory", "gpu", "gpu_driver", "rendering_method"]:
+    for key: String in ["branch", "os", "cpu", "cpu_threads", "ram", "disk_space_left", "gpu", "gpu_driver",
+            "rendering_method"]:
         assert_has(hardware, key, "the hardware should name its %s" % key)
 
 
 func test_a_snapshot_without_a_scenery_is_valid_json() -> void:
-    var snapshot: Dictionary = BugReportSnapshot.collect(null, Time.get_ticks_msec())
+    var snapshot: Dictionary = BugReportSnapshot.collect(null, Time.get_ticks_msec(), _definition())
 
     var parsed: Variant = JSON.parse_string(JSON.stringify(snapshot))
     assert_true(parsed is Dictionary, "the snapshot should survive JSON")
-    for section: String in ["hardware", "scenario", "simulation", "camera", "streaming", "vehicles",
+    for section: String in ["hardware", "settings", "scenario", "simulation", "camera", "streaming", "vehicles",
             "signal_heads", "events"]:
         assert_has(parsed, section, "the snapshot should have its %s" % section)
 
@@ -57,13 +62,54 @@ func test_the_body_has_every_field_and_the_archive_and_ends_with_the_boundary() 
     var fields: Dictionary = BugReportSender.fields_of({"title": "a title", "build": 42})
     var archive: PackedByteArray = PackedByteArray([1, 2, 3])
 
-    var body: String = BugReportSender.build_body(BOUNDARY, fields, archive).get_string_from_utf8()
+    var body: String = BugReportSender.build_body(BOUNDARY, fields, archive, PackedByteArray()).get_string_from_utf8()
 
     assert_string_contains(body, "--%s\r\nContent-Disposition: form-data; name=\"api_version\"" % BOUNDARY)
     assert_string_contains(body, "name=\"title\"\r\nContent-Type: text/plain; charset=utf-8\r\n\r\na title\r\n")
     assert_string_contains(body, "name=\"build\"\r\nContent-Type: text/plain; charset=utf-8\r\n\r\n42\r\n")
     assert_string_contains(body, "name=\"attachments\"; filename=\"report.zip\"\r\nContent-Type: application/zip")
     assert_true(body.ends_with("--%s--\r\n" % BOUNDARY), "the body should be closed by its boundary")
+
+
+func test_the_body_carries_the_screenshot_as_a_part_of_its_own_after_the_archive() -> void:
+    var fields: Dictionary = BugReportSender.fields_of({"title": "a title"})
+    var archive: PackedByteArray = PackedByteArray([1, 2, 3])
+
+    var without: String = BugReportSender.build_body(
+            BOUNDARY, fields, archive, PackedByteArray()).get_string_from_utf8()
+    var body: String = BugReportSender.build_body(
+            BOUNDARY, fields, archive, "jpeg".to_utf8_buffer()).get_string_from_utf8()
+
+    assert_false(without.contains("name=\"screenshot\""), "no screenshot should leave no part of it")
+    var part: String = "name=\"screenshot\"; filename=\"%s\"\r\nContent-Type: image/jpeg\r\n\r\njpeg\r\n" % BugReportSender.SCREENSHOT_FILE
+    assert_string_contains(body, part)
+    assert_lt(body.find("name=\"attachments\""), body.find("name=\"screenshot\""), "the archive should come first")
+    assert_true(body.ends_with("--%s--\r\n" % BOUNDARY), "the body should be closed by its boundary")
+
+
+func test_only_the_fields_the_player_typed_go_unmasked() -> void:
+    var home: String = OS.get_environment("HOME") if OS.has_environment("HOME") else OS.get_environment("USERPROFILE")
+    var path: String = home.path_join("MaSzyna")
+
+    var fields: Dictionary = BugReportSender.fields_of({
+        "title": path, "description": path, "settings": path,
+    })
+
+    assert_eq(fields["title"], path)
+    assert_eq(fields["description"], path)
+    assert_eq(fields["settings"], BugReportSender.mask_personal(path))
+    assert_false(fields["settings"].contains(home), "a field the game wrote should not name the home")
+
+
+func test_the_settings_are_every_setting_of_the_definition_by_its_name() -> void:
+    ProjectSettings.set_setting(BugReportSender.ENDPOINT_SETTING, REPORTS_DIRECTORY)
+
+    var settings: Dictionary = BugReportSnapshot.settings(_definition())
+
+    assert_eq(settings, {
+        BugReportSender.ENDPOINT_SETTING: REPORTS_DIRECTORY,
+        UNSET_SECTION.path_join(UNSET_KEY): UNSET_DEFAULT,
+    }, "a project setting by its full name, one of UserSettings by its section and key")
 
 
 func test_the_fields_start_with_the_api_version() -> void:
@@ -180,3 +226,19 @@ func test_the_last_mark_can_be_taken_away() -> void:
     annotator.remove_last_mark()
 
     assert_eq(annotator.render_annotated_image().get_pixelv(Vector2i(MARK.position)), Color(0, 0, 0, 0))
+
+
+## A settings definition of a project setting and a UserSettings one never set, in two sections
+func _definition() -> JSON:
+    var definition: JSON = JSON.new()
+    definition.data = {"sections": [
+        {"title": "Reports", "settings": [
+            {"title": "Endpoint", "store": "project", "key": BugReportSender.ENDPOINT_SETTING,
+                    "type": "String", "default": ""},
+        ]},
+        {"title": "Test", "settings": [
+            {"title": "Never set", "store": "user", "section": UNSET_SECTION, "key": UNSET_KEY,
+                    "type": "int", "default": UNSET_DEFAULT},
+        ]},
+    ]}
+    return definition

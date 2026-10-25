@@ -4,11 +4,13 @@ extends HTTPRequest
 ## Sends a problem report to where Project Setting maszyna/bugtracking/endpoint points.
 ##
 ## An http:// or https:// endpoint opens the GitHub issue - report API version API_VERSION: one
-## multipart/form-data POST of text fields and one archive.
-##   fields      "api_version", then the report's own: "title", "description", "build",
-##               "scenery", "vehicle" (UTF-8 text; a field may be empty)
+## multipart/form-data POST of text fields, one archive and the screenshot.
+##   fields      "api_version", then the report's own: "title", "description", "build", "branch",
+##               "scenery", "vehicle", "hardware" and "settings" (the snapshot's sections as
+##               JSON) - UTF-8 text; a field may be empty
 ##   attachments ATTACHMENTS_FILE (application/zip): SNAPSHOT_FILE, and SCREENSHOT_FILE and the logs
 ##               (the session's app.log, the game's log files - BugReport) when there are any
+##   screenshot  SCREENSHOT_FILE (image/jpeg) once more, when it is attached - for the issue to show
 ## It answers JSON with the issue's "issue_url". The fields are enough to open the issue; the
 ## archive is the one file the issue links to.
 ##
@@ -18,8 +20,8 @@ extends HTTPRequest
 ##
 ## What leaves the machine names nobody: the snapshot and the logs go with the player's home
 ## directory and system user name masked (mask_personal()) - the logs write paths under the home,
-## and a player with no nick is named by the user name. The report's own fields are what the player
-## typed and go as they are.
+## and a player with no nick is named by the user name. Of the report's own fields, those the
+## player typed (PLAYER_FIELDS) go as they are, the rest masked as well.
 
 signal report_sent(issue_url: String)
 ## The report was saved into a directory, not sent
@@ -30,7 +32,9 @@ signal report_failed(message: String)
 const ENDPOINT_SETTING: String = "maszyna/bugtracking/endpoint"
 const FILE_SCHEME: String = "file://"
 ## What the endpoint is told it is sent - raised whenever the fields or the archive change
-const API_VERSION: int = 1
+const API_VERSION: int = 2
+## The fields of a report that are what the player typed - never masked
+const PLAYER_FIELDS: PackedStringArray = ["title", "description"]
 const REPORT_FILE: String = "report.json"
 const ATTACHMENTS_FILE: String = "report.zip"
 const SNAPSHOT_FILE: String = "snapshot.json"
@@ -99,7 +103,7 @@ func send(
     var boundary: String = "%s%d" % [BOUNDARY_PREFIX, randi()]
     var error: Error = request_raw(
             endpoint, PackedStringArray(["Content-Type: multipart/form-data; boundary=" + boundary]),
-            HTTPClient.METHOD_POST, build_body(boundary, fields, archive))
+            HTTPClient.METHOD_POST, build_body(boundary, fields, archive, screenshot))
     if not error == OK:
         report_failed.emit(error_string(error))
 
@@ -121,11 +125,13 @@ static func mask_personal(text: String) -> String:
     return text
 
 
-## The text fields of a report: the API version, then the report's own, each as text
+## The text fields of a report: the API version, then the report's own, each as text - masked
+## (mask_personal()) unless the player typed it
 static func fields_of(report: Dictionary) -> Dictionary:
     var fields: Dictionary = {"api_version": str(API_VERSION)}
     for field: Variant in report:
-        fields[field] = str(report[field])
+        var text: String = str(report[field])
+        fields[field] = text if field in PLAYER_FIELDS else mask_personal(text)
     return fields
 
 
@@ -142,15 +148,19 @@ static func pack(files: Dictionary[String, PackedByteArray], path: String) -> Er
     return packer.close()
 
 
-## The multipart/form-data body: every field as text, then the archive
+## The multipart/form-data body: every field as text, then the archive and the screenshot - none
+## when it is empty
 static func build_body(
-        boundary: String, fields: Dictionary, archive: PackedByteArray) -> PackedByteArray:
+        boundary: String, fields: Dictionary, archive: PackedByteArray,
+        screenshot: PackedByteArray) -> PackedByteArray:
     var body: PackedByteArray = PackedByteArray()
     for field: Variant in fields:
         body.append_array(_part(
                 boundary, str(field), "", "text/plain; charset=utf-8",
                 str(fields[field]).to_utf8_buffer()))
     body.append_array(_part(boundary, "attachments", ATTACHMENTS_FILE, "application/zip", archive))
+    if screenshot:
+        body.append_array(_part(boundary, "screenshot", SCREENSHOT_FILE, "image/jpeg", screenshot))
     body.append_array(("--%s--\r\n" % boundary).to_utf8_buffer())
     return body
 

@@ -4,9 +4,9 @@
 [ext_resource type="Script" uid="uid://b0r5vydn7ve4l" path="res://addons/libreloaded/environment/environment_node.gd" id="2_env"]
 [ext_resource type="PackedScene" uid="uid://dmhikrkk2qsjl" path="res://addons/libreloaded/player/player.tscn" id="3_player"]
 [ext_resource type="PackedScene" path="res://weather/weather_sfx.tscn" id="5_weather_sfx"]
-[ext_resource type="Resource" path="res://sounds/player/player_sfx_bank.tres" id="6_player_sfx_bank"]
+[ext_resource type="SfxBank" path="res://sounds/player/player_sfx_bank.tres" id="6_player_sfx_bank"]
 [ext_resource type="Script" uid="uid://clkcp3220jqpe" path="res://addons/libreloaded/scenery/scenery_streamer.gd" id="8_streamer"]
-[ext_resource type="Script" path="res://world/sky/gnd_skydome_maszyna_environment.gd" id="9_sky"]
+[ext_resource type="Script" uid="uid://ci62ovufebdnf" path="res://world/sky/gnd_skydome_maszyna_environment.gd" id="9_sky"]
 
 [node name="World" type="Node3D" unique_id=747719912]
 script = ExtResource("1_world")
@@ -24,12 +24,24 @@ wind_strength = 0.2
 fog_density = 0.015
 fog_distance = 235.0
 
-[node name="Sky" type="Node" parent="."]
+[node name="Sky" type="Node" parent="." unique_id=1104925771]
 script = ExtResource("9_sky")
 environment_node_path = NodePath("../EnvironmentNode")
 tonemap_white = 10.0
 tonemap_agx_white = 8.0
-tonemap_agx_contrast = 1.1
+day_tonemap_agx_contrast = 1.2
+night_tonemap_agx_contrast = 1.0
+day_adjustment_contrast = 1.1
+auto_exposure_enabled = true
+auto_exposure_scale = 0.15000000000000002
+auto_exposure_speed = 1.0
+auto_exposure_min_sensitivity = 25.0
+auto_exposure_max_sensitivity = 400.0
+sdfgi_energy = 1.2
+sdfgi_bounce_feedback = 0.8
+day_ambient_energy = 0.325
+day_ambient_sky_contribution = 0.69
+day_fog_color = Color(1, 0.95, 0.91, 1)
 
 [node name="Player" parent="." unique_id=1785690669 instance=ExtResource("3_player")]
 unique_name_in_owner = true

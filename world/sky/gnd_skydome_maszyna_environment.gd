@@ -208,10 +208,7 @@ func apply_visual_configuration() -> void:
         fog_distance / _skydome_value(FOG_REFERENCE_DISTANCE_PROPERTY))
     for property: StringName in FOG_RANGE_PROPERTIES:
         skydome.set(property, _skydome_value(property) * range_scale)
-    var fog_curve: float = maxf(FOG_CURVE_MIN, float(ProjectSettings.get_setting(
-        FOG_CURVE_SETTING, FOG_CURVE_DEFAULT)))
-    var sky_affect: float = clampf(pow(float(ProjectSettings.get_setting(
-        FOG_SKY_HEIGHT_SETTING, FOG_SKY_HEIGHT_DEFAULT)) / fog_distance, fog_curve), 0.0, 1.0)
+    var sky_affect: float = get_fog_sky_share(fog_distance)
     # The sky takes fog_sky_affect of the fog colour whatever the density is, while geometry at
     # fog_distance takes the density itself - a sky fogged harder than the terrain in front of it
     # cuts every distant silhouette back out of the fog, so the height share carries the opacity.
@@ -264,8 +261,20 @@ func apply_visual_configuration() -> void:
 
 
 ## Skydome later overrides shadow opacity from cloud coverage.
+## Skydome's day light - its sun - times the sky's sun_energy, its night light - the moon
+## (Skydome.gd:1191) - times moon_energy; its day's and night's ambient light and fog colour the sky's,
+## which Skydome draws itself (Skydome.gd:1211-1214) - the share the sky gives of the ambient light is
+## SkyEnvironment's to set
 func apply_light_configuration() -> void:
     _apply_sun_settings(sun_light)
+    skydome.day_light_energy = _skydome_value(&"day_light_energy") * sun_energy
+    skydome.night_light_energy = _skydome_value(&"night_light_energy") * moon_energy
+    skydome.day_ambient_color = day_ambient_color
+    skydome.day_ambient_energy = day_ambient_energy
+    skydome.night_ambient_color = night_ambient_color
+    skydome.night_ambient_energy = night_ambient_energy
+    skydome.day_fog_color = day_fog_color
+    skydome.night_fog_color = night_fog_color
 
 
 func apply_time_configuration() -> void:

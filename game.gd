@@ -294,7 +294,7 @@ func _exit_to_menu(game_dir: String = "") -> void:
     _play_music(MUSIC_MENU_VOLUME_DB)
     await $SpinnerOverlay.fade_in(EXIT_FADE_TIME)
     # the world stops once the spinner covers it, and stays stopped until the next scenery shows;
-    # the menu is heard at the wall clock's speed (TrainSoundSystem)
+    # the menu is heard at the wall clock's speed (MaszynaVehicleSoundServer)
     SimulationServer.simulation_pause()
     SimulationServer.simulation_reset_speed()
     HUDServer.hud_set_visible(false)

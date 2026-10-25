@@ -56,9 +56,10 @@ jobs:
       - name: Build the host library
         run: make compile-debug CLANG_TIDY_COMPILE_COMMANDS_FILE= CLANG_TIDY_BINDINGS_FILE=
 
-      # and maszyna-python-host, the process PythonScreenServer runs CPython in, and the
+      # and maszyna-python-host, the process PythonScreenServer runs CPython in, the
       # libreloaded.gdextension CMake generates into libreloaded's addon - not versioned, and without
-      # it Godot loads no library; kept by their paths from the repository's root
+      # it Godot loads no library - and gnd-sfx's library libreloaded's build makes beside its own;
+      # kept by their paths from the repository's root
       - uses: actions/upload-artifact@v7
         with:
           name: host-library
@@ -66,6 +67,7 @@ jobs:
             bin/libreloaded/linux/libreloaded.debug.64.so
             bin/libreloaded/linux/maszyna-python-host.64
             vendor/libreloaded/addons/libreloaded/libreloaded.gdextension
+            vendor/libreloaded/vendor/gnd-sfx/addons/gnd_sfx/bin/linux/libgndsfx.linux.template_debug.double.x86_64.so
           if-no-files-found: error
 
   run-tests:
@@ -95,7 +97,8 @@ jobs:
       - name: Fetch Terrain3D
         run: make terrain3d
 
-      # addons/libreloaded and addons/libmaszyna are not versioned: they lead to the submodules
+      # addons/libreloaded, addons/gnd_sfx and addons/libmaszyna are not versioned: they lead to the
+      # submodules
       - name: Link the addons
         run: make links
 

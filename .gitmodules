@@ -1,16 +1,13 @@
 [submodule "vendor/libreloaded"]
 	path = vendor/libreloaded
 	url = https://github.com/MaSzyna-Reloaded/libreloaded.git
-	branch = main
+	branch = dev/road-vehicles
 	ignore = untracked
 [submodule "vendor/libmaszyna"]
 	path = vendor/libmaszyna
 	url = https://github.com/MaSzyna-Reloaded/libmaszyna.git
-	branch = dev/separate-libmaszyna-rebased
+	branch = dev/road-vehicles
 	ignore = untracked
-[submodule "vendor/gnd-sfx"]
-	path = vendor/gnd-sfx
-	url = https://github.com/GamesNotDeveloped/godot-sfx.git
 [submodule "vendor/gnd-skydome"]
 	path = vendor/gnd-skydome
 	url = https://github.com/GamesNotDeveloped/godot-skydome.git

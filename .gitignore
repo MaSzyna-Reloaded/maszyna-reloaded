@@ -22,3 +22,4 @@ __pycache__/
 # GIMP writes a sidecar next to an edited image; it is not project data
 .comments/
 /addons/terrain_3d
+/addons/gnd_sfx

@@ -27,6 +27,8 @@ LIBRELOADED_MAKE=$(MAKE) -C $(LIBRELOADED) GODOT_PROJECT_DIR=$(PROJECT_DIR) LINU
 	"LIBRELOADED_PLUGINS=$(LIBRELOADED_PLUGINS)"
 # The addon of libreloaded, in its checkout; a plugin's is addons/<name> in its own
 LIBRELOADED_ADDON:=addons/libreloaded
+# The sound addon the game uses, libreloaded's own (its build makes its library)
+GND_SFX_ADDON:=vendor/gnd-sfx/addons/gnd_sfx
 
 # The app shows the build number (vendor/libreloaded/cmake/write_build_number.cmake), so the archive
 # name stays the same from build to build and does not carry a branch or a date
@@ -52,12 +54,13 @@ WINDOWS_INSTALLER_IMAGE:=ghcr.io/maszyna-reloaded/windows-installer:$(shell sha2
 WINDOWS_INSTALLER_RUN=docker run --rm --user $(shell id -u):$(shell id -g) -v $(CURDIR):$(CURDIR) -w $(CURDIR) $(WINDOWS_INSTALLER_IMAGE)
 
 
-# addons/libreloaded and addons/<plugin> lead to the checkout in use - the submodule, or a local one
+# addons/libreloaded, addons/gnd_sfx and addons/<plugin> lead to the checkout in use - the submodule, or a local one
 # (make libreloaded-local, make plugin-local) - so they are not versioned (.gitignore): working
 # against a local checkout changes nothing git sees. make links makes them, after a clone too;
 # libreloaded's build makes only those missing and never replaces one
 links:
 	ln -sfn $(if $(wildcard $(LIBRELOADED_LOCAL_FILE)),"$(LIBRELOADED)",../vendor/libreloaded)/$(LIBRELOADED_ADDON) addons/libreloaded
+	ln -sfn $(if $(wildcard $(LIBRELOADED_LOCAL_FILE)),"$(LIBRELOADED)",../vendor/libreloaded)/$(GND_SFX_ADDON) addons/gnd_sfx
 	for plugin in $(PLUGINS); do \
 		if [ -f ".$$plugin-local" ]; then ln -sfn "$$(cat .$$plugin-local)/addons/$$plugin" "addons/$$plugin" || exit 1; \
 		else ln -sfn "../vendor/$$plugin/addons/$$plugin" "addons/$$plugin" || exit 1; fi; \

@@ -90,8 +90,8 @@ func send_report() -> void:
         "scenery": scenario.get("filename", ""),
         "vehicle": vehicle,
         # the issue shows them without unpacking the archive
-        "hardware": JSON.stringify(hardware),
-        "settings": JSON.stringify(_snapshot["settings"]),
+        "hardware": hardware,
+        "settings": _snapshot["settings"],
     }
     # the log of this session, its last part - only while it is written: with file logging off the
     # file is an earlier session's (EngineOverrides, the Debug settings), and there are no game logs

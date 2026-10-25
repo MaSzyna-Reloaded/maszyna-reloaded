@@ -33,14 +33,15 @@ testing, a directory (`user://bug_reports`) saves the reports locally; on Linux 
 A saved report is a directory of its own, named by the local time it was made
 (`2026-10-04T15-30-12/`), with what the server receives:
 
-* `report.json` - the text fields, as one JSON object (indented)
+* `report.json` - the `report` part, indented
 * `report.zip` - the `attachments` part
 
 ## The request
 
-Report API version **2**. One `POST` to the endpoint URL, `multipart/form-data`: the report's
-metadata as text fields, every file in one zip archive, and the screenshot once more on its own. Godot's `HTTPRequest` adds `Host`,
-`User-Agent: GodotEngine/...` and `Content-Length`; the game adds only the content type:
+Report API version **2**. One `POST` to the endpoint URL, `multipart/form-data`: the report as
+one JSON object, every file in one zip archive, and the screenshot once more on its own. Godot's
+`HTTPRequest` adds `Host`, `User-Agent: GodotEngine/...` and `Content-Length`; the game adds only
+the content type:
 
 ```
 POST /<endpoint path> HTTP/1.1
@@ -48,65 +49,60 @@ Content-Type: multipart/form-data; boundary=MaSzynaReport1849302847
 ```
 
 The boundary is `MaSzynaReport` followed by a random number, new for every request. Lines of the
-multipart framing end with `\r\n`. The parts come in this order:
+multipart framing end with `\r\n`, and an empty line parts a part's headers from its contents. The
+parts come in this order:
 
 | Part (`name`) | `filename` | `Content-Type` | Always |
 |---|---|---|---|
-| `api_version` | - | `text/plain; charset=utf-8` | yes - `2` |
-| `title` | - | `text/plain; charset=utf-8` | yes |
-| `description` | - | `text/plain; charset=utf-8` | yes |
-| `build` | - | `text/plain; charset=utf-8` | yes |
-| `branch` | - | `text/plain; charset=utf-8` | yes, may be empty |
-| `scenery` | - | `text/plain; charset=utf-8` | yes, may be empty |
-| `vehicle` | - | `text/plain; charset=utf-8` | yes, may be empty |
-| `hardware` | - | `text/plain; charset=utf-8` | yes |
-| `settings` | - | `text/plain; charset=utf-8` | yes |
+| `report` | - | `application/json` | yes |
 | `attachments` | `report.zip` | `application/zip` | yes |
 | `screenshot` | `screenshot.jpg` | `image/jpeg` | only when attached |
 
 ```
 --MaSzynaReport1849302847
-Content-Disposition: form-data; name="api_version"
-Content-Type: text/plain; charset=utf-8
+Content-Disposition: form-data; name="report"
+Content-Type: application/json
 
-1
---MaSzynaReport1849302847
-Content-Disposition: form-data; name="title"
-Content-Type: text/plain; charset=utf-8
-
-[20261003-1708] Stary Jawór / SU46-048: the doors do not open
-...
+{"api_version":2,"title":"[20261003-1708] Stary Jawór / SU46-048: the doors do not open",...}
 --MaSzynaReport1849302847
 Content-Disposition: form-data; name="attachments"; filename="report.zip"
 Content-Type: application/zip
 
 <zip bytes>
+--MaSzynaReport1849302847
+Content-Disposition: form-data; name="screenshot"; filename="screenshot.jpg"
+Content-Type: image/jpeg
+
+<jpeg bytes>
 --MaSzynaReport1849302847--
 ```
 
-`api_version` is raised whenever the fields or the archive change, so a server can tell which
-shape it was sent. Version 1 had neither `branch`, `hardware`, `settings` nor `screenshot`; the
-server takes both, as builds of version 1 are still played. The fields are enough to open the issue without unpacking anything; the archive
-is the one file the issue links to.
+`api_version` is raised whenever the report or the archive change, so a server can tell which
+shape it was sent. Version 1 sent the report as text fields of their own - `api_version` (`1`),
+`title`, `description`, `build`, `scenery`, `vehicle` - and `attachments`, with neither `branch`,
+`hardware`, `settings` nor `screenshot`; the server takes both, as builds of version 1 are still
+played. The report is enough to open the issue without unpacking anything; the archive is the one
+file the issue links to.
 
-### The fields
+### The report
 
-Every value is UTF-8 text:
+One JSON object, UTF-8:
 
-| Field | Value |
+| Key | Value |
 |---|---|
+| `api_version` | `2`, a number |
 | `title` | the issue's title: `[<build>] <scenery title> / <vehicle>: <description's first line, 80 characters at most>`; in the selector, without a scenery or a vehicle, `[<build>] <description's first line>` |
 | `description` | what the player wrote, whole, trimmed; never empty |
 | `build` | the build number of the game (`GameDataServer.build_get_number()`, e.g. `20261003-1708`) |
 | `branch` | the branch the build was made from (`build_branch.txt`, stamped beside `build_number.txt` by `make build-number` and the CI: a pull request's branch, a tag's name), empty in a checkout never stamped |
 | `scenery` | the scenery's file (`stary_jawor_eszelon.scn`), empty in the selector |
 | `vehicle` | the vehicle the player drives (its vehicle id), empty when none |
-| `hardware` | the snapshot's `hardware` section as JSON, for the issue to show without unpacking the archive |
-| `settings` | the snapshot's `settings` section as JSON, the same way |
+| `hardware` | the snapshot's `hardware` section, an object, for the issue to show without unpacking the archive |
+| `settings` | the snapshot's `settings` section, an object, the same way |
 
-`branch`, `hardware` and `settings` go with the player's home directory and system user name
-masked, as the snapshot and the logs do; `title` and `description` are what the player typed and
-go as they are.
+Every text of `branch`, `hardware` and `settings` goes with the player's home directory and system
+user name masked, as the snapshot and the logs do; `title` and `description` are what the player
+typed and go as they are.
 
 The game sends a report only after the player ticked "I agree to sharing the hardware information
 and the report, and to publishing them on GitHub".
@@ -230,12 +226,12 @@ A failed report keeps what the player wrote, so it can be sent again.
   installed on the reports repository only, with `Issues: write` and `Contents: write` (the
   release asset), and opens the issues as the app's bot; the repository is the server's
   configuration, not the game's.
-* **Open the issue** with the `title` field as its title, and a body made of `description`, the
+* **Open the issue** with the report's `title` as its title, and a body made of `description`, the
   build, scenery and vehicle, the hardware summary and links to the attachments.
 * **Store the archive itself.** GitHub's REST API cannot attach a file to an issue, so the server
   keeps `report.zip` (its own storage, a release asset) and links it from the issue, and keeps the
   `screenshot` the same way, shown in the issue's body. It summarises `hardware` and lists
-  `settings` in the body from the fields - an issue body is limited to 65536 characters, the
+  `settings` in the body from the report - an issue body is limited to 65536 characters, the
   snapshot does not fit in it.
 * **Limit abuse:** a rate limit per address, a size limit on the request (the archive: a snapshot
   of a few MB and a log of up to 4 MB, which pack small, and a JPEG of a few hundred kB), and a
@@ -246,8 +242,7 @@ A failed report keeps what the player wrote, so it can be sent again.
 To test a server without the game, a request of the same shape:
 
 ```bash
-curl -F api_version=2 -F 'title=[test] a title' -F 'description=a test' -F build=test \
-     -F branch=main -F scenery= -F vehicle= -F 'hardware={}' -F 'settings={}' \
+curl -F 'report=@report.json;type=application/json' \
      -F 'attachments=@report.zip;type=application/zip' \
      -F 'screenshot=@screenshot.jpg;type=image/jpeg' \
      https://<endpoint>

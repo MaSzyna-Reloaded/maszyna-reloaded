@@ -2,8 +2,8 @@
 
 [ext_resource type="Script" path="res://hud/script_editor_panel.gd" id="1_panel"]
 [ext_resource type="Theme" path="res://hud/timetable_theme.tres" id="2_theme"]
-[ext_resource type="Script" path="res://addons/libmaszyna/debug_hud/window_move_handle.gd" id="3_move"]
-[ext_resource type="Script" path="res://addons/libmaszyna/debug_hud/window_resize_corner.gd" id="4_resize"]
+[ext_resource type="Script" path="res://addons/libreloaded/debug_hud/window_move_handle.gd" id="3_move"]
+[ext_resource type="Script" path="res://addons/libreloaded/debug_hud/window_resize_corner.gd" id="4_resize"]
 
 [sub_resource type="CodeHighlighter" id="CodeHighlighter_lua"]
 number_color = Color(0.63, 1, 0.88, 1)
@@ -64,7 +64,7 @@ unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 360)
 layout_mode = 2
 size_flags_vertical = 3
-placeholder_text = "local v = maszyna.vehicle.find(\"EU07-005\")"
+placeholder_text = "local v = reloaded.vehicle.find(\"EU07-005\")"
 syntax_highlighter = SubResource("CodeHighlighter_lua")
 gutters_draw_line_numbers = true
 indent_automatic = true

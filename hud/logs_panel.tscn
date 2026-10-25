@@ -2,8 +2,8 @@
 
 [ext_resource type="Script" path="res://hud/logs_panel.gd" id="1_panel"]
 [ext_resource type="Theme" path="res://hud/timetable_theme.tres" id="2_theme"]
-[ext_resource type="Script" path="res://addons/libmaszyna/debug_hud/window_move_handle.gd" id="3_move"]
-[ext_resource type="Script" path="res://addons/libmaszyna/debug_hud/window_resize_corner.gd" id="4_resize"]
+[ext_resource type="Script" path="res://addons/libreloaded/debug_hud/window_move_handle.gd" id="3_move"]
+[ext_resource type="Script" path="res://addons/libreloaded/debug_hud/window_resize_corner.gd" id="4_resize"]
 [ext_resource type="PackedScene" path="res://hud/log_lines.tscn" id="5_lines"]
 
 [node name="LogsPanel" type="PanelContainer"]

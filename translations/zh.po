@@ -1,5 +1,5 @@
 # Strings of the demo's own interface that the game's catalogue (lang/*.po) does not have.
-# MaszynaTranslationServer merges them under the game's catalogue (maszyna/locale/translations).
+# ReloadedTranslationServer merges them under the game's catalogue (reloaded/locale/translations).
 # template.po lists every msgid, as the game's lang/template.po does, for a new language to start from.
 msgid ""
 msgstr ""
@@ -380,8 +380,8 @@ msgstr "摄像机"
 msgid "Camera chunk"
 msgstr "摄像机区块"
 
-msgid "Draw distance"
-msgstr "绘制距离"
+msgid "Tracks and traction distance"
+msgstr "轨道和接触网距离"
 
 msgid "Chunks"
 msgstr "区块"
@@ -1391,6 +1391,12 @@ msgstr "车辆细节距离"
 msgid "Real mirrors"
 msgstr "真实后视镜"
 
+msgid "Road traffic density"
+msgstr "道路交通密度"
+
+msgid "Road traffic vehicles"
+msgstr "道路交通车辆数"
+
 msgid "Smoke"
 msgstr "烟雾"
 
@@ -2086,3 +2092,9 @@ msgstr "由 Python 脚本绘制的驾驶室屏幕无法启动，将保持空白�
 
 msgid "Lazy loading (experimental)"
 msgstr "延迟加载（实验性）"
+
+msgid "All sceneries"
+msgstr "所有场景"
+
+msgid "Sceneries of one source only"
+msgstr "仅显示一个来源的场景"

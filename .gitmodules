@@ -1,7 +1,13 @@
+[submodule "vendor/libreloaded"]
+	path = vendor/libreloaded
+	url = https://github.com/MaSzyna-Reloaded/libreloaded.git
+	branch = main
+	ignore = untracked
 [submodule "vendor/libmaszyna"]
 	path = vendor/libmaszyna
-	url = git@github.com:MaSzyna-Reloaded/MaSzyna-API-wrapper.git
-	branch = dev/separate-game-alpha
+	url = https://github.com/MaSzyna-Reloaded/libmaszyna.git
+	branch = dev/separate-libmaszyna-rebased
+	ignore = untracked
 [submodule "vendor/gnd-sfx"]
 	path = vendor/gnd-sfx
 	url = https://github.com/GamesNotDeveloped/godot-sfx.git
@@ -14,3 +20,6 @@
 [submodule "vendor/gut"]
 	path = vendor/gut
 	url = https://github.com/bitwes/Gut.git
+[submodule "vendor/gnd-biomes"]
+	path = vendor/gnd-biomes
+	url = https://github.com/GamesNotDeveloped/godot-biomes.git

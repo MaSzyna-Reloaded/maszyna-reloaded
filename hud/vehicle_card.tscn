@@ -2,8 +2,8 @@
 
 [ext_resource type="Script" path="res://hud/vehicle_card.gd" id="1_card"]
 [ext_resource type="Theme" path="res://hud/timetable_theme.tres" id="2_theme"]
-[ext_resource type="Script" path="res://addons/libmaszyna/debug_hud/window_move_handle.gd" id="3_move"]
-[ext_resource type="Script" path="res://addons/libmaszyna/debug_hud/window_resize_corner.gd" id="4_resize"]
+[ext_resource type="Script" path="res://addons/libreloaded/debug_hud/window_move_handle.gd" id="3_move"]
+[ext_resource type="Script" path="res://addons/libreloaded/debug_hud/window_resize_corner.gd" id="4_resize"]
 [ext_resource type="PackedScene" path="res://ui/tile_grid.tscn" id="5_grid"]
 [ext_resource type="Texture2D" path="res://startup/eu07_parked_sketch.svg" id="7_sketch"]
 [ext_resource type="Texture2D" path="res://hud/icons/magnifier.svg" id="8_magnifier"]

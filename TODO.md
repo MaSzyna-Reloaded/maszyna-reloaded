@@ -1,5 +1,18 @@
 # TODO
 
+## World (own format)
+
+
+## Scenery selector
+
+* The selector lists the providers' sceneries (`SceneryServer.scenery_list()`), but its vehicle
+  viewer and vehicle browser are MaSzyna's: the viewer builds MaSzyna's model and skins
+  (`show_vehicle(MaszynaVehicleData)`, the selector casts the trainset's `VehicleData` to it), the
+  browser lists `MaszynaVehiclesBank`. A vehicle of another catalogue provider needs the catalogue
+  to give a preview model and its vehicles by category (`VehicleCatalogServer`) first.
+* A tile's tooltip shows the vehicle as the catalogue finds it (`VehicleData.vehicle`,
+  `dynamic/pkp/su42_v1/su42`), not the directory alone as before.
+
 ## HUD
 
 * The HUD keeps copies of the player's state: `DrivingAid.vehicle`, `FollowedVehicleChip.vehicle`,

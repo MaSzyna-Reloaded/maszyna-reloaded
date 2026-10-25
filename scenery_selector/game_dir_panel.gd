@@ -2,7 +2,7 @@ class_name GameDirPanel
 extends VBoxContainer
 
 ## Where the game's data is: the directory in use, the installations of the original found on this
-## computer (UserSettings.find_maszyna_game_dirs()) - looked for again whenever the panel is shown
+## computer (MaszynaGameDirectory.find_game_dirs()) - looked for again whenever the panel is shown
 ## and by "Scan" - one of which is chosen as the game directory, or a folder chosen by hand, and
 ## below them how Reloaded is installed. The list and the buttons are its two sections. What the
 ## choice means is its owner's: the selector saves it, the settings set it until "Save". It stands
@@ -36,12 +36,12 @@ func _notification(what: int) -> void:
 
 ## The installations looked for again, and the directory in use shown
 func scan() -> void:
-    _dirs = UserSettings.find_maszyna_game_dirs()
+    _dirs = MaszynaGameDirectory.find_game_dirs()
     var notes: PackedStringArray = []
     notes.resize(_dirs.size())
     notes.fill("")
     # the directory in use stands selected, when the search found it
-    %InstallationList.set_rows(_dirs, notes, PackedStringArray(), _dirs.find(UserSettings.get_maszyna_game_dir()))
+    %InstallationList.set_rows(_dirs, notes, PackedStringArray(), _dirs.find(MaszynaGameDirectory.get_game_dir()))
     %NoneFound.visible = not _dirs
     %InstallationList.visible = not %NoneFound.visible
     %SetButton.disabled = %NoneFound.visible
@@ -51,8 +51,8 @@ func scan() -> void:
 
 ## The directory in use, and the problem with it when it holds no game data
 func show_game_dir() -> void:
-    %Problem.visible = not UserSettings.is_maszyna_game_dir_valid()
-    %CurrentDir.text = tr("Current game directory: %s") % UserSettings.get_maszyna_game_dir()
+    %Problem.visible = not MaszynaGameDirectory.is_game_dir_valid()
+    %CurrentDir.text = tr("Current game directory: %s") % MaszynaGameDirectory.get_game_dir()
 
 
 ## The owner decides what the choice means - applies it at once, or asks first (in a game)
@@ -63,7 +63,7 @@ func choose_game_dir(path: String) -> void:
 ## Called by the owner once it applied the directory - the game's data was read again at once
 func show_game_dir_changed() -> void:
     show_game_dir()
-    %ChangedNotice.message = tr("The game's data is now read from %s.") % UserSettings.get_maszyna_game_dir()
+    %ChangedNotice.message = tr("The game's data is now read from %s.") % MaszynaGameDirectory.get_game_dir()
     %ChangedNotice.ask()
 
 
@@ -131,7 +131,7 @@ func release_panel_focus() -> void:
 
 
 func _on_folder_dialog_dir_selected(dir: String) -> void:
-    if UserSettings.is_maszyna_game_dir(dir):
+    if MaszynaGameDirectory.is_game_dir(dir):
         choose_game_dir(dir)
         return
     %Status.text = tr("%s is not a MaSzyna game directory - it has no scenery, dynamic and textures folders.") % dir

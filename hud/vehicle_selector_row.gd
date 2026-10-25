@@ -37,14 +37,11 @@ func _ready() -> void:
 
 ## The vehicle's name, its train, speed, driver, motion and delay as they are now
 func refresh() -> void:
-    var driver:RID = DriverServer.vehicle_get_driver(vehicle)
-    var timetable_state:Dictionary = DriverServer.driver_get_timetable_state(driver) if driver.is_valid() else {}
-    var timetable:Timetable = timetable_state.get("timetable")
+    var run:RID = TrainRun.of_vehicle(vehicle)
+    var timetable:RID = StationServer.run_get_timetable(run) if run.is_valid() else RID()
     %Name.text = VehicleServer.vehicle_get_name(vehicle)
-    %Train.text = "%s %s" % [timetable.train_category, timetable.train_name] if timetable else tr("No timetable")
-    %Relation.text = "%s  →  %s" % [
-        timetable.relation_from.replace("_", " "), timetable.relation_to.replace("_", " ")
-    ] if timetable and (timetable.relation_from or timetable.relation_to) else ""
+    %Train.text = TrainRun.train_title(timetable) if timetable.is_valid() else tr("No timetable")
+    %Relation.text = TrainRun.relation(timetable) if timetable.is_valid() else ""
     %Relation.visible = not %Relation.text == ""
     %Speed.text = "%d km/h" % roundi(absf(VehicleServer.vehicle_get_speed(vehicle)))
     var driver_kind:Driver = driver_of(vehicle, _player_vehicle)
@@ -52,9 +49,9 @@ func refresh() -> void:
     %DriverPill.theme_type_variation = DRIVER_PILLS[driver_kind]
     %DriverBadge.theme_type_variation = DRIVER_BADGES[driver_kind]
     %Motion.text = motion_label(vehicle)
-    %Delay.visible = not timetable == null
-    if timetable:
-        var late_minutes:int = MaszynaLegacyDriverTimetable.state_delay_minutes(timetable_state, SimulationServer.time_of_day)
+    %Delay.visible = timetable.is_valid()
+    if timetable.is_valid():
+        var late_minutes:int = TrainRun.delay_minutes(run)
         %Delay.text = tr("On time") if late_minutes == 0 else "%+d min" % late_minutes
         %Delay.add_theme_color_override(&"font_color",
                 ON_TIME_COLOR if late_minutes == 0 else (LATE_COLOR if late_minutes > 0 else EARLY_COLOR))

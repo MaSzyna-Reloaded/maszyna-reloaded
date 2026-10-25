@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
-# Installed by `make install-git-hooks` (core.hooksPath = scripts/git-hooks)
+# Installed by `make install-git-hooks` (core.hooksPath = scripts/git-hooks); libreloaded's
+# check-staged-uids of the checkout in use (the submodule or make libreloaded-local)
 set -euo pipefail
 
-"$(git rev-parse --show-toplevel)/vendor/libmaszyna/scripts/check-staged-uids"
+make -s -C "$(git rev-parse --show-toplevel)" check-staged-uids

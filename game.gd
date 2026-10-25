@@ -70,7 +70,7 @@ const GAME_LOG_LEVELS: Dictionary[String, GameLog.LogLevel] = {
 }
 
 ## The trainsets as the scenery declares them - a start without the selector arranges none
-const DECLARED_TRAINSET: Array[MaszynaDynamicData] = []
+const DECLARED_TRAINSET: Array[VehicleData] = []
 
 ## A scenery started at once, without the selector - as "-s" on the command line does
 @export var scenery: String = ""
@@ -90,14 +90,7 @@ var _surroundings_area_ready: bool = false
 var _surroundings_vehicles_built: bool = false
 
 
-## Before _ready(): the original's driver thinks for the drivers a scenery declares
-## (SceneryInstancer) before any scenery is loaded
-func _enter_tree() -> void:
-    DriverServer.implementation_register(SceneryInstancer.DRIVER_IMPLEMENTATION, MaszynaLegacyAIDriver.new())
-
-
 func _exit_tree() -> void:
-    DriverServer.implementation_unregister(SceneryInstancer.DRIVER_IMPLEMENTATION)
     PythonScreenServer.python_runtime_failed.disconnect(_on_python_runtime_failed)
 
 
@@ -112,12 +105,12 @@ func _ready() -> void:
     var scenery_at: int = args.find(ARG_SCENERY)
     if scenery_at >= 0 and scenery_at + 1 < args.size():
         # started from the command line, the selector screen is skipped - so is its warning
-        if not UserSettings.is_maszyna_game_dir_valid():
+        if not MaszynaGameDirectory.is_game_dir_valid():
             print((
                 "Invalid game directory: %s - it has no scenery, dynamic and textures folders. "
                 + "Unpack MaSzyna Reloaded into the directory of the original MaSzyna, or start "
                 + "the game without -s and set the directory there."
-            ) % UserSettings.get_maszyna_game_dir())
+            ) % MaszynaGameDirectory.get_game_dir())
             get_tree().quit(EXIT_INVALID_GAME_DIR)
             return
         var vehicle_id: String = ""
@@ -131,18 +124,34 @@ func _ready() -> void:
                     break
         # in lower case, as the original takes -v (application.cpp:1142) - the scenery's vehicles
         # are named so
-        start_scenery(args[scenery_at + 1], vehicle_id.to_lower(), DECLARED_TRAINSET)
+        start_scenery(_find_scenery(args[scenery_at + 1]), vehicle_id.to_lower(), DECLARED_TRAINSET)
     elif scenery:
-        start_scenery(scenery, "", DECLARED_TRAINSET)
+        start_scenery(_find_scenery(scenery), "", DECLARED_TRAINSET)
     else:
         $ScenerySelectorScreen.open()
         $BugReport.show_edge_button()
 
 
-## Loads scenery/<filename> and puts the player in vehicle_id (none: the scenery's own driver) -
-## chosen in the selector, or given on the command line; trainset is the player's trainset as the
-## selector arranged it (MaszynaIncludeNode.trainset_override), empty for the declared one
-func start_scenery(filename: String, vehicle_id: String, trainset: Array[MaszynaDynamicData]) -> void:
+## The scenery a name given on the command line (or `scenery`) names: the first of the providers'
+## lists of that id (a .scn's file name, a world's .json), described by its provider; null for none
+func _find_scenery(id: String) -> SceneryInfo:
+    for info: SceneryInfo in SceneryServer.scenery_list():
+        if info.id == id:
+            return (instance_from_id(SceneryServer.provider_get(info.provider)) as SceneryProvider).describe(info)
+    push_error("No scenery %s in any provider's list" % id)
+    return null
+
+
+## Loads the scenery `info` by its provider and puts the player in vehicle_id (none: the scenery's
+## own driver) - chosen in the selector, or given on the command line; trainset is the player's
+## trainset as the selector arranged it (SceneryContentNode.trainset_override), empty for the
+## declared one
+func start_scenery(info: SceneryInfo, vehicle_id: String, trainset: Array[VehicleData]) -> void:
+    # a name on the command line no provider has: the selector instead
+    if not info:
+        $ScenerySelectorScreen.open()
+        $BugReport.show_edge_button()
+        return
     _play_music(MUSIC_LOADING_VOLUME_DB)
     # the world starts while the loading screen fades out, not when it is built, and at the wall
     # clock's speed whatever the last one ran at
@@ -150,16 +159,17 @@ func start_scenery(filename: String, vehicle_id: String, trainset: Array[Maszyna
     SimulationServer.simulation_reset_speed()
     HUDServer.hud_set_visible(false)
     $BugReport.hide_edge_button()
-    var info: MaszynaSceneryInfo = MaszynaSceneryInfo.read(filename)
     $GameHud.show_scenario(info, vehicle_id)
-    # the name the scenery list gave it ("//$l", "//$n" and the file name)
-    $LoadingScreen.show_loading(MaszynaSceneryInfo.read_display_name(filename))
+    # the name the scenery list gave it
+    $LoadingScreen.show_loading(info.title if info.title else info.id)
     # the selector dissolves into the loading screen and hides once it is done; the loading below
     # blocks the main thread, so it waits for the dissolve not to stutter
     if $ScenerySelectorScreen.visible:
         await $ScenerySelectorScreen.hidden
     # made under the loading screen: its environment and first frames stall the main thread
-    _world = WORLD_SCENE.instantiate() as SceneryWorld
+    # a game built on this one may show a provider's sceneries in a scene of its own
+    var world_scene: PackedScene = GameExtensions.world_scene_get(info.provider)
+    _world = (world_scene if world_scene else WORLD_SCENE).instantiate() as SceneryWorld
     _world.load_progress.connect(_on_world_load_progress)
     _world.scenario_progress.connect(_on_world_scenario_progress)
     _world.load_files_parsed.connect($LoadingScreen.set_files)
@@ -183,7 +193,7 @@ func start_scenery(filename: String, vehicle_id: String, trainset: Array[Maszyna
             log_files.append(handler.get_path())
     $GamePlayLogRecorder.start()
     $BugReport.attach_world(_world, log_files)
-    await _world.load_scenery(filename, trainset, vehicle_id)
+    await _world.load_scenery(info, trainset, vehicle_id)
     await _build_surroundings()
     var tween: Tween = create_tween()
     tween.tween_property($LoadingScreen, "modulate:a", 0.0, LOADING_FADE_OUT_TIME)
@@ -196,7 +206,7 @@ func start_scenery(filename: String, vehicle_id: String, trainset: Array[Maszyna
 
 
 ## The scenery's load on the loading screen, in its share of the progress
-func _on_world_load_progress(progress: float, stage: MaszynaIncludeNode.LoadStage, message: String) -> void:
+func _on_world_load_progress(progress: float, stage: SceneryContentNode.LoadStage, message: String) -> void:
     $LoadingScreen.set_progress(progress * SCENERY_LOAD_SHARE, stage, message)
 
 
@@ -204,7 +214,7 @@ func _on_world_load_progress(progress: float, stage: MaszynaIncludeNode.LoadStag
 func _on_world_scenario_progress(progress: float) -> void:
     $LoadingScreen.set_progress(
             lerpf(SCENERY_LOAD_SHARE, SURROUNDINGS_STREAMING_PROGRESS, progress),
-            MaszynaIncludeNode.LoadStage.SURROUNDINGS, "")
+            SceneryContentNode.LoadStage.SURROUNDINGS, "")
 
 
 ## The player's surroundings, the last stage of the loading screen: the streaming's chunks around
@@ -231,12 +241,12 @@ func _build_surroundings() -> void:
         var built: float = 1.0 - float(pending) / most_pending if most_pending > 0 else 0.0
         progress = maxf(progress, lerpf(SURROUNDINGS_STREAMING_PROGRESS, 0.99, built))
         $LoadingScreen.set_progress(
-                progress, MaszynaIncludeNode.LoadStage.SURROUNDINGS, "")
+                progress, SceneryContentNode.LoadStage.SURROUNDINGS, "")
         await get_tree().process_frame
     SceneryStreamingServer.area_unwatch(SURROUNDINGS_CHUNK_RADIUS)
     SceneryStreamingServer.area_ready.disconnect(_on_surroundings_area_ready)
     RailVehicleRenderingServer.builds_finished.disconnect(_on_surroundings_vehicles_built)
-    $LoadingScreen.set_progress(1.0, MaszynaIncludeNode.LoadStage.SURROUNDINGS, "")
+    $LoadingScreen.set_progress(1.0, SceneryContentNode.LoadStage.SURROUNDINGS, "")
     print("[SceneryLoad] SURROUNDINGS %.1f s" % ((Time.get_ticks_msec() - started_msec) / 1000.0))
 
 
@@ -292,6 +302,7 @@ func _exit_to_menu(game_dir: String = "") -> void:
     # the scenery's script context and environment go with the world
     $GameHud.attach_script_context(RID())
     $GameHud.attach_environment(null)
+    $GameHud.attach_world(null, null)
     $GamePlayLogRecorder.stop()
     for log_file: String in _log_handlers:
         for logger_id: String in GAME_LOG_FILES[log_file]:
@@ -307,7 +318,7 @@ func _exit_to_menu(game_dir: String = "") -> void:
     ProcessMemory.release_unused()
     SceneryLoadMeasurement.print_process("SceneryMemory", "menu")
     if game_dir:
-        UserSettings.save_maszyna_game_dir(game_dir)
+        MaszynaGameDirectory.save_game_dir(game_dir)
     await get_tree().create_timer(EXIT_SPINNER_HOLD_TIME).timeout
     $ScenerySelectorScreen.open()
     $BugReport.show_edge_button()
@@ -340,6 +351,7 @@ func _apply_music_settings() -> void:
 ## The world's scenario is ready; player initialization is coordinated by the world scene.
 func _on_scenery_loaded(_first_vehicle_id: String) -> void:
     $GameHud.attach_script_context(_world.get_script_context())
+    $GameHud.attach_world(_world)
     _music_tween = create_tween()
     _music_tween.tween_property($Music, "volume_linear", 0.0, MUSIC_FADE_OUT_TIME)
     _music_tween.tween_callback($Music.stop)

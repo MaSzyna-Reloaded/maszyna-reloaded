@@ -143,7 +143,7 @@ line per happening: `<time> <simulation time> <kind> <subject>
 * `scenery left` when the player leaves the scenery, `game closed` when the game quits with it
   running - the last line of `gameplay.log` either way.
 
-`ai.log` also has the AI drivers' orders (`MaszynaLegacyAIDriver`, at DEBUG).
+`ai.log` also has the AI drivers' orders (`MaszynaAIDriver`, at DEBUG).
 
 ### `snapshot.json`
 

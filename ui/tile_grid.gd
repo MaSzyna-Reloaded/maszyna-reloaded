@@ -65,14 +65,11 @@ const DROP_MARKER_COLOR: Color = Color(1.0, 0.6, 0.15)
 const DROP_MARKER_WIDTH: float = 3.0
 
 
-## One side view to render: the vehicle it belongs to, the skin to render it with, and what to say
-## about it. An empty caption writes nothing under the tile.
+## One side view to render: the vehicle it belongs to, in the livery to render it in, and what to
+## say about it. An empty caption writes nothing under the tile.
 class Tile:
-    var data_path: String
-    var file_name: String
-    var skin: String
-    ## The vehicle's id, which its MMD may name as (p1)
-    var vehicle_id: String
+    ## The vehicle, in the livery to show it in - its own copy, as the grid may change the livery
+    var vehicle: VehicleData
     var tooltip: String
     var caption: String
     ## The side view drawn mirrored - a vehicle that stands the other way round
@@ -80,14 +77,8 @@ class Tile:
     ## Its button (tile_actions) can ask for it to be taken away
     var removable: bool = true
 
-    func _init(
-        p_data_path: String, p_file_name: String, p_skin: String, p_vehicle_id: String,
-        p_tooltip: String = "", p_caption: String = ""
-    ) -> void:
-        data_path = p_data_path
-        file_name = p_file_name
-        skin = p_skin
-        vehicle_id = p_vehicle_id
+    func _init(p_vehicle: VehicleData, p_tooltip: String = "", p_caption: String = "") -> void:
+        vehicle = p_vehicle.duplicate()
         tooltip = p_tooltip
         caption = p_caption
 
@@ -221,9 +212,9 @@ func set_tile_flipped(index: int, flipped: bool) -> void:
     (_controls[index].get_node("Preview") as TextureButton).flip_h = flipped
 
 
-## The side view of a tile again, after the owner gave it another skin
-func reload_tile(index: int, skin: String) -> void:
-    _tiles[index].skin = skin
+## The side view of a tile again, after the owner gave it another livery
+func reload_tile(index: int, livery: String) -> void:
+    _tiles[index].vehicle.livery = livery
     _load_profile(_controls[index].get_node("Preview") as TextureButton, _tiles[index])
 
 
@@ -479,12 +470,11 @@ func _create_placeholder(size: Vector2) -> ColorRect:
     return placeholder
 
 
-## Side view from MaszynaVehicleProfileManager (rendered on the spot when the data has no image of it)
+## The vehicle's side view from its catalogue provider (VehicleCatalogServer) - which may render it
+## on the spot
 func _load_profile(preview: TextureButton, tile: Tile) -> void:
     # nothing of the button is drawn while it has no texture - the placeholder is what shows
-    var profile: Texture2D = await MaszynaVehicleProfileManager.get_profile(
-        tile.data_path, tile.file_name, tile.skin, tile.vehicle_id
-    )
+    var profile: Texture2D = await VehicleCatalogServer.vehicle_get_side_view(tile.vehicle)
     if not is_instance_valid(preview):
         return
     if not profile:
@@ -502,7 +492,7 @@ func _load_profile(preview: TextureButton, tile: Tile) -> void:
     # a vehicle of a trainset takes its length over the buffers, and its side view overhangs that
     # onto its neighbours when it is longer - the shared bogies of an articulated unit
     var coupling_width: float = (
-        MaszynaVehicleProfileManager.get_profile_coupling_width(tile.data_path, tile.file_name)
+        VehicleCatalogServer.vehicle_get_side_view_coupling_width(tile.vehicle)
         if layout == Layout.ROW else 0.0
     )
     if coupling_width > 0.0:

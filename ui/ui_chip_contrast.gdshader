@@ -3,11 +3,11 @@ shader_type canvas_item;
 // The background of a driving aid tile, darker where the scene behind it is bright: over the dark
 // cab it stays faint, over the sky it becomes a dark plate, so the light text on it reads on both.
 // It only scales the tile's own background alpha, which keeps the anti-aliased rounded corners.
-// With HDR output the screen is linear and goes past white (GameWindow sets maszyna_hdr_output): the
+// With HDR output the screen is linear and goes past white (GameWindow sets reloaded_hdr_output): the
 // brightness is read as on an ordinary screen - up to white, on the sRGB curve - and the alpha,
 // which an 8-bit screen clips at 1, is clipped here, or the blend breaks.
 
-global uniform bool maszyna_hdr_output;
+global uniform bool reloaded_hdr_output;
 
 uniform sampler2D screen_texture : hint_screen_texture, filter_linear_mipmap;
 // The background brightness the plate starts to darken at, and where it is darkest
@@ -20,7 +20,7 @@ uniform float background_lod = 2.0;
 
 void fragment() {
 	vec3 background = textureLod(screen_texture, SCREEN_UV, background_lod).rgb;
-	if (maszyna_hdr_output) {
+	if (reloaded_hdr_output) {
 		background = clamp(background, vec3(0.0), vec3(1.0));
 		// linear to sRGB, as an ordinary screen holds it
 		background = mix(

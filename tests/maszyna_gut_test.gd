@@ -89,7 +89,7 @@ func wait_idle_frames(frames, message = ""):
 ## takes it from VehicleServer.vehicle_list_persons().
 func build_vehicle(vehicle_id:String = "TestTrain", description:VehicleController = null,
         initial_velocity:float = 0.0,
-        driver:MaszynaDynamicData.DriverType = MaszynaDynamicData.DriverType.DRIVER_NOBODY) -> VehicleController:
+        driver:MaszynaVehicleData.DriverType = MaszynaVehicleData.DriverType.DRIVER_NOBODY) -> VehicleController:
     return VehicleServer.vehicle_get_controller(
             build_vehicle_node(vehicle_id, description, initial_velocity, driver).get_vehicle_rid())
 
@@ -97,7 +97,7 @@ func build_vehicle(vehicle_id:String = "TestTrain", description:VehicleControlle
 ## The node itself, for a test that needs a NodePath to the vehicle (RailVehicle3D.controller_path).
 func build_vehicle_node(vehicle_id:String = "TestTrain", description:VehicleController = null,
         initial_velocity:float = 0.0,
-        driver:MaszynaDynamicData.DriverType = MaszynaDynamicData.DriverType.DRIVER_NOBODY) -> VehiclePhysicsNode:
+        driver:MaszynaVehicleData.DriverType = MaszynaVehicleData.DriverType.DRIVER_NOBODY) -> VehiclePhysicsNode:
     var physics_node: RailVehiclePhysicsNode = RailVehiclePhysicsNode.new()
     physics_node.controller = description
     physics_node.vehicle_id = vehicle_id
@@ -107,12 +107,12 @@ func build_vehicle_node(vehicle_id:String = "TestTrain", description:VehicleCont
     var vehicle_rid:RID = physics_node.get_vehicle_rid()
     RailVehicleServer.vehicle_add_front_cabin(vehicle_rid)
     RailVehicleServer.vehicle_add_rear_cabin(vehicle_rid)
-    if driver == MaszynaDynamicData.DriverType.DRIVER_NOBODY:
+    if driver == MaszynaVehicleData.DriverType.DRIVER_NOBODY:
         return physics_node
     var person:RID = PersonServer.person_create()
     # persons outlive vehicles: one left behind would sit in the next test's world
     physics_node.tree_exited.connect(PersonServer.person_free.bind(person))
-    if driver == MaszynaDynamicData.DriverType.DRIVER_HEAD:
+    if driver == MaszynaVehicleData.DriverType.DRIVER_HEAD:
         RailVehicleServer.person_enter_front_cabin(person, vehicle_rid, VehiclePersonRole.VEHICLE_PERSON_ROLE_DRIVER)
     else:
         RailVehicleServer.person_enter_rear_cabin(person, vehicle_rid, VehiclePersonRole.VEHICLE_PERSON_ROLE_DRIVER)
@@ -139,8 +139,8 @@ func get_vehicle_driver(vehicle_rid:RID) -> RID:
 
 ## A power supply whose battery is `battery_voltage` [V] nominal - the low voltage a test's vehicle
 ## needs for its cab, which a bare vehicle has none of
-func build_power_supply(battery_voltage:float) -> MoverRailVehiclePowerSupply:
-    var power_supply:MoverRailVehiclePowerSupply = MoverRailVehiclePowerSupply.new()
+func build_power_supply(battery_voltage:float) -> MaszynaMoverRailVehiclePowerSupply:
+    var power_supply:MaszynaMoverRailVehiclePowerSupply = MaszynaMoverRailVehiclePowerSupply.new()
     power_supply.battery_voltage = battery_voltage
     return power_supply
 
@@ -161,8 +161,8 @@ func build_track(track_name:String, length:float) -> RID:
 ## to NaN (test_rail_vehicle_at_rest.gd). It takes its controller within a few frames; the test frees
 ## it, before its physics node goes with autofree.
 func build_rail_vehicle(vehicle_id:String, track_name:String, offset:float,
-        driver:MaszynaDynamicData.DriverType = MaszynaDynamicData.DriverType.DRIVER_NOBODY) -> RailVehicle3D:
-    var model:RailVehicleController = MoverRailVehicleController.new()
+        driver:MaszynaVehicleData.DriverType = MaszynaVehicleData.DriverType.DRIVER_NOBODY) -> RailVehicle3D:
+    var model:RailVehicleController = MaszynaMoverRailVehicleController.new()
     model.vehicle_id = vehicle_id
     model.mass = RAIL_VEHICLE_MASS
     model.type_name = "test"
@@ -180,18 +180,18 @@ func build_rail_vehicle(vehicle_id:String, track_name:String, offset:float,
 ## for `capacity` passengers getting off and on `exchange_speed` a second through one open side
 func build_passenger_car(vehicle_id:String, track_name:String, offset:float, capacity:float,
         exchange_speed:float, initial_velocity:float = 0.0) -> RailVehicle3D:
-    var model:RailVehicleController = MoverRailVehicleController.new()
+    var model:RailVehicleController = MaszynaMoverRailVehicleController.new()
     model.vehicle_id = vehicle_id
     model.mass = RAIL_VEHICLE_MASS
     model.type_name = "test"
-    var doors:MoverRailVehicleDoors = MoverRailVehicleDoors.new()
+    var doors:MaszynaMoverRailVehicleDoors = MaszynaMoverRailVehicleDoors.new()
     doors.max_shift = PASSENGER_CAR_DOOR_SHIFT
     model.add_component(doors)
-    var load:MoverRailVehicleLoad = MoverRailVehicleLoad.new()
+    var load:MaszynaMoverRailVehicleLoad = MaszynaMoverRailVehicleLoad.new()
     load.max_load = capacity
     load.load_speed = exchange_speed
     load.unload_speed = exchange_speed
-    var accepted:Array[String] = [MaszynaLegacyStation.PASSENGERS]
+    var accepted:Array[String] = [MaszynaStation.PASSENGERS]
     load.accepted_loads = accepted
     model.add_component(load)
     var physics_node:VehiclePhysicsNode = build_vehicle_node(vehicle_id, model, initial_velocity)
@@ -215,28 +215,28 @@ func free_rail_vehicle(vehicle:RailVehicle3D) -> void:
 ## An exterior model built in code, drawn as nodes - what a vehicle assembled by hand names its
 ## parts in (RailVehicle3D.model_instance_path): a transform submodel for every name, placed as
 ## given, under the submodel `parents` names for it or at the top. Added by the test to its vehicle.
-func build_model_instance(submodels:Dictionary, parents:Dictionary) -> E3DModelInstance:
-    var built:Dictionary[String, E3DSubModel] = {}
+func build_model_instance(submodels:Dictionary, parents:Dictionary) -> MaszynaE3DModelInstance:
+    var built:Dictionary[String, MaszynaE3DSubModel] = {}
     for submodel_name:String in submodels:
-        var submodel:E3DSubModel = E3DSubModel.new()
+        var submodel:MaszynaE3DSubModel = MaszynaE3DSubModel.new()
         submodel.resource_name = submodel_name
-        submodel.submodel_type = E3DSubModel.SUBMODEL_TRANSFORM
+        submodel.submodel_type = MaszynaE3DSubModel.SUBMODEL_TRANSFORM
         submodel.transform = submodels[submodel_name]
         built[submodel_name] = submodel
-    var top:Array[E3DSubModel] = []
+    var top:Array[MaszynaE3DSubModel] = []
     for submodel_name:String in built:
         if parents.has(submodel_name):
-            var parent:E3DSubModel = built[parents[submodel_name]]
+            var parent:MaszynaE3DSubModel = built[parents[submodel_name]]
             var children:Array = parent.submodels
             children.append(built[submodel_name])
             parent.submodels = children
         else:
             top.append(built[submodel_name])
-    var model:E3DModel = E3DModel.new()
+    var model:MaszynaE3DModel = MaszynaE3DModel.new()
     model.submodels = top
-    var instance:E3DModelInstance = E3DModelInstance.new()
+    var instance:MaszynaE3DModelInstance = MaszynaE3DModelInstance.new()
     instance.name = "Model"
-    instance.instance_kind = E3DRenderingServer.INSTANCE_KIND_DYNAMIC
+    instance.instance_kind = ModelRenderingServer.INSTANCE_KIND_DYNAMIC
     instance.model = model
     return instance
 
@@ -245,7 +245,7 @@ func build_model_instance(submodels:Dictionary, parents:Dictionary) -> E3DModelI
 ## (as nodes, which a test looks into) only once wait_detailed() says so: a fixture without model
 ## files is never drawn in detail
 func spawn_maszyna_vehicle(data_path:String, file_name:String, skin:String, vehicle_id:String,
-        driver_type:MaszynaDynamicData.DriverType = MaszynaDynamicData.DriverType.DRIVER_NOBODY) -> MaszynaRailVehicle3D:
+        driver_type:MaszynaVehicleData.DriverType = MaszynaVehicleData.DriverType.DRIVER_NOBODY) -> MaszynaRailVehicle3D:
     var vehicle:MaszynaRailVehicle3D = MaszynaRailVehicle3D.new()
     vehicle.driver_type = driver_type
     vehicle.data_path = data_path

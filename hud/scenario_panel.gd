@@ -1,8 +1,8 @@
 extends PanelContainer
 
 ## The scenario being played, to read again after the selector is gone: the scenery title, its
-## image and description from the .scn header, and the mission of the trainset the player chose
-## (the same header the scenario selector shows, MaszynaSceneryInfo). Its second tab tells what the
+## image and description (SceneryInfo), and the mission of the trainset the player chose
+## (RailVehicleServer.trainset_get_description()). Its second tab tells what the
 ## player is to do in the vehicle they drive (ScenarioTask), read on a Timer while that tab is
 ## shown; the vehicle is the player's of the moment (PlayerServer), kept nowhere here.
 
@@ -12,7 +12,7 @@ signal close_requested
 
 ## The scenario the player has started; an empty vehicle_id lets the scenery pick its own driver, so
 ## there is no chosen trainset whose mission could be shown
-func show_scenario(info:MaszynaSceneryInfo, vehicle_id:String) -> void:
+func show_scenario(info:SceneryInfo, vehicle_id:String) -> void:
     %Title.text = info.title
     %Description.text = info.description
     %Description.visible = not info.description == ""
@@ -22,12 +22,9 @@ func show_scenario(info:MaszynaSceneryInfo, vehicle_id:String) -> void:
         if image:
             %Image.texture = ImageTexture.create_from_image(image)
     %Image.visible = not %Image.texture == null
-    %Mission.text = ""
-    for trainset:MaszynaSceneryInfo.Trainset in info.trainsets:
-        var driver:MaszynaSceneryInfo.Vehicle = trainset.get_driver_vehicle()
-        if vehicle_id and driver and driver.vehicle_id == vehicle_id:
-            %Mission.text = trainset.description
-            break
+    var vehicle:RID = VehicleServer.vehicle_get_rid_by_id(vehicle_id) if vehicle_id else RID()
+    var trainset:RID = RailVehicleServer.vehicle_get_trainset(vehicle) if vehicle.is_valid() else RID()
+    %Mission.text = RailVehicleServer.trainset_get_description(trainset) if trainset.is_valid() else ""
     %MissionSection.visible = not %Mission.text == ""
 
 

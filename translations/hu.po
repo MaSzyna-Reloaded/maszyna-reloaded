@@ -1,5 +1,5 @@
 # Strings of the demo's own interface that the game's catalogue (lang/*.po) does not have.
-# MaszynaTranslationServer merges them under the game's catalogue (maszyna/locale/translations).
+# ReloadedTranslationServer merges them under the game's catalogue (reloaded/locale/translations).
 # template.po lists every msgid, as the game's lang/template.po does, for a new language to start from.
 msgid ""
 msgstr ""
@@ -380,8 +380,8 @@ msgstr "Kamera"
 msgid "Camera chunk"
 msgstr "Kamera blokk"
 
-msgid "Draw distance"
-msgstr "Látótávolság"
+msgid "Tracks and traction distance"
+msgstr "Sínek és felsővezeték távolsága"
 
 msgid "Chunks"
 msgstr "Blokkok"
@@ -1391,6 +1391,12 @@ msgstr "Járműrészletek távolsága"
 msgid "Real mirrors"
 msgstr "Valódi tükrök"
 
+msgid "Road traffic density"
+msgstr "Közúti forgalom sűrűsége"
+
+msgid "Road traffic vehicles"
+msgstr "Közúti forgalom járművei"
+
 msgid "Smoke"
 msgstr "Füst"
 
@@ -2086,3 +2092,9 @@ msgstr "A Python-szkriptek által rajzolt vezetőfülke-kijelzők nem indíthat�
 
 msgid "Lazy loading (experimental)"
 msgstr "Késleltetett betöltés (kísérleti)"
+
+msgid "All sceneries"
+msgstr "Minden pálya"
+
+msgid "Sceneries of one source only"
+msgstr "Csak egy forrás pályái"

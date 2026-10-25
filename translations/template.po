@@ -1,5 +1,5 @@
 # Strings of the demo's own interface that the game's catalogue (lang/*.po) does not have.
-# MaszynaTranslationServer merges them under the game's catalogue (maszyna/locale/translations).
+# ReloadedTranslationServer merges them under the game's catalogue (reloaded/locale/translations).
 # template.po lists every msgid, as the game's lang/template.po does, for a new language to start from.
 msgid ""
 msgstr ""
@@ -380,7 +380,7 @@ msgstr ""
 msgid "Camera chunk"
 msgstr ""
 
-msgid "Draw distance"
+msgid "Tracks and traction distance"
 msgstr ""
 
 msgid "Chunks"
@@ -824,6 +824,9 @@ msgstr ""
 msgid "braked %d%%"
 msgstr ""
 
+msgid "%d t, actual %d t"
+msgstr ""
+
 msgid "Line speed %d km/h, no stations"
 msgstr ""
 
@@ -834,6 +837,15 @@ msgid "On time"
 msgstr ""
 
 msgid "Next station"
+msgstr ""
+
+msgid "Passenger stop"
+msgstr ""
+
+msgid "Technical stop"
+msgstr ""
+
+msgid "Change of direction"
 msgstr ""
 
 msgid "Terminus"
@@ -912,6 +924,9 @@ msgid "File"
 msgstr ""
 
 msgid "Skin"
+msgstr ""
+
+msgid "Livery"
 msgstr ""
 
 msgid "Length"
@@ -1389,6 +1404,12 @@ msgid "Vehicle detail distance"
 msgstr ""
 
 msgid "Real mirrors"
+msgstr ""
+
+msgid "Road traffic density"
+msgstr ""
+
+msgid "Road traffic vehicles"
 msgstr ""
 
 msgid "Smoke"
@@ -2112,4 +2133,10 @@ msgid "wrong kind of track"
 msgstr ""
 
 msgid "collision"
+msgstr ""
+
+msgid "All sceneries"
+msgstr ""
+
+msgid "Sceneries of one source only"
 msgstr ""

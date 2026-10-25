@@ -1,8 +1,8 @@
 extends MarginContainer
 class_name LanguageSwitcher
 
-## The language of the game's strings (MaszynaTranslationServer.language): one flag for every catalogue
-## MaszynaTranslationServer finds in the game's lang/, English alone when there is none - built again
+## The language of the game's strings (ReloadedTranslationServer.language): one flag for every catalogue
+## ReloadedTranslationServer finds in the game's lang/, English alone when there is none - built again
 ## when the game directory changes. Its left margin keeps it clear of what stands before it in a row.
 
 ## How large a flag is drawn
@@ -22,19 +22,19 @@ const LANGUAGE_NAMES:Dictionary[String, String] = {
 
 
 func _ready() -> void:
-    MaszynaTranslationServer.translation_languages_changed.connect(_on_translation_languages_changed)
+    ReloadedTranslationServer.translation_languages_changed.connect(_on_translation_languages_changed)
     _on_translation_languages_changed()
 
 
 func _exit_tree() -> void:
-    MaszynaTranslationServer.translation_languages_changed.disconnect(_on_translation_languages_changed)
+    ReloadedTranslationServer.translation_languages_changed.disconnect(_on_translation_languages_changed)
 
 
 func _on_translation_languages_changed() -> void:
     for button:Node in %Flags.get_children():
         button.free()
     var group:ButtonGroup = ButtonGroup.new()
-    for language:String in MaszynaTranslationServer.translation_get_languages():
+    for language:String in ReloadedTranslationServer.translation_get_languages():
         var button:Button = Button.new()
         button.toggle_mode = true
         button.button_group = group
@@ -46,10 +46,10 @@ func _on_translation_languages_changed() -> void:
             button.custom_minimum_size = FLAG_SIZE
         else:
             button.text = language.to_upper()
-        button.button_pressed = language == MaszynaTranslationServer.language
+        button.button_pressed = language == ReloadedTranslationServer.language
         button.pressed.connect(_on_language_pressed.bind(language))
         %Flags.add_child(button)
 
 
 func _on_language_pressed(language:String) -> void:
-    MaszynaTranslationServer.language = language
+    ReloadedTranslationServer.language = language

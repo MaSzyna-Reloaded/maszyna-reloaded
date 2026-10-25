@@ -19,23 +19,26 @@ signal scenario_progress(progress: float)
 var _scenery: SceneryContentNode = null
 ## The provider of the scenery, which runs its scenario from its load until it unloads
 var _provider: SceneryProvider = null
+## The vehicle_id the player starts in (load_scenery()); empty: the scenery's first vehicle
+var _start_vehicle_id: String = ""
 
 
 ## Loads the scenery `info` by its provider, the player's trainset as arranged
-## (SceneryContentNode.trainset_override), and starts its scenario - done once `scenery_loaded` has
-## been emitted
+## (SceneryContentNode.trainset_override), and starts its scenario and the player in `vehicle_id` -
+## done once the player stands there with its camera (Player.camera_changed)
 func load_scenery(info: SceneryInfo, trainset: Array[VehicleData], vehicle_id: String = "") -> void:
     var scenery: SceneryContentNode = _open_scenery(info)
     scenery.trainset_override.assign(trainset)
-    %Player.clear_start_train()
-    %Player.start_vehicle_id = vehicle_id
+    PlayerServer.player_stop()
+    _start_vehicle_id = vehicle_id
     scenery.load()
-    await %Player.initialization_ready
+    await %Player.camera_changed
 
 
-## Frees what the scenery holds, spread over frames - the world itself goes with queue_free()
+## Frees what the scenery holds, spread over frames - the world itself goes with queue_free(); the
+## player stops first, out of the scenery's vehicles
 func unload_scenery() -> void:
-    %Player.clear_start_train()
+    PlayerServer.player_stop()
     await _close_scenery()
 
 
@@ -91,8 +94,11 @@ func _on_scenery_loaded(first_vehicle_id: String) -> void:
     # started - a scenery without sounds tells no share of it on the way
     scenario_progress.emit(0.0)
     await _provider.scenario_start(_scenery, scenario_progress.emit)
-    if not %Player.start_vehicle_id:
-        %Player.start_vehicle_id = first_vehicle_id
+    var vehicle_id: String = _start_vehicle_id if _start_vehicle_id else first_vehicle_id
+    var vehicle: RID = VehicleServer.vehicle_get_rid_by_id(vehicle_id) if vehicle_id else RID()
+    if vehicle_id and not vehicle.is_valid():
+        push_warning("World: vehicle '%s' is not registered; the player starts outside." % vehicle_id)
+    PlayerServer.player_start(vehicle)
     scenery_loaded.emit(first_vehicle_id)
 
 

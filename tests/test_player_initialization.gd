@@ -8,12 +8,8 @@ const TRACK_LENGTH:float = 200.0
 const VEHICLE_OFFSET:float = 100.0
 const PLAYER_POSITION:Vector3 = Vector3(30.0, 3.0, 615.0)
 
-class ScenerySource extends Node:
-    signal scenery_loaded(first_vehicle_id:String)
-
 var _player:Player
 var _streamer:Node
-var _source:ScenerySource
 var _world:SceneryWorld
 var _vehicle:RailVehicle3D
 var _track:RID
@@ -28,14 +24,13 @@ func before_each() -> void:
 
 
 func after_each() -> void:
+    PlayerServer.player_stop()
     if is_instance_valid(_world):
         await _world.unload_scenery()
         _world.free()
     if is_instance_valid(_player):
         _player.free()
     _streamer.free()
-    if is_instance_valid(_source):
-        _source.free()
     if is_instance_valid(_vehicle):
         free_rail_vehicle(_vehicle)
     if _track.is_valid():
@@ -45,23 +40,18 @@ func after_each() -> void:
 
 
 func test_streaming_does_not_start_before_scenery_loaded() -> void:
-    _source = ScenerySource.new()
-    add_child(_source)
     _player = PLAYER_SCENE.instantiate()
-    _player.initialization_ready.connect(_streamer.set_active.bind(true))
-    _player.initialization_stopped.connect(_streamer.set_active.bind(false))
     _player.camera_changed.connect(_streamer.set_camera)
     watch_signals(_player)
     add_child(_player)
-    _source.scenery_loaded.connect(_player._on_scenery_loaded)
     assert_false(SceneryStreamingServer.streaming_has_camera())
     assert_null(_player.camera, "no camera of the player's before it has started")
-    assert_signal_emit_count(_player, "initialization_ready", 0)
-    _source.scenery_loaded.emit("")
+    assert_signal_emit_count(_player, "camera_changed", 0)
+    PlayerServer.player_start(RID())
     assert_true(SceneryStreamingServer.streaming_has_camera())
-    assert_eq(get_viewport().get_camera_3d(), _player.camera, "the player's one camera, current from initialization_ready")
+    assert_eq(get_viewport().get_camera_3d(), _player.camera, "the player's one camera, current once it has started")
     assert_eq(_player.camera.get_parent(), _player.free_view, "started outside, it looks through the free view")
-    assert_signal_emit_count(_player, "initialization_ready", 1)
+    assert_signal_emit_count(_player, "camera_changed", 1)
 
 
 func test_streamer_uses_its_assigned_camera_not_the_viewport_camera() -> void:
@@ -140,23 +130,17 @@ func test_first_streaming_camera_is_already_in_the_selected_cabin() -> void:
     packed.pack(cabin)
     cabin.free()
     CabinSystem.vehicle_set_cabin_scene(_vehicle.get_rid(), packed)
-    _source = ScenerySource.new()
-    add_child(_source)
     _player = PLAYER_SCENE.instantiate()
-    _player.initialization_ready.connect(_streamer.set_active.bind(true))
-    _player.initialization_stopped.connect(_streamer.set_active.bind(false))
     _player.camera_changed.connect(_streamer.set_camera)
-    _player.start_vehicle_id = "InitializationVehicle"
     _player.position = PLAYER_POSITION
     add_child(_player)
-    _source.scenery_loaded.connect(_player._on_scenery_loaded)
     var positions:Array[Vector3] = []
     var driven:Array[RID] = []
     var observe:Callable = func() -> void:
         positions.append(SceneryStreamingServer.streaming_get_camera_position())
         driven.append(PlayerServer.player_get_vehicle())
     SceneryStreamingServer.streaming_camera_changed.connect(observe)
-    _source.scenery_loaded.emit("")
+    PlayerServer.player_start(_vehicle.get_rid())
     SceneryStreamingServer.streaming_camera_changed.disconnect(observe)
     assert_eq(positions.size(), 1, "no streaming from an intermediate camera")
     assert_eq(driven[0], _vehicle.get_rid(), "seated before streaming starts")
@@ -165,7 +149,7 @@ func test_first_streaming_camera_is_already_in_the_selected_cabin() -> void:
     PlayerCameraServer.camera_toggle_cabin()
     assert_eq(SceneryStreamingServer.streaming_get_camera_position(), _player.free_view.global_position)
     assert_eq(PlayerServer.player_get_vehicle(), _vehicle.get_rid(), "view changes do not leave the vehicle")
-    _player.clear_start_train()
+    PlayerServer.player_stop()
     assert_false(SceneryStreamingServer.streaming_has_camera())
 
 
@@ -173,7 +157,7 @@ func test_world_initializes_on_each_scenery_load_and_detaches_on_unload() -> voi
     _world = WORLD_SCENE.instantiate()
     add_child(_world)
     _player = _world.get_node("Player") as Player
-    watch_signals(_player)
+    watch_signals(PlayerServer)
     assert_false(SceneryStreamingServer.streaming_has_camera())
     var trainset:Array[VehicleData] = []
     var ep07:SceneryInfo = SceneryInfo.new()
@@ -181,15 +165,16 @@ func test_world_initializes_on_each_scenery_load_and_detaches_on_unload() -> voi
     ep07.id = "ep07.scn"
     _world.load_scenery(ep07, trainset)
     assert_true(await wait_until(func() -> bool:
-        return get_signal_emit_count(_player, "initialization_ready") == 1, LOAD_TIMEOUT))
-    assert_eq(PlayerServer.player_get_vehicle(), VehicleServer.vehicle_get_rid_by_id("ep07-424"))
+        return PlayerServer.player_get_vehicle() == VehicleServer.vehicle_get_rid_by_id("ep07-424") \
+                and _player.camera, LOAD_TIMEOUT), "the player stands in the scenery's first vehicle")
+    assert_signal_emit_count(PlayerServer, "player_started", 1)
     assert_true(SceneryStreamingServer.streaming_has_camera())
     await _world.unload_scenery()
     assert_false(SceneryStreamingServer.streaming_has_camera())
     assert_false(PlayerServer.player_get_vehicle().is_valid())
     _world.load_scenery(ep07, trainset, "NoSuchVehicle")
     assert_true(await wait_until(func() -> bool:
-        return get_signal_emit_count(_player, "initialization_ready") == 2, LOAD_TIMEOUT))
+        return get_signal_emit_count(PlayerServer, "player_started") == 2, LOAD_TIMEOUT))
     assert_false(PlayerServer.player_get_vehicle().is_valid())
     assert_eq(SceneryStreamingServer.streaming_get_camera_position(), _player.free_view.global_position)
 
@@ -198,18 +183,12 @@ func test_scenery_vehicle_without_a_cabin_scene_waits_for_its_cabin() -> void:
     _track = build_track(TRACK_NAME, TRACK_LENGTH)
     _vehicle = build_rail_vehicle("NoCabinInitializationVehicle", TRACK_NAME, VEHICLE_OFFSET)
     assert_true(await wait_until(func() -> bool: return _vehicle.get_rid().is_valid(), LOAD_TIMEOUT))
-    _source = ScenerySource.new()
-    add_child(_source)
     _player = PLAYER_SCENE.instantiate()
-    _player.initialization_ready.connect(_streamer.set_active.bind(true))
-    _player.initialization_stopped.connect(_streamer.set_active.bind(false))
     _player.camera_changed.connect(_streamer.set_camera)
-    _player.start_vehicle_id = "NoCabinInitializationVehicle"
     _player.position = PLAYER_POSITION
     watch_signals(_player)
     add_child(_player)
-    _source.scenery_loaded.connect(_player._on_scenery_loaded)
-    _source.scenery_loaded.emit("")
+    PlayerServer.player_start(_vehicle.get_rid())
     assert_false(PlayerServer.player_get_vehicle().is_valid())
-    assert_signal_emit_count(_player, "initialization_ready", 0)
+    assert_signal_emit_count(_player, "camera_changed", 0)
     assert_false(SceneryStreamingServer.streaming_has_camera())

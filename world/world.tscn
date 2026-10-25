@@ -41,6 +41,3 @@ weather_path = NodePath("../Sky/_WorldEnvironment/Weather")
 
 [connection signal="configuration_changed" from="EnvironmentNode" to="Sky" method="apply_configuration"]
 [connection signal="camera_changed" from="Player" to="SceneryStreamer" method="set_camera"]
-[connection signal="initialization_ready" from="Player" to="SceneryStreamer" method="set_active" binds= [true]]
-[connection signal="initialization_stopped" from="Player" to="SceneryStreamer" method="set_active" binds= [false]]
-[connection signal="scenery_loaded" from="." to="Player" method="_on_scenery_loaded"]

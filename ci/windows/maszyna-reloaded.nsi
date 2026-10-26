@@ -1,7 +1,8 @@
 ; Windows installer of the exported game: one file to download instead of a zip, whose exe run
 ; from inside the archive starts without libreloaded.64.dll. Built by `make release-windows` in
 ; ci/docker/windows-installer with:
-;   SOURCE_DIR   - the unpacked export (reloaded.exe, libreloaded.64.dll, maszyna-python-host.64.exe)
+;   SOURCE_DIR   - the unpacked export (reloaded.exe, maszyna-python-host.64.exe and the libraries
+;                  of libreloaded and the addons), installed whole (export-files.sh)
 ;   BUILD_NUMBER - demo/build_number.txt
 ;   OUTFILE      - the installer to write
 ; Installed per user, so it needs no administrator rights.
@@ -24,6 +25,11 @@ RequestExecutionLevel user
 InstallDir "$LOCALAPPDATA\Programs\${PRODUCT_NAME}"
 InstallDirRegKey HKCU "${UNINSTALL_KEY}" "InstallLocation"
 SetCompressor /SOLID lzma
+
+; the export's files, listed when the installer is made (makensis runs in the script's directory)
+!tempfile INSTALL_FILES
+!tempfile UNINSTALL_FILES
+!system 'sh export-files.sh "${SOURCE_DIR}" "${INSTALL_FILES}" "${UNINSTALL_FILES}"' = 0
 
 !define MUI_ABORTWARNING
 !define MUI_LANGDLL_ALLLANGUAGES
@@ -66,10 +72,7 @@ FunctionEnd
 Section "!$(SECTION_GAME)" SectionGame
     SectionIn RO
     SetOutPath "$INSTDIR"
-    File "${SOURCE_DIR}/reloaded.exe"
-    File "${SOURCE_DIR}/libreloaded.64.dll"
-    ; the process the cab screens' Python runs in (libmaszyna's PythonScreenServer)
-    File "${SOURCE_DIR}/maszyna-python-host.64.exe"
+    !include "${INSTALL_FILES}"
     WriteUninstaller "$INSTDIR\uninstall.exe"
 
     CreateShortcut "$SMPROGRAMS\${PRODUCT_NAME}.lnk" "$INSTDIR\reloaded.exe"
@@ -93,10 +96,8 @@ SectionEnd
 
 ; only the installed files are removed: the directory may have been chosen by hand and hold more
 Section "Uninstall"
-    Delete "$INSTDIR\reloaded.exe"
+    !include "${UNINSTALL_FILES}"
     Delete "$INSTDIR\reloaded.console.exe"
-    Delete "$INSTDIR\libreloaded.64.dll"
-    Delete "$INSTDIR\maszyna-python-host.64.exe"
     Delete "$INSTDIR\uninstall.exe"
     RMDir "$INSTDIR"
     Delete "$SMPROGRAMS\${PRODUCT_NAME}.lnk"
@@ -109,3 +110,6 @@ Section "Uninstall"
     Delete "$DESKTOP\${SHORTCUT_VERBOSE}.lnk"
     DeleteRegKey HKCU "${UNINSTALL_KEY}"
 SectionEnd
+
+!delfile "${INSTALL_FILES}"
+!delfile "${UNINSTALL_FILES}"

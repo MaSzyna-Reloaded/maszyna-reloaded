@@ -7,11 +7,19 @@ name: build
 # (compile-debug) once, by build-host, and handed to the other jobs; the Windows and Android release
 # libraries cross-compiled on the runner, the Linux one in libreloaded's ci/docker/linux-sdk for an
 # old glibc. The games are published as a GitHub release: a pull request keeps one
-# prerelease per branch (maszyna-reloaded-<branch>), a pushed tag on main gets a release of its own
-# (maszyna-reloaded-<tag>). The maszyna-reloaded-* tags are both kinds' and made by CI itself.
+# prerelease per branch (maszyna-reloaded-<branch>), main one nightly prerelease
+# (maszyna-reloaded-nightly), a release/<name> branch one release candidate
+# (maszyna-reloaded-rc-<name>), and a pushed tag on main gets a release of its own
+# (maszyna-reloaded-<tag>). The maszyna-reloaded-* tags are all of them and made by CI itself.
+# Discord hears of the nightly, the candidates and the tags' releases from the publish job (the
+# DISCORD_RELEASES_WEBHOOK secret), never of a pull request's prerelease.
 on:
   pull_request:
   push:
+    # main is the nightly's branch until devel takes its place
+    branches:
+      - main
+      - 'release/**'
     tags:
       - '**'
       - '!maszyna-reloaded-*'
@@ -233,11 +241,13 @@ jobs:
           path: ${{ matrix.output }}
           if-no-files-found: error
 
-  # The games the builds exported (game-<platform>-<target>-<arch>), named with the branch or the
-  # tag and the build number; nothing is built again here. A pull request publishes them as the
-  # branch's prerelease (maszyna-reloaded-<branch>, "/" as "-") on its own commit, whose files every
-  # push replaces; a tag pushed on main as its release (maszyna-reloaded-<tag>, files without the
-  # build number). A pull request from a fork has a read-only token and keeps only the artifacts.
+  # The games the builds exported (game-<platform>-<target>-<arch>), named with the release and the
+  # build number; nothing is built again here. A pull request publishes them as the branch's
+  # prerelease (maszyna-reloaded-<branch>, "/" as "-") on its own commit, a push on main as the
+  # nightly (maszyna-reloaded-nightly), on release/<name> as its candidate
+  # (maszyna-reloaded-rc-<name>) - each a prerelease whose files every push replaces; a tag pushed
+  # on main as its release (maszyna-reloaded-<tag>, files without the build number). A pull request
+  # from a fork has a read-only token and keeps only the artifacts.
   publish:
     needs: [build-host, build]
     if: >
@@ -255,17 +265,30 @@ jobs:
           pattern: game-*
           path: artifacts
 
-      # each game as maszyna-reloaded-<branch>-<build>-<platform>-<target>-<arch>.zip or .apk, the
-      # Windows installer as maszyna-reloaded-<branch>-<build>-windows-setup.exe
+      - name: Name the release
+        id: release
+        env:
+          BRANCH: ${{ github.head_ref }}
+        run: |
+          case "$GITHUB_EVENT_NAME:$GITHUB_REF" in
+            pull_request:*) name="$BRANCH" ;;
+            push:refs/tags/*) name="$GITHUB_REF_NAME" ;;
+            push:refs/heads/release/*) name="rc-${GITHUB_REF_NAME#release/}" ;;
+            push:refs/heads/*) name=nightly ;;
+          esac
+          echo "value=maszyna-reloaded-${name//\//-}" >> "$GITHUB_OUTPUT"
+
+      # each game as <release>-<build>-<platform>-<target>-<arch>.zip or .apk, the Windows installer
+      # as <release>-<build>-windows-setup.exe
       - name: Name the files
         env:
-          NAME: ${{ github.head_ref || github.ref_name }}
+          RELEASE: ${{ steps.release.outputs.value }}
           BUILD_NUMBER: ${{ needs.build-host.outputs.build_number }}
         run: |
           mkdir release
-          # a tag's release is the tag's name alone; a branch's prerelease carries the build number
-          prefix="maszyna-reloaded-${NAME//\//-}"
-          if [ "$GITHUB_EVENT_NAME" = pull_request ]; then
+          # a tag's release is the tag's name alone; a prerelease carries the build number
+          prefix="$RELEASE"
+          if [ "$GITHUB_REF_TYPE" != tag ]; then
             prefix="$prefix-$BUILD_NUMBER"
           fi
           for dir in artifacts/game-*; do
@@ -279,20 +302,22 @@ jobs:
           test -f "release/$prefix-windows-setup.exe"
           ls -l release
 
-      - name: Publish the branch prerelease
-        if: github.event_name == 'pull_request'
+      - name: Publish the prerelease
+        if: github.ref_type != 'tag'
         env:
           GH_TOKEN: ${{ github.token }}
           GH_REPO: ${{ github.repository }}
-          BRANCH: ${{ github.head_ref }}
-          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          RELEASE: ${{ steps.release.outputs.value }}
+          SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+          PR_NUMBER: ${{ github.event.number }}
           BUILD_NUMBER: ${{ needs.build-host.outputs.build_number }}
         run: |
-          tag="maszyna-reloaded-${BRANCH//\//-}"
+          # the pull request's number, or the branch pushed
+          source="${PR_NUMBER:+#$PR_NUMBER}"
           # the tag is moved to the commit just built: the old release goes with its tag
-          gh release delete "$tag" --cleanup-tag --yes || true
-          gh release create "$tag" release/* --prerelease --target "$HEAD_SHA" \
-            --title "$tag" --notes "Build $BUILD_NUMBER of $HEAD_SHA (#${{ github.event.number }})"
+          gh release delete "$RELEASE" --cleanup-tag --yes || true
+          gh release create "$RELEASE" release/* --prerelease --target "$SHA" \
+            --title "$RELEASE" --notes "Build $BUILD_NUMBER of $SHA (${source:-$GITHUB_REF_NAME})"
 
       - name: Publish the tag release
         if: github.event_name == 'push'
@@ -300,6 +325,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           GH_REPO: ${{ github.repository }}
           TAG: ${{ github.ref_name }}
+          RELEASE: ${{ steps.release.outputs.value }}
           BUILD_NUMBER: ${{ needs.build-host.outputs.build_number }}
         run: |
           # only a tag on main is released: main has to contain the tagged commit
@@ -310,8 +336,22 @@ jobs:
           fi
           # released as maszyna-reloaded-<tag>, a tag of CI's own on the same commit (the trigger leaves
           # maszyna-reloaded-* out); a rerun finds the release already there and only replaces its files
-          release="maszyna-reloaded-$TAG"
-          gh release create "$release" --target "$GITHUB_SHA" --title "$release" \
+          gh release create "$RELEASE" --target "$GITHUB_SHA" --title "$RELEASE" \
             --notes "Build $BUILD_NUMBER of $GITHUB_SHA, tag $TAG" --generate-notes \
-            || gh release view "$release" > /dev/null
-          gh release upload "$release" release/* --clobber
+            || gh release view "$RELEASE" > /dev/null
+          gh release upload "$RELEASE" release/* --clobber
+
+      # the nightly, a release candidate and a tag's release; the repository's own webhook is not
+      # subscribed to releases, which would announce every pull request's prerelease as well
+      - name: Announce on Discord
+        if: github.event_name == 'push'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_RELEASES_WEBHOOK }}
+          RELEASE: ${{ steps.release.outputs.value }}
+          BUILD_NUMBER: ${{ needs.build-host.outputs.build_number }}
+        run: |
+          url=$(gh release view "$RELEASE" --json url --jq .url)
+          jq -n --arg content "**$RELEASE** - build $BUILD_NUMBER"$'\n'"$url" '{content: $content}' \
+            | curl -fsS -H 'Content-Type: application/json' -d @- "$DISCORD_WEBHOOK"

@@ -1,7 +1,8 @@
 name: build
 
 # The game's tests and its release of each platform, with the double precision Godot fetched from
-# libmaszyna's release godot-<version>-double (vendor/libreloaded/ci/fetch-godot.sh). libreloaded
+# libreloaded's release godot-<build>-double - its version with its godot-patches
+# (vendor/libreloaded/ci/fetch-godot.sh). libreloaded
 # with its plugin libmaszyna (the vendor/libreloaded and vendor/libmaszyna submodules) is built
 # into this project by the Makefile's own rules: the tests' and the exporting editor's library
 # (compile-debug) once, by build-host, and handed to the other jobs; the Windows and Android release

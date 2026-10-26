@@ -36,6 +36,7 @@ general/3d_panning_strength=0.55
 
 [autoload]
 
+ReloadedPlugins="*res://addons/libreloaded/plugins/reloaded_plugins.gd"
 BiomesServer="*res://addons/gnd_biomes/biomes_server.gd"
 TractionRenderingServer="*res://addons/libreloaded/traction/traction_rendering_server.gd"
 VehicleCatalogServer="*res://addons/libreloaded/vehicles/vehicle_catalog_server.gd"
@@ -48,7 +49,6 @@ MaszynaMaterialParser="*uid://7b48fl428yqa"
 MaszynaMaterialFactory="*uid://v144f3irjg7m"
 MaszynaE3DModelManager="*uid://b2v733o52i40x"
 MaszynaVehicleSystem="*res://addons/libmaszyna/vehicle/maszyna_vehicle_system.gd"
-MaszynaVehicleCatalogProvider="*res://addons/libmaszyna/vehicle/maszyna_vehicle_catalog_provider.gd"
 MaszynaVehicleProfileManager="*res://addons/libmaszyna/vehicle/maszyna_vehicle_profile_manager.gd"
 MaszynaE3DModelTool="*uid://df7a5f7f35wd1"
 AudioStreamManager="*uid://cp8sgfk334adm"
@@ -86,8 +86,6 @@ clouds_mode=1
 day_light_energy=2.0
 shader_zenith_color=Color(0.11514282, 0.20309141, 0.3828125, 1)
 shader_horizon_height=0.178
-day_ambient_energy=0.325
-day_ambient_sky_contribution=0.69
 shader_night_sky_energy=0.165
 clouds_color_shadow=Color(0.8515625, 0.8515625, 0.8515625, 1)
 clouds_shadow_angular_distance_clear=0.53
@@ -927,6 +925,10 @@ reloaded_overcast={
 reloaded_fog_range={
 "type": "float",
 "value": 25000.0
+}
+maszyna_selfillum_energy={
+"type": "float",
+"value": 0.2
 }
 reloaded_light_level={
 "type": "float",

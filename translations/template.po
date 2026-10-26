@@ -1256,6 +1256,9 @@ msgid "Scenery"
 msgstr ""
 
 
+msgid "Self-illumination energy"
+msgstr ""
+
 msgid "Improved railway lights visibility"
 msgstr ""
 
@@ -1404,6 +1407,21 @@ msgid "Vehicle detail distance"
 msgstr ""
 
 msgid "Real mirrors"
+msgstr ""
+
+msgid "Interior lights energy"
+msgstr ""
+
+msgid "Interior lights cast shadows"
+msgstr ""
+
+msgid "Interior lights glow energy"
+msgstr ""
+
+msgid "Interior lights glow range"
+msgstr ""
+
+msgid "Interior lights glow attenuation"
 msgstr ""
 
 msgid "Road traffic density"

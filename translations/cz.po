@@ -1241,6 +1241,9 @@ msgid "Scenery"
 msgstr "Scenérie"
 
 
+msgid "Self-illumination energy"
+msgstr "Jas samosvícení"
+
 msgid "Improved railway lights visibility"
 msgstr "Lepší viditelnost železničních světel"
 
@@ -1390,6 +1393,21 @@ msgstr "Vzdálenost detailů vozidel"
 
 msgid "Real mirrors"
 msgstr "Skutečná zrcátka"
+
+msgid "Interior lights energy"
+msgstr "Jas osvětlení interiéru vozů"
+
+msgid "Interior lights cast shadows"
+msgstr "Osvětlení interiéru vozů vrhá stíny"
+
+msgid "Interior lights glow energy"
+msgstr "Záře světel interiéru vozů"
+
+msgid "Interior lights glow range"
+msgstr "Dosah záře světel interiéru vozů"
+
+msgid "Interior lights glow attenuation"
+msgstr "Útlum záře světel interiéru vozů"
 
 msgid "Road traffic density"
 msgstr "Hustota silničního provozu"

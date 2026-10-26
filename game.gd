@@ -302,7 +302,7 @@ func _exit_to_menu(game_dir: String = "") -> void:
     # the scenery's script context and environment go with the world
     $GameHud.attach_script_context(RID())
     $GameHud.attach_environment(null)
-    $GameHud.attach_world(null, null)
+    $GameHud.attach_world(null)
     $GamePlayLogRecorder.stop()
     for log_file: String in _log_handlers:
         for logger_id: String in GAME_LOG_FILES[log_file]:

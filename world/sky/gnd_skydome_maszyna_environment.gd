@@ -216,6 +216,10 @@ func apply_visual_configuration() -> void:
     for property: StringName in FOG_SKY_AFFECT_PROPERTIES:
         skydome.set(property, sky_affect)
     skydome.fog_sky_affect_intensity = 0.0
+    # ...that share is the zenith's: towards the horizon the sky thickens as the fog layer does, up
+    # to what the terrain at the fog's end takes - a fog reaching past FOG_SKY_HEIGHT_SETTING left
+    # the sky behind the fully fogged terrain darker than it (+8 of 255 in a 1500 m fog)
+    skydome.fog_sky_horizon_curve = _environment.fog_depth_curve
     for property: StringName in FOG_VOLUMETRIC_SKY_AFFECT_PROPERTIES:
         skydome.set(property, 1.0)
     # closer than the reference distance the volumetric fog thickens in proportion; further away
@@ -238,26 +242,41 @@ func apply_visual_configuration() -> void:
     # depth is the density times the length, so the density has to be divided by this whole factor
     # and not by length_scale alone, or undoing the shrink thickens the fog by the shrink again.
     # A scale of exactly 1.0 leaves the volume, and with it the shrink, entirely to Skydome.
+    var length_shrink: float = maxf(
+        1.0 - SKYDOME_VOL_FOG_LENGTH_SHRINK * storm_fog_intensity, SKYDOME_VOL_FOG_LENGTH_SHRINK_MIN)
     var volume_scale: float = 1.0
     if not is_equal_approx(length_scale, 1.0):
-        var length_shrink: float = maxf(
-            1.0 - SKYDOME_VOL_FOG_LENGTH_SHRINK * storm_fog_intensity, SKYDOME_VOL_FOG_LENGTH_SHRINK_MIN)
         volume_scale = length_scale / length_shrink
-        for property: StringName in FOG_VOLUMETRIC_LENGTH_PROPERTIES:
-            skydome.set(property, _skydome_value(property) * volume_scale)
-    for property: StringName in FOG_VOLUMETRIC_DENSITY_PROPERTIES:
-        skydome.set(
-            property, _skydome_value(property) * density_scale * volumetric_scale / volume_scale
-        )
+    var fog_ends: Array[float] = [
+        fog_distance * float(ProjectSettings.get_setting(
+            FOG_DAY_DISTANCE_FACTOR_SETTING, FOG_DAY_DISTANCE_FACTOR_DEFAULT)),
+        fog_distance * float(ProjectSettings.get_setting(
+            FOG_NIGHT_DISTANCE_FACTOR_SETTING, FOG_NIGHT_DISTANCE_FACTOR_DEFAULT)),
+    ]
+    # The volume reaches no further than the depth fog: the volumetric fog is darker than the depth
+    # fog's colour, and past the depth fog's end, where everything is that colour, an object in the
+    # volume had less of it in front than the sky behind it, which has all of it - drawn brighter
+    # than the fog around it (+3 of 255 at 100 m in a 103 m fog with a 192 m volume). Shortened,
+    # it is as much thicker, keeping the darkening the sky gets.
+    var reach_scales: Array[float] = []
+    for period: int in FOG_VOLUMETRIC_LENGTH_PROPERTIES.size():
+        var length_property: StringName = FOG_VOLUMETRIC_LENGTH_PROPERTIES[period]
+        var length: float = _skydome_value(length_property) * volume_scale
+        var reach_scale: float = minf(1.0, fog_ends[period] / maxf(length * length_shrink, 0.001))
+        reach_scales.append(reach_scale)
+        skydome.set(length_property, length * reach_scale)
+        var density_property: StringName = FOG_VOLUMETRIC_DENSITY_PROPERTIES[period]
+        skydome.set(density_property, _skydome_value(density_property) * density_scale
+            * volumetric_scale / volume_scale / reach_scale)
     # Skydome adds this as a second extinction per metre on top of the day/night density
-    # (Skydome.gd:1305), so the stretched volume has to thin it by the same factor as that one.
+    # (Skydome.gd:1305), so the stretched volume has to thin it by the same factor as that one,
+    # and the shortened one thicken it - by the day's or the night's, whichever it is
     skydome.vol_fog_density_boost = (
         _skydome_value(&"vol_fog_density_boost")
-        * volumetric_scale / distance_ratio / volume_scale)
-    skydome.day_fog_distance = fog_distance * float(ProjectSettings.get_setting(
-        FOG_DAY_DISTANCE_FACTOR_SETTING, FOG_DAY_DISTANCE_FACTOR_DEFAULT))
-    skydome.night_fog_distance = fog_distance * float(ProjectSettings.get_setting(
-        FOG_NIGHT_DISTANCE_FACTOR_SETTING, FOG_NIGHT_DISTANCE_FACTOR_DEFAULT))
+        * volumetric_scale / distance_ratio / volume_scale
+        / lerpf(reach_scales[1], reach_scales[0], get_day_share()))
+    skydome.day_fog_distance = fog_ends[0]
+    skydome.night_fog_distance = fog_ends[1]
 
 
 ## Skydome later overrides shadow opacity from cloud coverage.

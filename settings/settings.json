@@ -815,6 +815,54 @@
                     "key": "maszyna/rendering/real_mirrors",
                     "type": "bool",
                     "default": true
+                },
+                {
+                    "title": "Interior lights energy",
+                    "store": "project",
+                    "key": "maszyna/vehicles/interior_lights/energy",
+                    "type": "float",
+                    "hint": "range",
+                    "hint_string": "0,4,0.05",
+                    "default": 0.5,
+                    "advanced": true
+                },
+                {
+                    "title": "Interior lights cast shadows",
+                    "store": "project",
+                    "key": "maszyna/vehicles/interior_lights/shadows",
+                    "type": "bool",
+                    "default": false,
+                    "advanced": true
+                },
+                {
+                    "title": "Interior lights glow energy",
+                    "store": "project",
+                    "key": "maszyna/vehicles/interior_lights/glow_energy",
+                    "type": "float",
+                    "hint": "range",
+                    "hint_string": "0,2,0.01",
+                    "default": 0.1,
+                    "advanced": true
+                },
+                {
+                    "title": "Interior lights glow range",
+                    "store": "project",
+                    "key": "maszyna/vehicles/interior_lights/glow_range",
+                    "type": "float",
+                    "hint": "range",
+                    "hint_string": "0,40,0.1",
+                    "default": 20.0,
+                    "advanced": true
+                },
+                {
+                    "title": "Interior lights glow attenuation",
+                    "store": "project",
+                    "key": "maszyna/vehicles/interior_lights/glow_attenuation",
+                    "type": "float",
+                    "hint": "range",
+                    "hint_string": "0,8,0.05",
+                    "default": 2.4,
+                    "advanced": true
                 }
             ]
         },

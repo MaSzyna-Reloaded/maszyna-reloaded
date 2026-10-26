@@ -1394,6 +1394,21 @@ msgstr "车辆细节距离"
 msgid "Real mirrors"
 msgstr "真实后视镜"
 
+msgid "Interior lights energy"
+msgstr "车厢内部灯光亮度"
+
+msgid "Interior lights cast shadows"
+msgstr "车厢内部灯光投射阴影"
+
+msgid "Interior lights glow energy"
+msgstr "车厢内灯光溢光强度"
+
+msgid "Interior lights glow range"
+msgstr "车厢内灯光溢光范围"
+
+msgid "Interior lights glow attenuation"
+msgstr "车厢内灯光溢光衰减"
+
 msgid "Road traffic density"
 msgstr "道路交通密度"
 

@@ -1394,6 +1394,21 @@ msgstr "Járműrészletek távolsága"
 msgid "Real mirrors"
 msgstr "Valódi tükrök"
 
+msgid "Interior lights energy"
+msgstr "Kocsibelső világítás erőssége"
+
+msgid "Interior lights cast shadows"
+msgstr "A kocsibelső világítás árnyékot vet"
+
+msgid "Interior lights glow energy"
+msgstr "Kocsibelső fényeinek derengése"
+
+msgid "Interior lights glow range"
+msgstr "Kocsibelső fényei derengésének hatótávja"
+
+msgid "Interior lights glow attenuation"
+msgstr "Kocsibelső fényei derengésének csillapítása"
+
 msgid "Road traffic density"
 msgstr "Közúti forgalom sűrűsége"
 

@@ -1241,6 +1241,9 @@ msgid "Scenery"
 msgstr "场景"
 
 
+msgid "Self-illumination energy"
+msgstr "自发光强度"
+
 msgid "Improved railway lights visibility"
 msgstr "增强铁路灯光可见度"
 

@@ -1256,6 +1256,9 @@ msgid "Scenery"
 msgstr "Sceneria"
 
 
+msgid "Self-illumination energy"
+msgstr "Jasność samopodświetlenia"
+
 msgid "Improved railway lights visibility"
 msgstr "Lepsza widoczność świateł kolejowych"
 

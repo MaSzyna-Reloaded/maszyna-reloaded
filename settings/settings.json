@@ -302,6 +302,16 @@
                     "restart_required": true
                 },
                 {
+                    "title": "Self-illumination energy",
+                    "store": "project",
+                    "key": "maszyna/rendering/selfillum_energy",
+                    "type": "float",
+                    "hint": "range",
+                    "hint_string": "0,2,0.01",
+                    "default": 0.2,
+                    "advanced": true
+                },
+                {
                     "title": "Improved railway lights visibility",
                     "store": "project",
                     "key": "maszyna/scenery/railway_lights_visibility_improved",

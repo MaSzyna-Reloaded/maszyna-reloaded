@@ -1256,6 +1256,9 @@ msgid "Scenery"
 msgstr ""
 
 
+msgid "Self-illumination energy"
+msgstr ""
+
 msgid "Improved railway lights visibility"
 msgstr ""
 

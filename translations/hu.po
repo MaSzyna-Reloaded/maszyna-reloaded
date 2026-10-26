@@ -1241,6 +1241,9 @@ msgid "Scenery"
 msgstr "Táj"
 
 
+msgid "Self-illumination energy"
+msgstr "Önvilágítás fényereje"
+
 msgid "Improved railway lights visibility"
 msgstr "Jobb vasúti fényláthatóság"
 

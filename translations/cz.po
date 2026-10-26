@@ -1241,6 +1241,9 @@ msgid "Scenery"
 msgstr "Scenérie"
 
 
+msgid "Self-illumination energy"
+msgstr "Jas samosvícení"
+
 msgid "Improved railway lights visibility"
 msgstr "Lepší viditelnost železničních světel"
 

@@ -1574,6 +1574,18 @@ msgstr "屏幕空间抗锯齿"
 msgid "Temporal anti-aliasing (TAA)"
 msgstr "时间抗锯齿 (TAA)"
 
+msgid "3D upscaling"
+msgstr "3D 缩放"
+
+msgid "Bilinear"
+msgstr "双线性"
+
+msgid "3D render scale"
+msgstr "3D 渲染比例"
+
+msgid "FSR sharpness"
+msgstr "FSR 锐度"
+
 msgid "Ambient occlusion (SSAO)"
 msgstr "环境光遮蔽 (SSAO)"
 

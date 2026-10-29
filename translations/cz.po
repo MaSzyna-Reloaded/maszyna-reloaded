@@ -1574,6 +1574,18 @@ msgstr "Vyhlazování hran v prostoru obrazovky"
 msgid "Temporal anti-aliasing (TAA)"
 msgstr "Časové vyhlazování (TAA)"
 
+msgid "3D upscaling"
+msgstr "Škálování 3D"
+
+msgid "Bilinear"
+msgstr "Bilineární"
+
+msgid "3D render scale"
+msgstr "Měřítko vykreslování 3D"
+
+msgid "FSR sharpness"
+msgstr "Ostrost FSR"
+
 msgid "Ambient occlusion (SSAO)"
 msgstr "Okolní zastínění (SSAO)"
 

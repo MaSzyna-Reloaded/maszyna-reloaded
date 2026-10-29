@@ -2128,3 +2128,15 @@ msgstr "Všechny scenérie"
 
 msgid "Sceneries of one source only"
 msgstr "Scenérie jen z jednoho zdroje"
+
+msgid "Missing files"
+msgstr "Chybějící soubory"
+
+msgid "Show missing files"
+msgstr "Zobrazit chybějící soubory"
+
+msgid "Not all files of the scenery were found: the scenario may not run correctly."
+msgstr "Nebyly nalezeny všechny soubory scenérie: scénář nemusí fungovat správně."
+
+msgid "Not all elements may be displayed correctly."
+msgstr "Ne všechny prvky se mohou zobrazovat správně."

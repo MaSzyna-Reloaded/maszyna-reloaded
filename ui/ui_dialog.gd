@@ -25,6 +25,9 @@ signal dismissed
 @export var back_text: String = ""
 @export var confirm_intent: UIButton.Intent = UIButton.Intent.SUCCESS
 @export var alternative_intent: UIButton.Intent = UIButton.Intent.DEFAULT
+## Lines shown under the message, scrolled, as they are - names of the data, not translated (the
+## files a scenery could not find); none: no list
+var details: PackedStringArray = []
 
 
 ## The buttons' intents are the dialog's settings, so they are given before the buttons are ready
@@ -37,6 +40,8 @@ func _enter_tree() -> void:
 func ask() -> void:
     %Title.text = title
     %Message.text = message
+    %Details.text = "\n".join(details)
+    %DetailsScroll.visible = details.size() > 0
     %BackButton.text = back_text
     %BackButton.visible = not back_text == ""
     %AlternativeButton.text = alternative_text

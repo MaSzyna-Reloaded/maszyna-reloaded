@@ -1589,6 +1589,18 @@ msgstr ""
 msgid "Temporal anti-aliasing (TAA)"
 msgstr ""
 
+msgid "3D upscaling"
+msgstr ""
+
+msgid "Bilinear"
+msgstr ""
+
+msgid "3D render scale"
+msgstr ""
+
+msgid "FSR sharpness"
+msgstr ""
+
 msgid "Ambient occlusion (SSAO)"
 msgstr ""
 

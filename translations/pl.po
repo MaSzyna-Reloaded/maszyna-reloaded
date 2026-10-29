@@ -1589,6 +1589,18 @@ msgstr "Wygładzanie krawędzi w przestrzeni ekranu"
 msgid "Temporal anti-aliasing (TAA)"
 msgstr "Wygładzanie czasowe (TAA)"
 
+msgid "3D upscaling"
+msgstr "Skalowanie 3D"
+
+msgid "Bilinear"
+msgstr "Dwuliniowe"
+
+msgid "3D render scale"
+msgstr "Skala renderowania 3D"
+
+msgid "FSR sharpness"
+msgstr "Ostrość FSR"
+
 msgid "Ambient occlusion (SSAO)"
 msgstr "Okluzja otoczenia (SSAO)"
 

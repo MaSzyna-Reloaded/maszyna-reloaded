@@ -22,9 +22,10 @@ extends Control
 ## under the section's folded "Advanced". "excludes" names the keys of the section's settings that
 ## cannot be switched on while this one is on (TAA or MSAA and FXAA); "depends_on" the key of the
 ## one that has to be on for this one to be changed; "disabled_by" the key of the one that keeps it
-## from being changed while it is on. "restart_required": true marks one that takes effect only
-## after the game restarts - a change of it lights the note above the buttons, and Save asks
-## whether to restart.
+## from being changed while it is on - or, with "disabled_by_values", while it has one of them
+## (TAA while the upscaling is FSR 2.2). "restart_required": true marks one that takes effect only after
+## the game restarts - a change of it lights the note above the buttons, and Save asks whether to
+## restart.
 
 const DEFINITION: JSON = preload("settings.json")
 const PAGE: PackedScene = preload("settings_page.tscn")
@@ -40,6 +41,19 @@ const STORES: Dictionary[String, SettingRow.Store] = {
     "user": SettingRow.Store.USER,
 }
 
+## The upscaling the player chooses (settings.json "upscaling"): off, or the viewport's mode
+const UPSCALING_OFF: int = 0
+const UPSCALING_MODES: Array[Viewport.Scaling3DMode] = [
+    # off is bilinear at full scale, which scales nothing
+    Viewport.SCALING_3D_MODE_BILINEAR,
+    Viewport.SCALING_3D_MODE_BILINEAR,
+    Viewport.SCALING_3D_MODE_FSR,
+    Viewport.SCALING_3D_MODE_FSR2,
+]
+## The 3D render scale is set in percent, Viewport.scaling_3d_scale is a fraction
+const PERCENT: float = 100.0
+## Godot's own FSR sharpness (Viewport.fsr_sharpness)
+const FSR_SHARPNESS_DEFAULT: float = 0.2
 ## Part of the screen the settings window takes
 const WINDOW_RATIO: float = 0.76
 ## The note above the buttons, shown while a change of a setting that takes effect after a restart
@@ -110,6 +124,7 @@ func _ready() -> void:
             if setting.has("disabled_by"):
                 row.disabling_rows.append(rows[setting["disabled_by"]])
                 rows[setting["disabled_by"]].affected_rows.append(row)
+                row.disabling_values = setting.get("disabled_by_values", [])
         page.cancelled.connect(ask_save_or_discard)
         page.navigate_down.connect(focus_actions)
         page.navigate_left.connect(focus_section_list)
@@ -277,3 +292,14 @@ func _apply_graphics() -> void:
         "render", "screen_space_aa", Viewport.SCREEN_SPACE_AA_DISABLED
     )
     viewport.use_taa = UserSettings.get_setting("render", "use_taa", true)
+    # FSR 2.2 turns TAA off by itself (renderer_viewport.cpp)
+    var upscaling: int = UserSettings.get_setting("render", "upscaling", UPSCALING_OFF)
+    viewport.scaling_3d_mode = UPSCALING_MODES[upscaling]
+    # off renders at full scale, whatever the scale set
+    viewport.scaling_3d_scale = (
+        1.0 if upscaling == UPSCALING_OFF
+        else UserSettings.get_setting("render", "scaling_3d_scale_percent", PERCENT) / PERCENT
+    )
+    viewport.fsr_sharpness = UserSettings.get_setting(
+        "render", "fsr_sharpness", FSR_SHARPNESS_DEFAULT
+    )

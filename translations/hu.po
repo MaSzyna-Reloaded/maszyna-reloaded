@@ -1574,6 +1574,18 @@ msgstr "Képernyőtéri élsimítás"
 msgid "Temporal anti-aliasing (TAA)"
 msgstr "Időbeli élsimítás (TAA)"
 
+msgid "3D upscaling"
+msgstr "3D felskálázás"
+
+msgid "Bilinear"
+msgstr "Bilineáris"
+
+msgid "3D render scale"
+msgstr "3D renderelési lépték"
+
+msgid "FSR sharpness"
+msgstr "FSR élesség"
+
 msgid "Ambient occlusion (SSAO)"
 msgstr "Környezeti takarás (SSAO)"
 

@@ -54,6 +54,10 @@
                     "excludes": [
                         "msaa_3d",
                         "screen_space_aa"
+                    ],
+                    "disabled_by": "upscaling",
+                    "disabled_by_values": [
+                        3
                     ]
                 },
                 {
@@ -80,6 +84,42 @@
                     "default": 0,
                     "excludes": [
                         "use_taa"
+                    ]
+                },
+                {
+                    "title": "3D upscaling",
+                    "store": "user",
+                    "section": "render",
+                    "key": "upscaling",
+                    "type": "int",
+                    "hint": "enum",
+                    "hint_string": "Off:0,Bilinear:1,FSR 1.0:2,FSR 2.2:3",
+                    "default": 0
+                },
+                {
+                    "title": "3D render scale",
+                    "store": "user",
+                    "section": "render",
+                    "key": "scaling_3d_scale_percent",
+                    "type": "int",
+                    "hint": "range",
+                    "hint_string": "50,100,1,suffix:%",
+                    "default": 100,
+                    "depends_on": "upscaling"
+                },
+                {
+                    "title": "FSR sharpness",
+                    "store": "user",
+                    "section": "render",
+                    "key": "fsr_sharpness",
+                    "type": "float",
+                    "hint": "range",
+                    "hint_string": "0,2,0.01",
+                    "default": 0.2,
+                    "disabled_by": "upscaling",
+                    "disabled_by_values": [
+                        0,
+                        1
                     ]
                 },
                 {

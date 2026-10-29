@@ -2170,3 +2170,15 @@ msgstr "Wszystkie scenerie"
 
 msgid "Sceneries of one source only"
 msgstr "Scenerie tylko z jednego źródła"
+
+msgid "Missing files"
+msgstr "Brakujące pliki"
+
+msgid "Show missing files"
+msgstr "Pokaż brakujące pliki"
+
+msgid "Not all files of the scenery were found: the scenario may not run correctly."
+msgstr "Nie wszystkie pliki scenerii zostały znalezione: scenariusz może nie działać poprawnie."
+
+msgid "Not all elements may be displayed correctly."
+msgstr "Nie wszystkie elementy mogą prawidłowo się wyświetlać."

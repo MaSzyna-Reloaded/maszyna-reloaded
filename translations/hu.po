@@ -2128,3 +2128,15 @@ msgstr "Minden pálya"
 
 msgid "Sceneries of one source only"
 msgstr "Csak egy forrás pályái"
+
+msgid "Missing files"
+msgstr "Hiányzó fájlok"
+
+msgid "Show missing files"
+msgstr "Hiányzó fájlok megjelenítése"
+
+msgid "Not all files of the scenery were found: the scenario may not run correctly."
+msgstr "A pálya nem minden fájlja található meg: a forgatókönyv nem feltétlenül fut megfelelően."
+
+msgid "Not all elements may be displayed correctly."
+msgstr "Nem minden elem jelenhet meg megfelelően."

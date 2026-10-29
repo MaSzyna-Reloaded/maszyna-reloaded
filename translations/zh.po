@@ -2128,3 +2128,15 @@ msgstr "所有场景"
 
 msgid "Sceneries of one source only"
 msgstr "仅显示一个来源的场景"
+
+msgid "Missing files"
+msgstr "缺失的文件"
+
+msgid "Show missing files"
+msgstr "显示缺失的文件"
+
+msgid "Not all files of the scenery were found: the scenario may not run correctly."
+msgstr "未找到场景的全部文件：场景可能无法正常运行。"
+
+msgid "Not all elements may be displayed correctly."
+msgstr "并非所有元素都能正确显示。"

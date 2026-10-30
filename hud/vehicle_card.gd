@@ -193,8 +193,8 @@ func _on_refresh_timer_timeout() -> void:
     _show_values(%MotionData, motion)
 
     var brakes:Dictionary[String, String] = {}
-    if state.has("brake_pipe_pressure"):
-        brakes[tr("Brake pipe")] = "%.2f bar" % state["brake_pipe_pressure"]
+    if state.has("pipe_pressure"):
+        brakes[tr("Brake pipe")] = "%.2f bar" % state["pipe_pressure"]
     if state.has("brake_air_pressure"):
         brakes[tr("Brake cylinder")] = "%.2f bar" % state["brake_air_pressure"]
     if state.has("compressor_pressure"):

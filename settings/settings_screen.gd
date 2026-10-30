@@ -36,10 +36,6 @@ const RESOLUTION: PackedScene = preload("setting_resolution.tscn")
 const FOLDER: PackedScene = preload("setting_folder.tscn")
 const GAME_DIR: PackedScene = preload("setting_game_dir.tscn")
 const TEXT: PackedScene = preload("setting_text.tscn")
-const STORES: Dictionary[String, SettingRow.Store] = {
-    "project": SettingRow.Store.PROJECT,
-    "user": SettingRow.Store.USER,
-}
 
 ## The upscaling the player chooses (settings.json "upscaling"): off, or the viewport's mode
 const UPSCALING_OFF: int = 0
@@ -100,7 +96,7 @@ func _ready() -> void:
                 else OPTION
             ).instantiate()
             row.title = setting["title"]
-            row.store = STORES[setting["store"]]
+            row.store = SettingRow.STORES[setting["store"]]
             row.section = setting.get("section", "")
             row.key = setting["key"]
             row.default_value = setting["default"]

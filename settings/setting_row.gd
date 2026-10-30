@@ -18,6 +18,11 @@ enum Store {
 
 ## UserSettings.hpp PROJECT_SETTINGS_SECTION
 const PROJECT_SETTINGS_SECTION: String = "project_settings"
+## The store by its name in settings.json
+const STORES: Dictionary[String, Store] = {
+    "project": Store.PROJECT,
+    "user": Store.USER,
+}
 
 ## Look of the row, by how lit it is - selector_theme.tres
 const ITEM_IDLE: StringName = &"SettingItem"
@@ -280,6 +285,14 @@ func _update_look() -> void:
 
 ## The value the setting has now
 func _read() -> Variant:
-    if store == Store.PROJECT:
-        return ProjectSettings.get_setting(key, default_value)
-    return UserSettings.get_setting(section, key, default_value)
+    return read_setting(store, section, key, default_value)
+
+
+## The value a setting has now - setting_default when it was never set; a PROJECT setting has no
+## section of its own
+static func read_setting(
+        setting_store: Store, setting_section: String, setting_key: String,
+        setting_default: Variant) -> Variant:
+    if setting_store == Store.PROJECT:
+        return ProjectSettings.get_setting(setting_key, setting_default)
+    return UserSettings.get_setting(setting_section, setting_key, setting_default)

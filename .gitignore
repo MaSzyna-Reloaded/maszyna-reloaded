@@ -4,6 +4,7 @@
 /bin/
 # stamped by make build-number, never by a build
 /build_number.txt
+/build_branch.txt
 /test_results.xml
 # make libreloaded-local
 /.libreloaded-local

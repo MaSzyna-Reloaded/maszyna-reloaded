@@ -2,10 +2,14 @@ class_name BugReportSnapshot
 extends RefCounted
 
 ## The state of the game a problem report carries, read at the moment the report is opened: the
-## hardware, the scenario, the simulation and its weather, the camera, the streaming, the vehicles
-## and signal heads around the player and the events ahead (what already happened is in the
-## recorder's gameplay log). Read once per report - the vehicles' dumps are no hot path here.
+## hardware, the player's settings, the scenario, the simulation and its weather, the camera, the
+## streaming, the vehicles and signal heads around the player and the events ahead (what already
+## happened is in the recorder's gameplay log). Read once per report - the vehicles' dumps are no hot path here.
 
+## The branch the build was made from, stamped beside build_number.txt (make build-number, the CI)
+const BRANCH_FILE: String = "res://build_branch.txt"
+## The kernel's release on Linux - the version of a GPU driver built into it
+const KERNEL_RELEASE_FILE: String = "/proc/sys/kernel/osrelease"
 ## Metres around the player's vehicle in which other vehicles and signal heads are reported
 const NEARBY_RADIUS: float = 2000.0
 ## A signal head's light in its line, by SignallingServer.LightState: off, on, blinking
@@ -17,10 +21,11 @@ const LIGHT_LETTERS: Dictionary[SignallingServer.LightState, String] = {
 
 
 ## Everything, by section; the world is null when no scenery is running
-static func collect(world: SceneryWorld, started_msec: int) -> Dictionary:
+static func collect(world: SceneryWorld, started_msec: int, settings_definition: JSON) -> Dictionary:
     var origin: Vector3 = RailVehicleServer.vehicle_get_transform(PlayerServer.player_get_vehicle()).origin
     return {
         "hardware": hardware(),
+        "settings": settings(settings_definition),
         "scenario": scenario(world),
         "simulation": simulation(world, started_msec),
         "camera": camera(world),
@@ -34,9 +39,11 @@ static func collect(world: SceneryWorld, started_msec: int) -> Dictionary:
 
 
 static func hardware() -> Dictionary:
-    var driver_info: PackedStringArray = OS.get_video_adapter_driver_info()
     return {
         "build": GameDataServer.build_get_number(),
+        # empty in a checkout never stamped
+        "branch": FileAccess.get_file_as_string(BRANCH_FILE).strip_edges()
+                if FileAccess.file_exists(BRANCH_FILE) else "",
         "godot": Engine.get_version_info().get("string", ""),
         "os": OS.get_name(),
         "os_version": OS.get_version(),
@@ -47,11 +54,13 @@ static func hardware() -> Dictionary:
         "double_precision": OS.has_feature("double"),
         "cpu": OS.get_processor_name(),
         "cpu_threads": OS.get_processor_count(),
-        "memory": OS.get_memory_info(),
+        "ram": OS.get_memory_info(),
+        # bytes free on the disk of user:// - the caches, the logs and the settings
+        "disk_space_left": disk_space_left("user://"),
         "gpu_vendor": RenderingServer.get_video_adapter_vendor(),
         "gpu": RenderingServer.get_video_adapter_name(),
         "gpu_type": enum_name(&"RenderingDevice", &"DeviceType", RenderingServer.get_video_adapter_type()),
-        "gpu_driver": " ".join(driver_info),
+        "gpu_driver": gpu_driver(),
         "graphics_api_version": RenderingServer.get_video_adapter_api_version(),
         "rendering_method": str(ProjectSettings.get_setting_with_override("rendering/renderer/rendering_method")),
         "rendering_driver": str(ProjectSettings.get_setting_with_override("rendering/rendering_device/driver")),
@@ -61,6 +70,42 @@ static func hardware() -> Dictionary:
         "locale": OS.get_locale(),
         "language": ReloadedTranslationServer.language,
     }
+
+
+## The GPU's driver and its version. Godot reads the version of a Linux driver from its module
+## (modinfo), and one built into the kernel - amdgpu, i915, nouveau - has none: the kernel's release
+## stands for it then
+static func gpu_driver() -> String:
+    var info: PackedStringArray = OS.get_video_adapter_driver_info()
+    if info.is_empty():
+        return ""
+    var version: String = info[1] if info.size() > 1 else ""
+    if version.is_empty() and OS.get_name() == "Linux":
+        # a /proc file tells no length, so it is read by line - get_file_as_string() reads nothing
+        var file: FileAccess = FileAccess.open(KERNEL_RELEASE_FILE, FileAccess.READ)
+        if file:
+            version = "kernel " + file.get_line().strip_edges()
+    return ("%s %s" % [info[0], version]).strip_edges()
+
+
+## Bytes free on the disk of a directory; -1 when it cannot be opened
+static func disk_space_left(path: String) -> int:
+    var directory: DirAccess = DirAccess.open(path)
+    return directory.get_space_left() if directory else -1
+
+
+## The value in effect of every setting the settings screen shows (settings.json, its advanced ones
+## too), by its name: a project setting's full name, "<section>/<key>" of one of UserSettings
+static func settings(definition: JSON) -> Dictionary:
+    var result: Dictionary = {}
+    for section: Dictionary in definition.data["sections"]:
+        for setting: Dictionary in section["settings"]:
+            var store: SettingRow.Store = SettingRow.STORES[setting["store"]]
+            var setting_section: String = setting.get("section", "")
+            var key: String = setting["key"]
+            var value: Variant = SettingRow.read_setting(store, setting_section, key, setting["default"])
+            result[key if store == SettingRow.Store.PROJECT else setting_section.path_join(key)] = value
+    return result
 
 
 static func scenario(world: SceneryWorld) -> Dictionary:

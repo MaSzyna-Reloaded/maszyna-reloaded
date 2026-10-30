@@ -263,7 +263,7 @@ func _show_chips() -> void:
 
 
 ## Every vehicle of the trainset freed; a player in its cab steps out first, as before a scenery
-## is freed - the camera lives in the vehicle's cabin (Player.clear_start_train())
+## is freed - the camera lives in the vehicle's cabin (PlayerServer.player_stop())
 func _remove_trainset(vehicle: RID) -> void:
     var trainset: Array[RID] = RailVehicleServer.vehicle_get_coupled(
             vehicle, RailVehicleController.COUPLER_END_FRONT, RailVehicleController.COUPLING_FLAG_COUPLER)

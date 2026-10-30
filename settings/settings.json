@@ -54,6 +54,10 @@
                     "excludes": [
                         "msaa_3d",
                         "screen_space_aa"
+                    ],
+                    "disabled_by": "upscaling",
+                    "disabled_by_values": [
+                        3
                     ]
                 },
                 {
@@ -80,6 +84,42 @@
                     "default": 0,
                     "excludes": [
                         "use_taa"
+                    ]
+                },
+                {
+                    "title": "3D upscaling",
+                    "store": "user",
+                    "section": "render",
+                    "key": "upscaling",
+                    "type": "int",
+                    "hint": "enum",
+                    "hint_string": "Off:0,Bilinear:1,FSR 1.0:2,FSR 2.2:3",
+                    "default": 0
+                },
+                {
+                    "title": "3D render scale",
+                    "store": "user",
+                    "section": "render",
+                    "key": "scaling_3d_scale_percent",
+                    "type": "int",
+                    "hint": "range",
+                    "hint_string": "50,100,1,suffix:%",
+                    "default": 100,
+                    "depends_on": "upscaling"
+                },
+                {
+                    "title": "FSR sharpness",
+                    "store": "user",
+                    "section": "render",
+                    "key": "fsr_sharpness",
+                    "type": "float",
+                    "hint": "range",
+                    "hint_string": "0,2,0.01",
+                    "default": 0.2,
+                    "disabled_by": "upscaling",
+                    "disabled_by_values": [
+                        0,
+                        1
                     ]
                 },
                 {
@@ -300,6 +340,16 @@
                     "type": "bool",
                     "default": false,
                     "restart_required": true
+                },
+                {
+                    "title": "Self-illumination energy",
+                    "store": "project",
+                    "key": "maszyna/rendering/selfillum_energy",
+                    "type": "float",
+                    "hint": "range",
+                    "hint_string": "0,2,0.01",
+                    "default": 0.2,
+                    "advanced": true
                 },
                 {
                     "title": "Improved railway lights visibility",
@@ -805,6 +855,54 @@
                     "key": "maszyna/rendering/real_mirrors",
                     "type": "bool",
                     "default": true
+                },
+                {
+                    "title": "Interior lights energy",
+                    "store": "project",
+                    "key": "maszyna/vehicles/interior_lights/energy",
+                    "type": "float",
+                    "hint": "range",
+                    "hint_string": "0,4,0.05",
+                    "default": 0.5,
+                    "advanced": true
+                },
+                {
+                    "title": "Interior lights cast shadows",
+                    "store": "project",
+                    "key": "maszyna/vehicles/interior_lights/shadows",
+                    "type": "bool",
+                    "default": false,
+                    "advanced": true
+                },
+                {
+                    "title": "Interior lights glow energy",
+                    "store": "project",
+                    "key": "maszyna/vehicles/interior_lights/glow_energy",
+                    "type": "float",
+                    "hint": "range",
+                    "hint_string": "0,2,0.01",
+                    "default": 0.1,
+                    "advanced": true
+                },
+                {
+                    "title": "Interior lights glow range",
+                    "store": "project",
+                    "key": "maszyna/vehicles/interior_lights/glow_range",
+                    "type": "float",
+                    "hint": "range",
+                    "hint_string": "0,40,0.1",
+                    "default": 20.0,
+                    "advanced": true
+                },
+                {
+                    "title": "Interior lights glow attenuation",
+                    "store": "project",
+                    "key": "maszyna/vehicles/interior_lights/glow_attenuation",
+                    "type": "float",
+                    "hint": "range",
+                    "hint_string": "0,8,0.05",
+                    "default": 2.4,
+                    "advanced": true
                 }
             ]
         },

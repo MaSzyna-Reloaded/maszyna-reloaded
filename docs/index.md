@@ -34,7 +34,11 @@ What lives here:
 * **[Problem reports](bug-reports)** - `bug_report/`: what the game sends to the reporting
   endpoint.
 * **Releases** - `make release-linux`, `release-windows`, `release-android` and the CI workflow
-  publishing a branch's prerelease.
+  keeping each run's games as its artifacts - a pull request's (`maszyna-reloaded-<branch>-<build>`),
+  main's nightly (`maszyna-reloaded-nightly-<build>`), a `release/<name>` branch's candidate
+  (`maszyna-reloaded-rc-<name>-<build>`) - and publishing a tag pushed on main as the release on
+  that tag (files `maszyna-reloaded-<tag>`); CI never makes a tag. Discord hears of all but the
+  pull requests'.
 
 ## Building
 

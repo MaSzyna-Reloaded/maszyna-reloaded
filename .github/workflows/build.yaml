@@ -1,20 +1,28 @@
 name: build
 
 # The game's tests and its release of each platform, with the double precision Godot fetched from
-# libmaszyna's release godot-<version>-double (vendor/libreloaded/ci/fetch-godot.sh). libreloaded
+# libreloaded's release godot-<build>-double - its version with its godot-patches
+# (vendor/libreloaded/ci/fetch-godot.sh). libreloaded
 # with its plugin libmaszyna (the vendor/libreloaded and vendor/libmaszyna submodules) is built
 # into this project by the Makefile's own rules: the tests' and the exporting editor's library
 # (compile-debug) once, by build-host, and handed to the other jobs; the Windows and Android release
 # libraries cross-compiled on the runner, the Linux one in libreloaded's ci/docker/linux-sdk for an
-# old glibc. The games are published as a GitHub release: a pull request keeps one
-# prerelease per branch (maszyna-reloaded-<branch>), a pushed tag on main gets a release of its own
-# (maszyna-reloaded-<tag>). The maszyna-reloaded-* tags are both kinds' and made by CI itself.
+# old glibc. Every run keeps its games as the run's artifacts, named with the run's prefix
+# (build-host's "Name the files"): maszyna-reloaded-<branch>-<build> of a pull request,
+# maszyna-reloaded-nightly-<build> of main, maszyna-reloaded-rc-<name>-<build> of a release/<name>
+# branch. Only a tag pushed on main is published as a GitHub release - on that tag itself, its files
+# named maszyna-reloaded-<tag>. CI never makes a tag. Discord hears of the nightly, the candidates
+# and the tags' releases from the publish job (the DISCORD_RELEASES_WEBHOOK secret), never of a
+# pull request's build.
 on:
   pull_request:
   push:
+    # main is the nightly's branch until devel takes its place
+    branches:
+      - main
+      - 'release/**'
     tags:
       - '**'
-      - '!maszyna-reloaded-*'
   workflow_dispatch:
 
 env:
@@ -31,6 +39,7 @@ jobs:
     outputs:
       build_number: ${{ steps.build-number.outputs.value }}
       build_branch: ${{ steps.build-number.outputs.branch }}
+      prefix: ${{ steps.prefix.outputs.value }}
     steps:
       - name: Checkout
         uses: actions/checkout@v7
@@ -48,6 +57,23 @@ jobs:
           echo "value=$(cat build_number.txt)" >> "$GITHUB_OUTPUT"
           echo "branch=$(cat build_branch.txt)" >> "$GITHUB_OUTPUT"
 
+      # the prefix of the run's files: maszyna-reloaded-<branch> ("/" as "-") of a pull request or
+      # another branch, -nightly of main, -rc-<name> of release/<name>, each with the build number;
+      # a tag's files are the tag's name alone
+      - name: Name the files
+        id: prefix
+        env:
+          BRANCH: ${{ github.head_ref }}
+        run: |
+          case "$GITHUB_EVENT_NAME:$GITHUB_REF" in
+            pull_request:*) name="$BRANCH-$(cat build_number.txt)" ;;
+            *:refs/tags/*) name="$GITHUB_REF_NAME" ;;
+            *:refs/heads/main) name="nightly-$(cat build_number.txt)" ;;
+            *:refs/heads/release/*) name="rc-${GITHUB_REF_NAME#release/}-$(cat build_number.txt)" ;;
+            *) name="$GITHUB_REF_NAME-$(cat build_number.txt)" ;;
+          esac
+          echo "value=maszyna-reloaded-${name//\//-}" >> "$GITHUB_OUTPUT"
+
       - name: Fetch the double precision Godot
         run: |
           vendor/libreloaded/ci/fetch-godot.sh godot.linuxbsd.editor.double.x86_64
@@ -61,9 +87,10 @@ jobs:
       - name: Build the host library
         run: make compile-debug CLANG_TIDY_COMPILE_COMMANDS_FILE= CLANG_TIDY_BINDINGS_FILE=
 
-      # and maszyna-python-host, the process PythonScreenServer runs CPython in, and the
+      # and maszyna-python-host, the process PythonScreenServer runs CPython in, the
       # libreloaded.gdextension CMake generates into libreloaded's addon - not versioned, and without
-      # it Godot loads no library; kept by their paths from the repository's root
+      # it Godot loads no library - and gnd-sfx's library libreloaded's build makes beside its own;
+      # kept by their paths from the repository's root
       - uses: actions/upload-artifact@v7
         with:
           name: host-library
@@ -71,6 +98,7 @@ jobs:
             bin/libreloaded/linux/libreloaded.debug.64.so
             bin/libreloaded/linux/maszyna-python-host.64
             vendor/libreloaded/addons/libreloaded/libreloaded.gdextension
+            vendor/libreloaded/vendor/gnd-sfx/addons/gnd_sfx/bin/linux/libgndsfx.linux.template_debug.double.x86_64.so
           if-no-files-found: error
 
   run-tests:
@@ -100,7 +128,8 @@ jobs:
       - name: Fetch Terrain3D
         run: make terrain3d
 
-      # addons/libreloaded and addons/libmaszyna are not versioned: they lead to the submodules
+      # addons/libreloaded, addons/gnd_sfx and addons/libmaszyna are not versioned: they lead to the
+      # submodules
       - name: Link the addons
         run: make links
 
@@ -233,91 +262,92 @@ jobs:
       - name: Build and export ${{ matrix.platform }}
         run: make -o compile-debug release-${{ matrix.platform }}
 
+      # each game as <prefix>-<platform>-<target>-<arch>.zip or .apk, the Windows installer as
+      # <prefix>-windows-setup.exe, each its own artifact of the same name
+      - name: Name the files
+        env:
+          PREFIX: ${{ needs.build-host.outputs.prefix }}
+          GAME: ${{ needs.build-host.outputs.prefix }}-${{ matrix.platform }}-template_release-${{ matrix.arch }}
+        run: |
+          mkdir release
+          for file in ${{ matrix.output }}; do
+            case "$file" in
+              *-setup.exe) cp "$file" "release/$PREFIX-windows-setup.exe" ;;
+              *) cp "$file" "release/$GAME.${file##*.}" ;;
+            esac
+          done
+          ls -l release
+
       - uses: actions/upload-artifact@v7
         with:
-          name: game-${{ matrix.platform }}-template_release-${{ matrix.arch }}
-          path: ${{ matrix.output }}
+          name: ${{ needs.build-host.outputs.prefix }}-${{ matrix.platform }}-template_release-${{ matrix.arch }}
+          path: release/*-template_release-*
           if-no-files-found: error
 
-  # The games the builds exported (game-<platform>-<target>-<arch>), named with the branch or the
-  # tag and the build number; nothing is built again here. A pull request publishes them as the
-  # branch's prerelease (maszyna-reloaded-<branch>, "/" as "-") on its own commit, whose files every
-  # push replaces; a tag pushed on main as its release (maszyna-reloaded-<tag>, files without the
-  # build number). A pull request from a fork has a read-only token and keeps only the artifacts.
+      - uses: actions/upload-artifact@v7
+        if: matrix.platform == 'windows'
+        with:
+          name: ${{ needs.build-host.outputs.prefix }}-windows-setup
+          path: release/*-windows-setup.exe
+          if-no-files-found: error
+
+  # A tag pushed on main is published as its release, on that tag itself (no tag is made), with the
+  # games the builds named; a branch's run keeps them as its artifacts only. Discord hears of the
+  # nightly and a release candidate (their run) and of a tag's release.
   publish:
     needs: [build-host, build]
-    if: >
-      github.event_name == 'push' ||
-      (github.event_name == 'pull_request' &&
-       github.event.pull_request.head.repo.full_name == github.repository)
+    if: github.event_name == 'push'
     runs-on: ubuntu-24.04
     permissions:
       contents: write
+      actions: read
     concurrency:
       group: publish-${{ github.ref }}
     steps:
       - uses: actions/download-artifact@v8
+        if: github.ref_type == 'tag'
         with:
-          pattern: game-*
-          path: artifacts
-
-      # each game as maszyna-reloaded-<branch>-<build>-<platform>-<target>-<arch>.zip or .apk, the
-      # Windows installer as maszyna-reloaded-<branch>-<build>-windows-setup.exe
-      - name: Name the files
-        env:
-          NAME: ${{ github.head_ref || github.ref_name }}
-          BUILD_NUMBER: ${{ needs.build-host.outputs.build_number }}
-        run: |
-          mkdir release
-          # a tag's release is the tag's name alone; a branch's prerelease carries the build number
-          prefix="maszyna-reloaded-${NAME//\//-}"
-          if [ "$GITHUB_EVENT_NAME" = pull_request ]; then
-            prefix="$prefix-$BUILD_NUMBER"
-          fi
-          for dir in artifacts/game-*; do
-            for file in "$dir"/*; do
-              case "$file" in
-                *-setup.exe) cp "$file" "release/$prefix-windows-setup.exe" ;;
-                *) cp "$file" "release/$prefix-${dir#artifacts/game-}.${file##*.}" ;;
-              esac
-            done
-          done
-          test -f "release/$prefix-windows-setup.exe"
-          ls -l release
-
-      - name: Publish the branch prerelease
-        if: github.event_name == 'pull_request'
-        env:
-          GH_TOKEN: ${{ github.token }}
-          GH_REPO: ${{ github.repository }}
-          BRANCH: ${{ github.head_ref }}
-          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
-          BUILD_NUMBER: ${{ needs.build-host.outputs.build_number }}
-        run: |
-          tag="maszyna-reloaded-${BRANCH//\//-}"
-          # the tag is moved to the commit just built: the old release goes with its tag
-          gh release delete "$tag" --cleanup-tag --yes || true
-          gh release create "$tag" release/* --prerelease --target "$HEAD_SHA" \
-            --title "$tag" --notes "Build $BUILD_NUMBER of $HEAD_SHA (#${{ github.event.number }})"
+          pattern: ${{ needs.build-host.outputs.prefix }}-*
+          path: release
+          merge-multiple: true
 
       - name: Publish the tag release
-        if: github.event_name == 'push'
+        if: github.ref_type == 'tag'
         env:
           GH_TOKEN: ${{ github.token }}
           GH_REPO: ${{ github.repository }}
           TAG: ${{ github.ref_name }}
+          PREFIX: ${{ needs.build-host.outputs.prefix }}
           BUILD_NUMBER: ${{ needs.build-host.outputs.build_number }}
         run: |
+          ls -l release
+          test -f "release/$PREFIX-windows-setup.exe"
           # only a tag on main is released: main has to contain the tagged commit
           status=$(gh api "repos/$GH_REPO/compare/main...$GITHUB_SHA" --jq .status)
           if [ "$status" != identical ] && [ "$status" != behind ]; then
             echo "::error::$TAG is not on main" >&2
             exit 1
           fi
-          # released as maszyna-reloaded-<tag>, a tag of CI's own on the same commit (the trigger leaves
-          # maszyna-reloaded-* out); a rerun finds the release already there and only replaces its files
-          release="maszyna-reloaded-$TAG"
-          gh release create "$release" --target "$GITHUB_SHA" --title "$release" \
-            --notes "Build $BUILD_NUMBER of $GITHUB_SHA, tag $TAG" --generate-notes \
-            || gh release view "$release" > /dev/null
-          gh release upload "$release" release/* --clobber
+          # --verify-tag: the release goes on the pushed tag, never on one made for it; a rerun
+          # finds the release already there and only replaces its files
+          gh release create "$TAG" --verify-tag --title "$PREFIX" \
+            --notes "Build $BUILD_NUMBER of $GITHUB_SHA" --generate-notes \
+            || gh release view "$TAG" > /dev/null
+          gh release upload "$TAG" release/* --clobber
+
+      # the repository's own webhook is not subscribed to releases; a branch's build is its run
+      - name: Announce on Discord
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_RELEASES_WEBHOOK }}
+          PREFIX: ${{ needs.build-host.outputs.prefix }}
+          BUILD_NUMBER: ${{ needs.build-host.outputs.build_number }}
+        run: |
+          if [ "$GITHUB_REF_TYPE" = tag ]; then
+            url=$(gh release view "$GITHUB_REF_NAME" --json url --jq .url)
+          else
+            url="$GITHUB_SERVER_URL/$GH_REPO/actions/runs/$GITHUB_RUN_ID"
+          fi
+          jq -n --arg content "**$PREFIX** - build $BUILD_NUMBER"$'\n'"$url" '{content: $content}' \
+            | curl -fsS -H 'Content-Type: application/json' -d @- "$DISCORD_WEBHOOK"

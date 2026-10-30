@@ -74,6 +74,19 @@ theme_override_colors/font_color = Color(0.9, 0.93, 1, 1)
 theme_override_font_sizes/font_size = 18
 autowrap_mode = 3
 
+[node name="DetailsScroll" type="ScrollContainer" parent="DialogPanel/Rows"]
+unique_name_in_owner = true
+visible = false
+custom_minimum_size = Vector2(0, 320)
+layout_mode = 2
+
+[node name="Details" type="Label" parent="DialogPanel/Rows/DetailsScroll"]
+unique_name_in_owner = true
+auto_translate_mode = 2
+layout_mode = 2
+theme_override_colors/font_color = Color(0.75, 0.8, 0.9, 1)
+theme_override_font_sizes/font_size = 15
+
 [node name="Buttons" type="HBoxContainer" parent="DialogPanel/Rows"]
 unique_name_in_owner = true
 layout_mode = 2

@@ -48,7 +48,8 @@ Where the game is not libmaszyna:
   GUT run, as libmaszyna's rules say
 * releases are cut here: `make build-number`, `make release-linux` / `release-windows` /
   `release-android`; the CI workflow builds libmaszyna from the submodule, exports and publishes
-  the branch's prerelease
+  a pull request's prerelease, main's nightly, a `release/<name>` branch's candidate and a tag's
+  release (`.github/workflows/build.yaml`)
 * a log view of many lines is `LogLines` (`hud/log_lines.gd`, `add_line()`): it draws only while
   it is visible and drops the oldest lines in batches. Never `RichTextLabel.remove_paragraph()`
   per line - it walks the whole text, and the Logs panel took 71% of the main thread on Wrzosy

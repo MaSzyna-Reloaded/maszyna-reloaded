@@ -61,6 +61,9 @@ var excluding_rows: Array[SettingRow] = []
 ## Rows that, while one of them is on, keep this one from being changed at all (the window's size
 ## while the window is fullscreen)
 var disabling_rows: Array[SettingRow] = []
+## The values of the disabling rows that keep this one from being changed (TAA while the upscaling
+## is FSR 2.2) - none: any value that is on
+var disabling_values: Array = []
 ## Rows whose availability follows this one's value - the ones requiring it or excluded by it
 var affected_rows: Array[SettingRow] = []
 ## The control takes a change - otherwise it is disabled
@@ -150,12 +153,24 @@ func is_on() -> bool:
     return false
 
 
+## Whether the setting keeps a row it disables from being changed: it has one of the values given,
+## or is on when none is given. Compared by value - a number from settings.json is a float, Array.has()
+## tells it from the int stored
+func is_disabling(values: Array) -> bool:
+    if not values:
+        return is_on()
+    var value: Variant = _read()
+    return values.any(func(disabling: Variant) -> bool: return value == disabling)
+
+
 ## Available while every required row is on and no excluding one is - unless this one is on itself,
 ## so a setting on together with an excluding one can still be switched off
 func update_available() -> void:
     available = (
         required_rows.all(func(row: SettingRow) -> bool: return row.is_on())
-        and not disabling_rows.any(func(row: SettingRow) -> bool: return row.is_on())
+        and not disabling_rows.any(
+            func(row: SettingRow) -> bool: return row.is_disabling(disabling_values)
+        )
         and (is_on() or not excluding_rows.any(func(row: SettingRow) -> bool: return row.is_on()))
     )
     %Title.modulate.a = 1.0 if available else UNAVAILABLE_ALPHA

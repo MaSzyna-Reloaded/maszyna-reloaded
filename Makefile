@@ -27,6 +27,8 @@ LIBRELOADED_MAKE=$(MAKE) -C $(LIBRELOADED) GODOT_PROJECT_DIR=$(PROJECT_DIR) LINU
 	"LIBRELOADED_PLUGINS=$(LIBRELOADED_PLUGINS)"
 # The addon of libreloaded, in its checkout; a plugin's is addons/<name> in its own
 LIBRELOADED_ADDON:=addons/libreloaded
+# The sound addon the game uses, libreloaded's own (its build makes its library)
+GND_SFX_ADDON:=vendor/gnd-sfx/addons/gnd_sfx
 
 # The app shows the build number (vendor/libreloaded/cmake/write_build_number.cmake), so the archive
 # name stays the same from build to build and does not carry a branch or a date
@@ -45,11 +47,15 @@ export BUILD_BRANCH
 # can load it (libreloaded's Makefile). Override when your double precision build is named
 # differently: make release-linux GODOT=godot-double
 GODOT?=godot-double
-# The engine the release is exported with - libreloaded's; the export looks its template up by it
+# The engine the release is exported with - libreloaded's; the export looks its template up by its
+# version, and libreloaded builds it under the name of its build: the version and its godot-patches
 GODOT_VERSION:=$(shell sed -n 's/^GODOT_VERSION:=//p' $(LIBRELOADED)/Makefile)
-GODOT_BIN:=$(LIBRELOADED)/build-godot-$(GODOT_VERSION)/bin
+GODOT_BUILD:=$(shell MAKEFLAGS= $(MAKE) -s --no-print-directory -C $(LIBRELOADED) godot-build)
+GODOT_BIN:=$(LIBRELOADED)/build-godot-$(GODOT_BUILD)/bin
 LINUX_TEMPLATE:=$(GODOT_BIN)/godot.linuxbsd.template_release.double.x86_64
 LINUX_TEMPLATE_INSTALLED:=$(HOME)/.local/share/godot/export_templates/$(GODOT_VERSION).stable.double/linux_release.x86_64
+WINDOWS_TEMPLATE:=$(GODOT_BIN)/godot.windows.template_release.double.x86_64.exe
+WINDOWS_TEMPLATE_INSTALLED:=$(HOME)/.local/share/godot/export_templates/$(GODOT_VERSION).stable.double/windows_release_x86_64.exe
 # The Windows installer is made by NSIS in ci/docker/windows-installer; the checkout is mounted at
 # its own path and the build runs as the host user
 # Published on ghcr.io and tagged by its Dockerfile: the CI pulls it, and a changed Dockerfile is a
@@ -58,12 +64,13 @@ WINDOWS_INSTALLER_IMAGE:=ghcr.io/maszyna-reloaded/windows-installer:$(shell sha2
 WINDOWS_INSTALLER_RUN=docker run --rm --user $(shell id -u):$(shell id -g) -v $(CURDIR):$(CURDIR) -w $(CURDIR) $(WINDOWS_INSTALLER_IMAGE)
 
 
-# addons/libreloaded and addons/<plugin> lead to the checkout in use - the submodule, or a local one
+# addons/libreloaded, addons/gnd_sfx and addons/<plugin> lead to the checkout in use - the submodule, or a local one
 # (make libreloaded-local, make plugin-local) - so they are not versioned (.gitignore): working
 # against a local checkout changes nothing git sees. make links makes them, after a clone too;
 # libreloaded's build makes only those missing and never replaces one
 links:
 	ln -sfn $(if $(wildcard $(LIBRELOADED_LOCAL_FILE)),"$(LIBRELOADED)",../vendor/libreloaded)/$(LIBRELOADED_ADDON) addons/libreloaded
+	ln -sfn $(if $(wildcard $(LIBRELOADED_LOCAL_FILE)),"$(LIBRELOADED)",../vendor/libreloaded)/$(GND_SFX_ADDON) addons/gnd_sfx
 	for plugin in $(PLUGINS); do \
 		if [ -f ".$$plugin-local" ]; then ln -sfn "$$(cat .$$plugin-local)/addons/$$plugin" "addons/$$plugin" || exit 1; \
 		else ln -sfn "../vendor/$$plugin/addons/$$plugin" "addons/$$plugin" || exit 1; fi; \
@@ -136,11 +143,20 @@ release-clear-godot-cache:
 	rm -rf .godot/exported
 
 
-# The template is built only while none is installed for this engine version - libreloaded builds
-# the engine (its Makefile), which takes hours and is done once per version
-$(LINUX_TEMPLATE_INSTALLED):
-	$(MAKE) -C $(LIBRELOADED) $(patsubst $(LIBRELOADED)/%,%,$(LINUX_TEMPLATE))
-	install -D $(LINUX_TEMPLATE) $@
+# The templates of the engine's build - its version and its godot-patches: libreloaded builds the
+# one missing (its Makefile), which takes hours and is done once per build (vendor/libreloaded/
+# ci/fetch-godot.sh fetches CI's instead), and the one newer than the installed one is installed -
+# a patch added is a new template, which upgrade-linux.sh and upgrade-windows.sh export with
+$(LINUX_TEMPLATE) $(WINDOWS_TEMPLATE):
+	$(MAKE) -C $(LIBRELOADED) $(patsubst $(LIBRELOADED)/%,%,$@)
+
+
+$(LINUX_TEMPLATE_INSTALLED): $(LINUX_TEMPLATE)
+	install -D $< $@
+
+
+$(WINDOWS_TEMPLATE_INSTALLED): $(WINDOWS_TEMPLATE)
+	install -D $< $@
 
 
 windows-installer-image:
@@ -169,7 +185,7 @@ release-linux-symbols: release-clear-godot-cache compile-debug compile-release-s
 	@echo "Exported with symbols: $(LINUX_ZIP)"
 
 
-release-windows: release-clear-godot-cache compile-debug compile-windows-release windows-installer-image
+release-windows: release-clear-godot-cache compile-debug compile-windows-release $(WINDOWS_TEMPLATE_INSTALLED) windows-installer-image
 	mkdir -p bin/windows
 	$(GODOT) --headless --path . --export-release "windows_x86_64" bin/windows/reloaded.zip
 	mv bin/windows/reloaded.zip $(WINDOWS_ZIP)

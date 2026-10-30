@@ -1256,6 +1256,9 @@ msgid "Scenery"
 msgstr "Sceneria"
 
 
+msgid "Self-illumination energy"
+msgstr "Jasność samopodświetlenia"
+
 msgid "Improved railway lights visibility"
 msgstr "Lepsza widoczność świateł kolejowych"
 
@@ -1405,6 +1408,21 @@ msgstr "Zasięg szczegółów pojazdów"
 
 msgid "Real mirrors"
 msgstr "Prawdziwe lusterka"
+
+msgid "Interior lights energy"
+msgstr "Jasność świateł we wnętrzach wagonów"
+
+msgid "Interior lights cast shadows"
+msgstr "Światła we wnętrzach wagonów rzucają cienie"
+
+msgid "Interior lights glow energy"
+msgstr "Poświata świateł wnętrz wagonów"
+
+msgid "Interior lights glow range"
+msgstr "Zasięg poświaty świateł wnętrz wagonów"
+
+msgid "Interior lights glow attenuation"
+msgstr "Zanikanie poświaty świateł wnętrz wagonów"
 
 msgid "Road traffic density"
 msgstr "Natężenie ruchu ulicznego"
@@ -1570,6 +1588,18 @@ msgstr "Wygładzanie krawędzi w przestrzeni ekranu"
 
 msgid "Temporal anti-aliasing (TAA)"
 msgstr "Wygładzanie czasowe (TAA)"
+
+msgid "3D upscaling"
+msgstr "Skalowanie 3D"
+
+msgid "Bilinear"
+msgstr "Dwuliniowe"
+
+msgid "3D render scale"
+msgstr "Skala renderowania 3D"
+
+msgid "FSR sharpness"
+msgstr "Ostrość FSR"
 
 msgid "Ambient occlusion (SSAO)"
 msgstr "Okluzja otoczenia (SSAO)"
@@ -2140,3 +2170,15 @@ msgstr "Wszystkie scenerie"
 
 msgid "Sceneries of one source only"
 msgstr "Scenerie tylko z jednego źródła"
+
+msgid "Missing files"
+msgstr "Brakujące pliki"
+
+msgid "Show missing files"
+msgstr "Pokaż brakujące pliki"
+
+msgid "Not all files of the scenery were found: the scenario may not run correctly."
+msgstr "Nie wszystkie pliki scenerii zostały znalezione: scenariusz może nie działać poprawnie."
+
+msgid "Not all elements may be displayed correctly."
+msgstr "Nie wszystkie elementy mogą prawidłowo się wyświetlać."

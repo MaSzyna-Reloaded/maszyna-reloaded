@@ -1256,6 +1256,9 @@ msgid "Scenery"
 msgstr ""
 
 
+msgid "Self-illumination energy"
+msgstr ""
+
 msgid "Improved railway lights visibility"
 msgstr ""
 
@@ -1404,6 +1407,21 @@ msgid "Vehicle detail distance"
 msgstr ""
 
 msgid "Real mirrors"
+msgstr ""
+
+msgid "Interior lights energy"
+msgstr ""
+
+msgid "Interior lights cast shadows"
+msgstr ""
+
+msgid "Interior lights glow energy"
+msgstr ""
+
+msgid "Interior lights glow range"
+msgstr ""
+
+msgid "Interior lights glow attenuation"
 msgstr ""
 
 msgid "Road traffic density"
@@ -1569,6 +1587,18 @@ msgid "Screen-space anti-aliasing"
 msgstr ""
 
 msgid "Temporal anti-aliasing (TAA)"
+msgstr ""
+
+msgid "3D upscaling"
+msgstr ""
+
+msgid "Bilinear"
+msgstr ""
+
+msgid "3D render scale"
+msgstr ""
+
+msgid "FSR sharpness"
 msgstr ""
 
 msgid "Ambient occlusion (SSAO)"
@@ -2139,4 +2169,16 @@ msgid "All sceneries"
 msgstr ""
 
 msgid "Sceneries of one source only"
+msgstr ""
+
+msgid "Missing files"
+msgstr ""
+
+msgid "Show missing files"
+msgstr ""
+
+msgid "Not all files of the scenery were found: the scenario may not run correctly."
+msgstr ""
+
+msgid "Not all elements may be displayed correctly."
 msgstr ""

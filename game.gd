@@ -270,6 +270,14 @@ func _on_python_runtime_failed(reason: String) -> void:
     %PythonRuntimeProblem.ask()
 
 
+## The files of the data the scenery could not find, listed (the notice's "Show missing files")
+func show_missing_files() -> void:
+    var paths: Array = _world.get_scenery().get_missing_files().keys()
+    paths.sort()
+    %MissingFilesList.details = PackedStringArray(paths)
+    %MissingFilesList.ask()
+
+
 ## Escape in the scenario selector: fade the screen to black and the music out, then quit
 func _on_scenery_selector_quit_requested() -> void:
     if _music_tween:
@@ -294,7 +302,7 @@ func _exit_to_menu(game_dir: String = "") -> void:
     _play_music(MUSIC_MENU_VOLUME_DB)
     await $SpinnerOverlay.fade_in(EXIT_FADE_TIME)
     # the world stops once the spinner covers it, and stays stopped until the next scenery shows;
-    # the menu is heard at the wall clock's speed (TrainSoundSystem)
+    # the menu is heard at the wall clock's speed (MaszynaVehicleSoundServer)
     SimulationServer.simulation_pause()
     SimulationServer.simulation_reset_speed()
     HUDServer.hud_set_visible(false)
@@ -302,7 +310,7 @@ func _exit_to_menu(game_dir: String = "") -> void:
     # the scenery's script context and environment go with the world
     $GameHud.attach_script_context(RID())
     $GameHud.attach_environment(null)
-    $GameHud.attach_world(null, null)
+    $GameHud.attach_world(null)
     $GamePlayLogRecorder.stop()
     for log_file: String in _log_handlers:
         for logger_id: String in GAME_LOG_FILES[log_file]:
@@ -351,6 +359,17 @@ func _apply_music_settings() -> void:
 ## The world's scenario is ready; player initialization is coordinated by the world scene.
 func _on_scenery_loaded(_first_vehicle_id: String) -> void:
     $GameHud.attach_script_context(_world.get_script_context())
+    # the files of the data the scenery could not find: the player is told what it may cost
+    var effects: Array[SceneryContentNode.MissingFileEffect] = []
+    effects.assign(_world.get_scenery().get_missing_files().values())
+    if effects:
+        var lines: PackedStringArray = []
+        if SceneryContentNode.MissingFileEffect.SCENARIO in effects:
+            lines.append(tr("Not all files of the scenery were found: the scenario may not run correctly."))
+        if SceneryContentNode.MissingFileEffect.APPEARANCE in effects:
+            lines.append(tr("Not all elements may be displayed correctly."))
+        %MissingFilesNotice.message = "\n\n".join(lines)
+        %MissingFilesNotice.ask()
     $GameHud.attach_world(_world)
     _music_tween = create_tween()
     _music_tween.tween_property($Music, "volume_linear", 0.0, MUSIC_FADE_OUT_TIME)

@@ -1241,6 +1241,9 @@ msgid "Scenery"
 msgstr "Táj"
 
 
+msgid "Self-illumination energy"
+msgstr "Önvilágítás fényereje"
+
 msgid "Improved railway lights visibility"
 msgstr "Jobb vasúti fényláthatóság"
 
@@ -1390,6 +1393,21 @@ msgstr "Járműrészletek távolsága"
 
 msgid "Real mirrors"
 msgstr "Valódi tükrök"
+
+msgid "Interior lights energy"
+msgstr "Kocsibelső világítás erőssége"
+
+msgid "Interior lights cast shadows"
+msgstr "A kocsibelső világítás árnyékot vet"
+
+msgid "Interior lights glow energy"
+msgstr "Kocsibelső fényeinek derengése"
+
+msgid "Interior lights glow range"
+msgstr "Kocsibelső fényei derengésének hatótávja"
+
+msgid "Interior lights glow attenuation"
+msgstr "Kocsibelső fényei derengésének csillapítása"
 
 msgid "Road traffic density"
 msgstr "Közúti forgalom sűrűsége"
@@ -1555,6 +1573,18 @@ msgstr "Képernyőtéri élsimítás"
 
 msgid "Temporal anti-aliasing (TAA)"
 msgstr "Időbeli élsimítás (TAA)"
+
+msgid "3D upscaling"
+msgstr "3D felskálázás"
+
+msgid "Bilinear"
+msgstr "Bilineáris"
+
+msgid "3D render scale"
+msgstr "3D renderelési lépték"
+
+msgid "FSR sharpness"
+msgstr "FSR élesség"
 
 msgid "Ambient occlusion (SSAO)"
 msgstr "Környezeti takarás (SSAO)"
@@ -2098,3 +2128,15 @@ msgstr "Minden pálya"
 
 msgid "Sceneries of one source only"
 msgstr "Csak egy forrás pályái"
+
+msgid "Missing files"
+msgstr "Hiányzó fájlok"
+
+msgid "Show missing files"
+msgstr "Hiányzó fájlok megjelenítése"
+
+msgid "Not all files of the scenery were found: the scenario may not run correctly."
+msgstr "A pálya nem minden fájlja található meg: a forgatókönyv nem feltétlenül fut megfelelően."
+
+msgid "Not all elements may be displayed correctly."
+msgstr "Nem minden elem jelenhet meg megfelelően."

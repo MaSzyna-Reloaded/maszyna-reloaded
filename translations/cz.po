@@ -1241,6 +1241,9 @@ msgid "Scenery"
 msgstr "Scenérie"
 
 
+msgid "Self-illumination energy"
+msgstr "Jas samosvícení"
+
 msgid "Improved railway lights visibility"
 msgstr "Lepší viditelnost železničních světel"
 
@@ -1390,6 +1393,21 @@ msgstr "Vzdálenost detailů vozidel"
 
 msgid "Real mirrors"
 msgstr "Skutečná zrcátka"
+
+msgid "Interior lights energy"
+msgstr "Jas osvětlení interiéru vozů"
+
+msgid "Interior lights cast shadows"
+msgstr "Osvětlení interiéru vozů vrhá stíny"
+
+msgid "Interior lights glow energy"
+msgstr "Záře světel interiéru vozů"
+
+msgid "Interior lights glow range"
+msgstr "Dosah záře světel interiéru vozů"
+
+msgid "Interior lights glow attenuation"
+msgstr "Útlum záře světel interiéru vozů"
 
 msgid "Road traffic density"
 msgstr "Hustota silničního provozu"
@@ -1555,6 +1573,18 @@ msgstr "Vyhlazování hran v prostoru obrazovky"
 
 msgid "Temporal anti-aliasing (TAA)"
 msgstr "Časové vyhlazování (TAA)"
+
+msgid "3D upscaling"
+msgstr "Škálování 3D"
+
+msgid "Bilinear"
+msgstr "Bilineární"
+
+msgid "3D render scale"
+msgstr "Měřítko vykreslování 3D"
+
+msgid "FSR sharpness"
+msgstr "Ostrost FSR"
 
 msgid "Ambient occlusion (SSAO)"
 msgstr "Okolní zastínění (SSAO)"
@@ -2098,3 +2128,15 @@ msgstr "Všechny scenérie"
 
 msgid "Sceneries of one source only"
 msgstr "Scenérie jen z jednoho zdroje"
+
+msgid "Missing files"
+msgstr "Chybějící soubory"
+
+msgid "Show missing files"
+msgstr "Zobrazit chybějící soubory"
+
+msgid "Not all files of the scenery were found: the scenario may not run correctly."
+msgstr "Nebyly nalezeny všechny soubory scenérie: scénář nemusí fungovat správně."
+
+msgid "Not all elements may be displayed correctly."
+msgstr "Ne všechny prvky se mohou zobrazovat správně."

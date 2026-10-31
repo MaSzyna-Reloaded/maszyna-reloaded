@@ -76,6 +76,9 @@ const DECLARED_TRAINSET: Array[VehicleData] = []
 ## behind it: the startup's (Startup.world_scene) - the game's world/world.tscn, or a game's built on
 ## it
 @export var world_scene: PackedScene = null
+## The patch of MaSzyna's vehicle files - what they do not define but the game draws and drives
+## (MaszynaVehicleSystem.patch_set()): libmaszyna's own
+@export var vehicle_patch: MaszynaVehiclePatch = null
 
 var _music_tween: Tween
 ## The level appropriate to the menu or loading screen, before the player's music volume.
@@ -97,6 +100,7 @@ func _exit_tree() -> void:
 
 
 func _ready() -> void:
+    MaszynaVehicleSystem.patch_set(vehicle_patch)
     UserSettings.config_changed.connect(_apply_music_settings)
     PythonScreenServer.python_runtime_failed.connect(_on_python_runtime_failed)
     _apply_music_settings()

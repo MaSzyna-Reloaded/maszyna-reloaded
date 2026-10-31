@@ -1424,12 +1424,6 @@ msgstr "Zasięg poświaty świateł wnętrz wagonów"
 msgid "Interior lights glow attenuation"
 msgstr "Zanikanie poświaty świateł wnętrz wagonów"
 
-msgid "Road traffic density"
-msgstr "Natężenie ruchu ulicznego"
-
-msgid "Road traffic vehicles"
-msgstr "Pojazdy ruchu ulicznego"
-
 msgid "Smoke"
 msgstr "Dym"
 
@@ -1474,9 +1468,6 @@ msgstr "Turbulencja wiatru"
 
 msgid "Fog curve"
 msgstr "Krzywa mgły"
-
-msgid "Fog sky height"
-msgstr "Wysokość mgły na niebie"
 
 msgid "Aerial perspective"
 msgstr "Perspektywa powietrzna"
@@ -1979,14 +1970,17 @@ msgstr "Autobusy"
 msgid "Cars"
 msgstr "Samochody"
 
-msgid "People"
-msgstr "Ludzie"
+msgid "Passenger cars"
+msgstr "Wagony pasażerskie"
 
-msgid "Animals"
-msgstr "Zwierzęta"
+msgid "Freight cars"
+msgstr "Wagony towarowe"
 
-msgid "Carriages"
-msgstr "Wagony"
+msgid "Special"
+msgstr "Specjalne"
+
+msgid "Other"
+msgstr "Inne"
 
 msgid "Unknown"
 msgstr "Nieznane"

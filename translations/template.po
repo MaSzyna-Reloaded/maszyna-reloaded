@@ -1424,12 +1424,6 @@ msgstr ""
 msgid "Interior lights glow attenuation"
 msgstr ""
 
-msgid "Road traffic density"
-msgstr ""
-
-msgid "Road traffic vehicles"
-msgstr ""
-
 msgid "Smoke"
 msgstr ""
 
@@ -1473,9 +1467,6 @@ msgid "Wind turbulence"
 msgstr ""
 
 msgid "Fog curve"
-msgstr ""
-
-msgid "Fog sky height"
 msgstr ""
 
 msgid "Aerial perspective"
@@ -1979,13 +1970,16 @@ msgstr ""
 msgid "Cars"
 msgstr ""
 
-msgid "People"
+msgid "Passenger cars"
 msgstr ""
 
-msgid "Animals"
+msgid "Freight cars"
 msgstr ""
 
-msgid "Carriages"
+msgid "Special"
+msgstr ""
+
+msgid "Other"
 msgstr ""
 
 msgid "Unknown"

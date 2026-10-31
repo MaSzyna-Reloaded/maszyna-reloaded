@@ -16,7 +16,13 @@ Where the game is not libmaszyna:
   nothing of the game: no game class, path, setting or input action is named in it. What the game
   needs from libmaszyna is a public API, a signal or a base class there (`SkyEnvironment`,
   `DebugHud`, `CabinSystem.vehicle_cabin_built`); a breach is reported to the operator
-* the game's sky is a backend extending libmaszyna's `SkyEnvironment` (`world/sky/`),
+* REQUIRED, ABSOLUTE: **a server is a singleton, never a class of static functions** - a C++
+  Engine singleton or a GDScript autoload its plugin adds, never a `class_name` of `static func`s
+  and `static var`s; none is added to such a class, one found is reported - see `CODE_STYLE.md`
+* REQUIRED, ABSOLUTE: **nothing is loaded in a constructor, and no lazy cache stands in for it**:
+  whoever makes or owns an object hands it what it needs through an explicit API (`*_set_*`) - see
+  `CODE_STYLE.md`
+* the game's sky is a backend extending libmaszyna's `SkyEnvironment` (`sky/`),
   placed beside the `EnvironmentNode` it draws, with the node's `configuration_changed`
   connected to its `apply_configuration()` in the scene
 * the original's AI driver is the game's (`ai_driver/`, `MaszynaAIDriver`): a

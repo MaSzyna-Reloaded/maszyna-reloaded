@@ -9,7 +9,7 @@
 shader = ExtResource("3_5prnv")
 shader_parameter/blur_amount = 4
 
-[node name="LoadingScreen" type="Control"]
+[node name="LoadingScreen" type="Control" unique_id=743559597]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -18,7 +18,7 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_xq1lc")
 
-[node name="Background" type="TextureRect" parent="."]
+[node name="Background" type="TextureRect" parent="." unique_id=220818051]
 material = SubResource("ShaderMaterial_wi7ft")
 layout_mode = 1
 anchors_preset = 15
@@ -31,11 +31,11 @@ texture = ExtResource("4_eev04")
 expand_mode = 1
 stretch_mode = 6
 
-[node name="Board" parent="." instance=ExtResource("5_board")]
+[node name="Board" parent="." unique_id=775532552 instance=ExtResource("5_board")]
 unique_name_in_owner = true
 layout_mode = 1
 
-[node name="Clock" type="Timer" parent="."]
+[node name="Clock" type="Timer" parent="." unique_id=21905129]
 unique_name_in_owner = true
 wait_time = 0.25
 

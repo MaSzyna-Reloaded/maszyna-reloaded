@@ -1,0 +1,40 @@
+name: release-candidate-cleanup
+
+# A pull request from release/<name>, merged or closed, takes its pre-release and its moving tag
+# maszyna-reloaded-rc-<name> with it (build.yaml's publish job makes them). A pull request from a
+# fork never had one.
+on:
+  pull_request:
+    types: [closed]
+
+jobs:
+  delete-pre-release:
+    if: >-
+      startsWith(github.head_ref, 'release/')
+      && github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+    steps:
+      # the script alone, from the pull request's head: its merge with main is gone once it closes
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          sparse-checkout: ci/release-candidate-tag.sh
+          sparse-checkout-cone-mode: false
+
+      - name: Delete the pre-release and its tag
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          BRANCH: ${{ github.head_ref }}
+        run: |
+          tag=$(ci/release-candidate-tag.sh "$BRANCH")
+          if gh release view "$tag" > /dev/null 2>&1; then
+            gh release delete "$tag" --cleanup-tag --yes
+          fi
+          # a tag left without its release
+          if gh api "repos/$GH_REPO/git/ref/tags/$tag" > /dev/null 2>&1; then
+            gh api -X DELETE "repos/$GH_REPO/git/refs/tags/$tag"
+          fi

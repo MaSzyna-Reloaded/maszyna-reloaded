@@ -1,3 +1,4 @@
+class_name MaszynaReloadedGame
 extends Node3D
 
 ## Seconds of the music fade out after a scenery has loaded
@@ -45,9 +46,6 @@ const ARG_SCENERY: String = "-s"
 const ARG_VEHICLE: String = "-v"
 ## Exit code of a scenery started from the command line without a valid game directory
 const EXIT_INVALID_GAME_DIR: int = 1
-## The 3D world of a scenery - made when one is chosen, freed in the menu, which renders nothing
-## behind it
-const WORLD_SCENE: PackedScene = preload("world/world.tscn")
 
 ## The game's log files of a scenery (GameLogFileHandler), each started afresh with it, beside the
 ## engine's file log (Log folder, the Debug settings) - none with the file logging off. A run
@@ -74,6 +72,10 @@ const DECLARED_TRAINSET: Array[VehicleData] = []
 
 ## A scenery started at once, without the selector - as "-s" on the command line does
 @export var scenery: String = ""
+## The 3D world of a scenery - made when one is chosen, freed in the menu, which renders nothing
+## behind it: the startup's (Startup.world_scene) - the game's world/world.tscn, or a game's built on
+## it
+@export var world_scene: PackedScene = null
 
 var _music_tween: Tween
 ## The level appropriate to the menu or loading screen, before the player's music volume.
@@ -168,8 +170,9 @@ func start_scenery(info: SceneryInfo, vehicle_id: String, trainset: Array[Vehicl
         await $ScenerySelectorScreen.hidden
     # made under the loading screen: its environment and first frames stall the main thread
     # a game built on this one may show a provider's sceneries in a scene of its own
-    var world_scene: PackedScene = GameExtensions.world_scene_get(info.provider)
-    _world = (world_scene if world_scene else WORLD_SCENE).instantiate() as SceneryWorld
+    var provider_world_scene: PackedScene = GameExtensions.world_scene_get(info.provider)
+    _world = (provider_world_scene if provider_world_scene else world_scene).instantiate() \
+            as SceneryWorld
     _world.load_progress.connect(_on_world_load_progress)
     _world.scenario_progress.connect(_on_world_scenario_progress)
     _world.load_files_parsed.connect($LoadingScreen.set_files)

@@ -1,7 +1,9 @@
 extends Control
 
 ## The settings, over the screen that opened it, in a window of the game (UIWindow): the sections
-## on the left, the settings of the selected one on the right, both built from settings.json. A
+## on the left, the settings of the selected one on the right, both built from the game's settings
+## (settings.json, reloaded/user_settings/declarations) with what a game built on this one or a
+## plugin adds to them (UserSettings.get_declarations(), UserSettingsProvider). A
 ## change is in effect at once; "Save" writes the changes to the file and closes; "Discard
 ## changes", once the player confirms it, puts back what the file holds - what there was when the
 ## screen opened - and closes; the close button and Escape ask whether to save or to discard, or
@@ -27,7 +29,6 @@ extends Control
 ## the game restarts - a change of it lights the note above the buttons, and Save asks whether to
 ## restart.
 
-const DEFINITION: JSON = preload("settings.json")
 const PAGE: PackedScene = preload("settings_page.tscn")
 const TOGGLE: PackedScene = preload("setting_toggle.tscn")
 const SLIDER: PackedScene = preload("setting_slider.tscn")
@@ -81,7 +82,7 @@ func _ready() -> void:
     UserSettings.config_changed.connect(_update_restart_note)
     _apply_graphics()
     var notes: PackedStringArray = []
-    for section: Dictionary in DEFINITION.data["sections"]:
+    for section: Dictionary in UserSettings.get_declarations()["sections"]:
         var settings: Array = section["settings"]
         var page: SettingsPage = PAGE.instantiate()
         page.sounds = sounds

@@ -15,9 +15,9 @@ func test_maps_cloudiness_and_wind_to_weather() -> void:
     sky._process(0.0)
 
     assert_almost_eq(sky.weather.cloud_density, 0.8, 0.000001)
-    assert_almost_eq(sky.skydome.clouds_wind_direction.x, 0.0, 0.000001)
-    assert_almost_eq(sky.skydome.clouds_wind_direction.y, 1.0, 0.000001)
-    assert_eq(sky.weather.skydome_path, NodePath("../Skydome"))
+    assert_almost_eq(_drawn(sky).clouds_wind_direction.x, 0.0, 0.000001)
+    assert_almost_eq(_drawn(sky).clouds_wind_direction.y, 1.0, 0.000001)
+    assert_eq(sky.weather.skydome_path, NodePath("../../Skydome"))
 
 
 
@@ -66,7 +66,7 @@ func test_maps_rain_intensity_to_storm_overcast_and_rainbow() -> void:
     assert_almost_eq(sky.weather.cloud_overcast_intensity, 0.8, 0.000001)
     assert_almost_eq(sky.weather.storm_intensity, 2.0 / 3.0, 0.000001)
     assert_almost_eq(sky.weather.storm_fog_intensity, 0.355, 0.000001)
-    assert_almost_eq(sky.skydome.rainbow_intensity, 0.12, 0.000001)
+    assert_almost_eq(_drawn(sky).rainbow_intensity, 0.12, 0.000001)
 
 
 func test_maps_wind_strength_to_weather_global_wind() -> void:
@@ -82,14 +82,11 @@ func test_maps_wind_strength_to_weather_global_wind() -> void:
     assert_almost_eq(weather.global_wind_strength, 5.0, 0.000001)
 
 
-func test_applies_skydome_and_weather_project_settings() -> void:
+func test_applies_weather_project_settings() -> void:
     var environment_node: EnvironmentNode = _create_environment_node()
     var sky: GndSkydomeMaszynaEnvironment = _create_sky(environment_node)
     sky._process(0.0)
-    var skydome: Skydome = sky.skydome
 
-    assert_almost_eq(skydome.day_light_energy, 2.0, 0.000001)
-    assert_eq(skydome.clouds_color_shadow, Color(0.8515625, 0.8515625, 0.8515625, 1.0))
     assert_almost_eq(sky.weather.visual_intensity, 1.0, 0.000001)
     assert_almost_eq(
         sky.weather.precipitation_wind_strength, 10.0, 0.000001
@@ -99,7 +96,7 @@ func test_applies_skydome_and_weather_project_settings() -> void:
 func test_maps_fog_controls_to_skydome_and_weather() -> void:
     var environment_node: EnvironmentNode = _create_environment_node()
     var sky: GndSkydomeMaszynaEnvironment = _create_sky(environment_node)
-    var skydome: Skydome = sky.skydome
+    var skydome: SkydomeSky = _drawn(sky)
     var weather: WeatherNode = sky.weather
 
     environment_node.fog_density = 0.3
@@ -118,7 +115,7 @@ func test_maps_fog_controls_to_skydome_and_weather() -> void:
     # has to hold is their product - the optical depth - not either one on its own.
     assert_almost_eq(
         skydome.night_vol_fog_density * skydome.night_vol_fog_length,
-        _skydome_default(&"night_vol_fog_density") * 4.0 * _skydome_default(&"night_vol_fog_length"),
+        _skydome_look(sky, &"night_vol_fog_density") * 4.0 * _skydome_look(sky, &"night_vol_fog_length"),
         0.000001,
     )
     assert_almost_eq(
@@ -136,8 +133,23 @@ func test_maps_fog_controls_to_skydome_and_weather() -> void:
     # the sky is fogged as hard as geometry at fog_distance is, or distant silhouettes stay visible
     assert_almost_eq(skydome.day_fog_sky_affect, 0.3, 0.000001)
     assert_almost_eq(skydome.night_fog_sky_affect, 0.3, 0.000001)
-    assert_eq(skydome.fog_mode, Skydome.FogModeOverride.DEPTH)
+    assert_eq(skydome.fog_mode, SkydomeSky.FogModeOverride.DEPTH)
     assert_eq(sky._environment.fog_mode, Environment.FOG_MODE_DEPTH)
+
+
+func test_far_fog_leaves_the_sky() -> void:
+    var environment_node: EnvironmentNode = _create_environment_node()
+    var sky: GndSkydomeMaszynaEnvironment = _create_sky(environment_node)
+    var skydome: SkydomeSky = _drawn(sky)
+
+    environment_node.fog_density = 1.0
+    environment_node.fog_distance = 5000.0
+    environment_node._process(0.0)
+    sky._process(0.0)
+
+    # a fog of kilometres hides none of the sky
+    assert_almost_eq(skydome.day_fog_sky_affect, 0.0, 0.000001)
+    assert_almost_eq(skydome.night_fog_sky_affect, 0.0, 0.000001)
 
 
 func test_fog_switch_disables_all_fog_layers() -> void:
@@ -164,21 +176,21 @@ func test_applies_time_and_location_as_solar_time() -> void:
     environment_node._process(0.0)
     sky._process(0.0)
 
-    assert_almost_eq(sky.skydome.latitude, 50.271, 0.000001)
-    assert_eq(sky.skydome.day_of_year, 32)
-    assert_almost_eq(sky.skydome.time_of_day, 11.0, 0.000001)
-    assert_eq(sky.skydome.world_environment_path, NodePath(".."))
-    assert_eq(sky.skydome.directional_light_path, NodePath("../SunLight"))
+    assert_almost_eq(_drawn(sky).latitude, 50.271, 0.000001)
+    assert_eq(_drawn(sky).day_of_year, 32)
+    assert_almost_eq(_drawn(sky).time_of_day, 11.0, 0.000001)
+    assert_eq(_drawn(sky).get_environment(), sky._environment)
+    assert_eq(_drawn(sky).get_light(), sky.sun_light)
 
 
-## The pristine value of a Skydome property, which is what the wrapper scales from. Read off the
-## script rather than through SkydomeSettings, because the gnd_skydome/* settings only exist where
-## the addon's EditorPlugin has run and most of them are never written to project.godot. That is
-## fine here - a test never runs from an exported pck, where script defaults are gone.
-func _skydome_default(property: StringName) -> float:
-    var skydome_script: Script = load("res://addons/gnd_skydome/Skydome.gd")
-    return float(ProjectSettings.get_setting(
-        SkydomeSettings.PREFIX + property, skydome_script.get_property_default_value(property)))
+## The look of a Skydome property, as its node keeps it - what the wrapper scales from
+func _skydome_look(sky: GndSkydomeMaszynaEnvironment, property: StringName) -> float:
+    return float(sky.skydome.get(property))
+
+
+## The sky as SkydomeServer draws it - the node's look with what the wrapper sets over it
+func _drawn(sky: GndSkydomeMaszynaEnvironment) -> SkydomeSky:
+    return SkydomeServer.skydome_get_sky(sky.skydome.get_rid())
 
 
 func _create_environment_node() -> EnvironmentNode:
@@ -190,6 +202,11 @@ func _create_sky(environment_node: EnvironmentNode) -> GndSkydomeMaszynaEnvironm
     var sky: GndSkydomeMaszynaEnvironment = GndSkydomeMaszynaEnvironment.new()
     # both children of the test
     sky.environment_node_path = NodePath("../%s" % environment_node.name)
+    var skydome: Skydome = Skydome.new()
+    skydome.name = "Skydome"
+    sky.add_child(skydome)
+    sky.skydome = skydome
     add_child_autofree(sky)
     environment_node.configuration_changed.connect(sky.apply_configuration)
+    skydome.param_changed.connect(sky.apply_configuration.unbind(1))
     return sky

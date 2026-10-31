@@ -31,18 +31,20 @@ func _ready() -> void:
     _rain_low_pass_filter = AudioServer.get_bus_effect(_rain_bus_index, 0) as AudioEffectLowPassFilter
     _weather = get_node(weather_path) as WeatherNode
     _weather.thunder.connect(_on_weather_thunder)
-    _weather.rain_strength_changed.connect(_on_weather_rain_strength_changed)
-    _weather.rain_local_strength_changed.connect(_on_weather_rain_local_strength_changed)
+    _weather.precipitation_strength_changed.connect(_on_weather_precipitation_strength_changed)
+    _weather.precipitation_local_strength_changed.connect(_on_weather_precipitation_local_strength_changed)
     SimulationServer.simulation_paused.connect(_on_runtime_paused)
     SimulationServer.simulation_unpaused.connect(_on_runtime_unpaused)
     # The weather state was already applied while the sky got ready.
-    _on_weather_rain_strength_changed(_weather.precipitation_intensity)
+    _on_weather_precipitation_strength_changed(
+        _weather.precipitation_intensity, _weather.get_falling_snow_fraction()
+    )
 
 
 func _exit_tree() -> void:
     _weather.thunder.disconnect(_on_weather_thunder)
-    _weather.rain_strength_changed.disconnect(_on_weather_rain_strength_changed)
-    _weather.rain_local_strength_changed.disconnect(_on_weather_rain_local_strength_changed)
+    _weather.precipitation_strength_changed.disconnect(_on_weather_precipitation_strength_changed)
+    _weather.precipitation_local_strength_changed.disconnect(_on_weather_precipitation_local_strength_changed)
     SimulationServer.simulation_paused.disconnect(_on_runtime_paused)
     SimulationServer.simulation_unpaused.disconnect(_on_runtime_unpaused)
 
@@ -69,12 +71,13 @@ func _on_weather_thunder(strength: float) -> void:
     player.play()
 
 
-func _on_weather_rain_strength_changed(strength: float) -> void:
-    _rain_player.play_automation(&"rain", &"strength", strength)
+## Only the rain's share of the precipitation is heard: the snow falls silent
+func _on_weather_precipitation_strength_changed(strength: float, snow: float) -> void:
+    _rain_player.play_automation(&"rain", &"strength", strength * (1.0 - snow))
 
 
 ## Rain heard from a shelter (e.g. a cab inside a vehicle's RainExclusion) is muffled.
-func _on_weather_rain_local_strength_changed(strength: float) -> void:
+func _on_weather_precipitation_local_strength_changed(strength: float, _snow: float) -> void:
     var global_strength: float = clampf(_weather.precipitation_intensity, 0.0, 1.0)
     var shelter_factor: float = 0.0
     if global_strength > 0.0001:

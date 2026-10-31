@@ -81,7 +81,6 @@
 * A pull request from a fork has a read-only token: after a `GODOT_VERSION` bump it cannot
   publish the engine release, and it publishes no prerelease.
 * Android: only `arm64`; the `android_x86_64` preset has no template.
-* The `maszyna-reloaded-<branch>` prerelease of a pull request stays after it is merged or closed.
 * The Windows installer and the exe are unsigned: SmartScreen asks "Run anyway". Candidates:
   SignPath Foundation (free for open source, signs in GitHub Actions), Certum Open Source Code
   Signing (cloud key, awkward in CI), Azure Trusted Signing (eligibility for individuals limited).

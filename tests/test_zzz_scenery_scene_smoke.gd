@@ -20,11 +20,14 @@ func after_each() -> void:
 
 func test_game_scene_instantiates() -> void:
     var packed:PackedScene = load("res://game.tscn")
+    # the startup's world (Startup.world_scene)
+    var world_scene:PackedScene = load("res://world/world.tscn")
     assert_not_null(packed, "scene should load")
     var instance:Node3D = packed.instantiate()
     assert_not_null(instance, "scene should instantiate")
     # a scenery given to the scene starts at once, without the selector - its world is made for it
     instance.scenery = SCENERY
+    (instance as MaszynaReloadedGame).world_scene = world_scene
     add_child(instance)
     # TrackServer is an engine singleton, not a node under /root - it has been since it moved
     # to C++, and looking it up by path is what AGENTS.md forbids

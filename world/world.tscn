@@ -1,15 +1,24 @@
 [gd_scene format=3 uid="uid://d34eb761dqq4u"]
 
-[ext_resource type="Script" uid="uid://bkqrinxt06s6d" path="res://world/world.gd" id="1_world"]
+[ext_resource type="Script" uid="uid://bkqrinxt06s6d" path="res://scenery_world/scenery_world.gd" id="1_world"]
 [ext_resource type="Script" uid="uid://b0r5vydn7ve4l" path="res://addons/libreloaded/environment/environment_node.gd" id="2_env"]
 [ext_resource type="PackedScene" uid="uid://dmhikrkk2qsjl" path="res://addons/libreloaded/player/player.tscn" id="3_player"]
 [ext_resource type="PackedScene" path="res://weather/weather_sfx.tscn" id="5_weather_sfx"]
 [ext_resource type="SfxBank" path="res://sounds/player/player_sfx_bank.tres" id="6_player_sfx_bank"]
 [ext_resource type="Script" uid="uid://clkcp3220jqpe" path="res://addons/libreloaded/scenery/scenery_streamer.gd" id="8_streamer"]
-[ext_resource type="Script" uid="uid://ci62ovufebdnf" path="res://world/sky/gnd_skydome_maszyna_environment.gd" id="9_sky"]
+[ext_resource type="Script" uid="uid://ci62ovufebdnf" path="res://sky/gnd_skydome_maszyna_environment.gd" id="9_sky"]
+[ext_resource type="TrackRenderingLook" path="res://addons/libreloaded/tracks/track_look.tres" id="10_track_look"]
+[ext_resource type="MaszynaTrackLooks" uid="uid://bbr7as7ymgov1" path="res://addons/libmaszyna/tracks/maszyna_track_looks.tres" id="11_maszyna_track_looks"]
+[ext_resource type="Material" uid="uid://cvk8w6tudm7p3" path="res://addons/libreloaded/environment/vehicle_snow_overlay.tres" id="12_vehicle_snow"]
+[ext_resource type="Script" uid="uid://blkilnimp0sck" path="res://addons/gnd_skydome/Skydome.gd" id="13_skydome"]
 
 [node name="World" type="Node3D" unique_id=747719912]
 script = ExtResource("1_world")
+track_looks = Dictionary[StringName, Resource]({
+&"maszyna": ExtResource("11_maszyna_track_looks"),
+&"standard": ExtResource("10_track_look")
+})
+vehicle_snow_material = ExtResource("12_vehicle_snow")
 
 [node name="SceneryStreamer" type="Node" parent="." unique_id=79567195]
 script = ExtResource("8_streamer")
@@ -17,39 +26,70 @@ script = ExtResource("8_streamer")
 [node name="EnvironmentNode" type="Node" parent="." unique_id=603722115]
 unique_name_in_owner = true
 script = ExtResource("2_env")
-current_time = 1.0
+current_time = 12.0
 day = 19
-month = 9
+month = 7
+timezone_offset = 2
 cloudiness = 0.0
 wind_strength = 0.2
 fog_density = 0.015
 fog_distance = 235.0
 
-[node name="Sky" type="Node" parent="." unique_id=1104925771]
+[node name="Sky" type="Node" parent="." unique_id=1104925771 node_paths=PackedStringArray("skydome")]
 script = ExtResource("9_sky")
+skydome = NodePath("Skydome")
 environment_node_path = NodePath("../EnvironmentNode")
-tonemap_white = 10.0
-tonemap_agx_white = 8.0
-day_tonemap_agx_contrast = 1.2
+tonemap_white = 4.0
+tonemap_agx_white = 4.0
+day_tonemap_agx_contrast = 1.3
 night_tonemap_agx_contrast = 1.0
-day_adjustment_contrast = 1.1
 moon_energy = 0.3
 auto_exposure_enabled = true
-day_auto_exposure_scale = 0.15000000000000002
-day_auto_exposure_min_sensitivity = 25.0
+day_auto_exposure_scale = 0.1
+day_auto_exposure_min_sensitivity = 20.0
 day_auto_exposure_max_sensitivity = 400.0
-night_auto_exposure_scale = 0.15000000000000002
-night_auto_exposure_min_sensitivity = 100.0
-night_auto_exposure_max_sensitivity = 400.0
+night_auto_exposure_scale = 0.05
+night_auto_exposure_min_sensitivity = 50.0
+night_auto_exposure_max_sensitivity = 100.0
 sdfgi_energy = 1.2
 sdfgi_bounce_feedback = 0.8
 day_ambient_energy = 1.0
 day_ambient_sky_contribution = 0.4
 night_ambient_color = Color(0.030064037, 0.047682397, 0.082066424, 1)
-night_ambient_energy = 0.3
+night_ambient_energy = 0.7
 night_ambient_sky_contribution = 0.2
 day_fog_color = Color(1, 0.95, 0.91, 1)
 night_fog_color = Color(0.033263337, 0.0491547, 0.10060064, 1)
+
+[node name="Skydome" type="Node" parent="Sky" unique_id=1530716629]
+script = ExtResource("13_skydome")
+day_light_energy = 2.0
+shader_zenith_color = Color(0.11514282, 0.20309141, 0.3828125, 1)
+shader_horizon_height = 0.178
+shader_night_sky_energy = 0.165
+night_vol_fog_density = 0.02
+clouds_color_shadow = Color(0.8515625, 0.8515625, 0.8515625, 1)
+clouds_shadow_angular_distance_clear = 0.53
+clouds_evolution_strength = 0.775
+clouds_evolution_scale = 0.198
+clouds_scroll_b = Vector2(0.002, 0)
+clouds_light_occlusion = 0.5
+clouds_ambient_occlusion = 0.12
+clouds_sky_occlusion = 0.3
+sun_disk_softness = 0.115
+sun_disk_strength = 3.0
+sun_halo_size = 0.1
+sun_halo_strength = 1.5
+sun_energy_scale = 3.0
+moon_glow_strength = 0.01
+moon_glow_size = 0.2
+sunshafts_intensity = 0.45
+sunshafts_cloud_occlusion = 0.35
+sunshafts_cloud_falloff = 0.45
+vol_fog_density_boost = 0.006
+fog_sun_scatter = 0.07
+shader_atmosphere_horizon_level = -0.1
+shader_atmosphere_sun_scatter = 0.5
 
 [node name="Player" parent="." unique_id=1785690669 instance=ExtResource("3_player")]
 unique_name_in_owner = true
@@ -60,4 +100,5 @@ sfx_bank = ExtResource("6_player_sfx_bank")
 weather_path = NodePath("../Sky/_WorldEnvironment/Weather")
 
 [connection signal="configuration_changed" from="EnvironmentNode" to="Sky" method="apply_configuration"]
+[connection signal="param_changed" from="Sky/Skydome" to="Sky" method="apply_configuration" unbinds=1]
 [connection signal="camera_changed" from="Player" to="SceneryStreamer" method="set_camera"]

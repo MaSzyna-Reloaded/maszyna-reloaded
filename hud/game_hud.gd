@@ -70,6 +70,7 @@ func _ready() -> void:
         var extension: GameHudExtension = scene.instantiate() as GameHudExtension
         add_child(extension)
         _extensions.append(extension)
+        extension.attach_debug_hud(%DebugHud)
         extension.fill_menu(%Diagnostics)
         %Diagnostics.index_pressed.connect(extension.menu_index_pressed)
         %DebugHud.windows_visibility_changed.connect(extension.set_windows_shown)

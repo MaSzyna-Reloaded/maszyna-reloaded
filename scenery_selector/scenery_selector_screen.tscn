@@ -2,36 +2,47 @@
 
 [ext_resource type="Script" uid="uid://c8tjaa2mvhqcf" path="res://scenery_selector/scenery_selector_screen.gd" id="1_screen"]
 [ext_resource type="Shader" uid="uid://dhrsqs6eebf6c" path="res://scenery_selector/scenery_selector_background.gdshader" id="2_shader"]
-[ext_resource type="Texture2D" uid="uid://gf4uwruf30ac" path="res://loading_screen/loading_screen_bg.jpg" id="3_bg"]
 [ext_resource type="Texture2D" uid="uid://c4su3anrskdcw" path="res://scenery_selector/logo.png" id="4_logo"]
 [ext_resource type="PackedScene" path="res://scenery_selector/vehicle_viewer.tscn" id="5_viewer"]
 [ext_resource type="PackedScene" uid="uid://5f6cnr8et0l6" path="res://ui/selector_list.tscn" id="6_list"]
 [ext_resource type="Theme" uid="uid://dydlldjr6yrr2" path="res://scenery_selector/selector_theme.tres" id="7_theme"]
 [ext_resource type="Script" uid="uid://bp7jxwcq7ajtb" path="res://ui/focus_section.gd" id="8_focus"]
 [ext_resource type="PackedScene" path="res://ui/tile_grid.tscn" id="9_grid"]
-[ext_resource type="Resource" uid="uid://bg4cnurfltuxp" path="res://startup/ui_sounds.tres" id="10_sounds"]
+[ext_resource type="SfxBank" uid="uid://bg4cnurfltuxp" path="res://startup/ui_sounds.tres" id="10_sounds"]
 [ext_resource type="Texture2D" uid="uid://b7dxj0otp70ih" path="res://startup/eu07_parked_sketch.svg" id="11_sketch"]
 [ext_resource type="PackedScene" path="res://scenery_selector/language_switcher.tscn" id="12_language"]
 [ext_resource type="PackedScene" path="res://ui/ui_dialog.tscn" id="13_notice"]
-[ext_resource type="Texture2D" path="res://settings/gear_icon.svg" id="14_gear"]
-[ext_resource type="Script" path="res://ui/ui_switch.gd" id="ui_switch"]
+[ext_resource type="Texture2D" uid="uid://c7c4w23vpvqkr" path="res://settings/gear_icon.svg" id="14_gear"]
 [ext_resource type="PackedScene" path="res://scenery_selector/game_dir_window.tscn" id="15_game_dir_window"]
-[ext_resource type="Script" path="res://ui/ui_chip.gd" id="16_chip"]
-[ext_resource type="Texture2D" path="res://ui/warning_icon.svg" id="17_warning_icon"]
-[ext_resource type="Script" path="res://ui/ui_button.gd" id="18_button"]
-[ext_resource type="Texture2D" path="res://ui/plus_icon.svg" id="19_plus"]
-[ext_resource type="Texture2D" path="res://ui/reset_icon.svg" id="21_reset"]
-[ext_resource type="Script" path="res://ui/ui_action_buttons.gd" id="22_action_buttons"]
+[ext_resource type="Script" uid="uid://ccfkl2kv0cwid" path="res://ui/ui_chip.gd" id="16_chip"]
+[ext_resource type="Texture2D" uid="uid://dqiwrfgodq1pu" path="res://ui/warning_icon.svg" id="17_warning_icon"]
+[ext_resource type="Script" uid="uid://bvxcnt1b010l6" path="res://ui/ui_button.gd" id="18_button"]
+[ext_resource type="Texture2D" uid="uid://cewv7py1guvti" path="res://ui/plus_icon.svg" id="19_plus"]
 [ext_resource type="PackedScene" path="res://scenery_selector/vehicle_browser_window.tscn" id="20_vehicle_browser"]
-[ext_resource type="Script" path="res://ui/ui_select.gd" id="23_select"]
+[ext_resource type="Texture2D" uid="uid://bmk4ssn3fhmu5" path="res://ui/reset_icon.svg" id="21_reset"]
+[ext_resource type="Script" uid="uid://dv4iiadnhpdc7" path="res://ui/ui_action_buttons.gd" id="22_action_buttons"]
+[ext_resource type="Script" uid="uid://uxpw3t45a4d5" path="res://ui/ui_select.gd" id="23_select"]
+[ext_resource type="Script" uid="uid://cmf7ormeqxcb6" path="res://ui/ui_switch.gd" id="ui_switch"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_background"]
 shader = ExtResource("2_shader")
 shader_parameter/tint = Color(0.16, 0.27, 0.5, 1)
-shader_parameter/brightness = 1.2
-shader_parameter/dissolve = 0.0
-shader_parameter/dissolve_softness = 0.25
-shader_parameter/dissolve_scale = 6.0
+shader_parameter/brightness = 0.7250000344375
+shader_parameter/level = 0.6800000323
+shader_parameter/contrast = 0.3750000178125
+shader_parameter/smear_scale = 1.6150000529625
+shader_parameter/stroke_stretch = 2.8150000862125
+shader_parameter/drift_speed = 0.1470000069825
+shader_parameter/vignette = 0.7850000372875
+shader_parameter/dissolve = 0.5450000258875
+shader_parameter/dissolve_softness = 0.7300000339764801
+shader_parameter/dissolve_scale = 5.525
+
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_iv70x"]
+frequency = 0.0016
+
+[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_tykho"]
+noise = SubResource("FastNoiseLite_iv70x")
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_panel"]
 content_margin_left = 16.0
@@ -133,7 +144,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-texture = ExtResource("3_bg")
+texture = SubResource("NoiseTexture2D_tykho")
 expand_mode = 1
 stretch_mode = 6
 
@@ -172,13 +183,13 @@ theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
 layout_mode = 2
 theme_override_constants/separation = 12
 
-[node name="ProviderFilterSection" type="PanelContainer" parent="Content/HBoxContainer/LeftSlot/ListPanel/VBoxContainer"]
+[node name="ProviderFilterSection" type="PanelContainer" parent="Content/HBoxContainer/LeftSlot/ListPanel/VBoxContainer" unique_id=1059160978]
 unique_name_in_owner = true
 layout_mode = 2
 theme_type_variation = &"FocusSection"
 script = ExtResource("8_focus")
 
-[node name="ProviderFilter" type="OptionButton" parent="Content/HBoxContainer/LeftSlot/ListPanel/VBoxContainer/ProviderFilterSection"]
+[node name="ProviderFilter" type="OptionButton" parent="Content/HBoxContainer/LeftSlot/ListPanel/VBoxContainer/ProviderFilterSection" unique_id=1528411305]
 unique_name_in_owner = true
 layout_mode = 2
 tooltip_text = "Sceneries of one source only"
@@ -255,12 +266,12 @@ theme_override_font_sizes/font_size = 18
 text = "Trainset"
 
 [node name="AllTrainsetsSwitch" type="CheckButton" parent="Content/HBoxContainer/DetailsPanel/VBoxContainer" unique_id=820972816]
-script = ExtResource("ui_switch")
 unique_name_in_owner = true
 visible = false
 layout_mode = 2
 focus_mode = 0
 text = "Show all trainsets of the scenario"
+script = ExtResource("ui_switch")
 
 [node name="TrainsetList" parent="Content/HBoxContainer/DetailsPanel/VBoxContainer" unique_id=219649123 instance=ExtResource("6_list")]
 unique_name_in_owner = true
@@ -269,7 +280,7 @@ custom_minimum_size = Vector2(0, 220)
 layout_mode = 2
 sounds = ExtResource("10_sounds")
 
-[node name="TrainsetRow" type="HBoxContainer" parent="Content/HBoxContainer/DetailsPanel/VBoxContainer"]
+[node name="TrainsetRow" type="HBoxContainer" parent="Content/HBoxContainer/DetailsPanel/VBoxContainer" unique_id=298021377]
 layout_mode = 2
 
 [node name="TrainsetGrid" parent="Content/HBoxContainer/DetailsPanel/VBoxContainer/TrainsetRow" unique_id=1198650542 instance=ExtResource("9_grid")]
@@ -283,7 +294,7 @@ placeholder_silhouette = ExtResource("11_sketch")
 reorderable = true
 tile_actions = true
 
-[node name="TrainsetEditSection" type="PanelContainer" parent="Content/HBoxContainer/DetailsPanel/VBoxContainer/TrainsetRow"]
+[node name="TrainsetEditSection" type="PanelContainer" parent="Content/HBoxContainer/DetailsPanel/VBoxContainer/TrainsetRow" unique_id=922058825]
 unique_name_in_owner = true
 modulate = Color(1, 1, 1, 0)
 layout_mode = 2
@@ -291,29 +302,29 @@ size_flags_vertical = 4
 theme_type_variation = &"FocusSection"
 script = ExtResource("8_focus")
 
-[node name="TrainsetEditButtons" type="HBoxContainer" parent="Content/HBoxContainer/DetailsPanel/VBoxContainer/TrainsetRow/TrainsetEditSection"]
+[node name="TrainsetEditButtons" type="HBoxContainer" parent="Content/HBoxContainer/DetailsPanel/VBoxContainer/TrainsetRow/TrainsetEditSection" unique_id=651394120]
 layout_mode = 2
 theme_override_constants/separation = 8
 script = ExtResource("22_action_buttons")
 tab_walks_buttons = false
 
-[node name="RestoreTrainsetButton" type="Button" parent="Content/HBoxContainer/DetailsPanel/VBoxContainer/TrainsetRow/TrainsetEditSection/TrainsetEditButtons"]
+[node name="RestoreTrainsetButton" type="Button" parent="Content/HBoxContainer/DetailsPanel/VBoxContainer/TrainsetRow/TrainsetEditSection/TrainsetEditButtons" unique_id=1321781376]
 unique_name_in_owner = true
 layout_mode = 2
-disabled = true
-mouse_default_cursor_shape = 2
 tooltip_text = "Restore trainset"
+mouse_default_cursor_shape = 2
+disabled = true
 icon = ExtResource("21_reset")
 icon_alignment = 1
 script = ExtResource("18_button")
 intent = 3
 
-[node name="AddVehicleButton" type="Button" parent="Content/HBoxContainer/DetailsPanel/VBoxContainer/TrainsetRow/TrainsetEditSection/TrainsetEditButtons"]
+[node name="AddVehicleButton" type="Button" parent="Content/HBoxContainer/DetailsPanel/VBoxContainer/TrainsetRow/TrainsetEditSection/TrainsetEditButtons" unique_id=1577187131]
 unique_name_in_owner = true
 layout_mode = 2
-disabled = true
-mouse_default_cursor_shape = 2
 tooltip_text = "Add vehicle"
+mouse_default_cursor_shape = 2
+disabled = true
 icon = ExtResource("19_plus")
 icon_alignment = 1
 script = ExtResource("18_button")
@@ -357,7 +368,7 @@ theme_override_styles/disabled = SubResource("StyleBoxFlat_load_disabled")
 disabled = true
 text = "Load"
 
-[node name="SettingsButton" type="Button" parent="."]
+[node name="SettingsButton" type="Button" parent="." unique_id=1664124754]
 layout_mode = 1
 anchors_preset = 1
 anchor_left = 1.0
@@ -372,15 +383,15 @@ focus_mode = 0
 mouse_default_cursor_shape = 2
 theme_override_colors/icon_normal_color = Color(0.81, 0.88, 1, 0.8)
 theme_override_colors/icon_hover_color = Color(1, 1, 1, 1)
-theme_override_styles/focus = SubResource("StyleBoxEmpty_gear_focus")
-theme_override_styles/hover = SubResource("StyleBoxFlat_gear_hover")
-theme_override_styles/pressed = SubResource("StyleBoxFlat_gear_hover")
 theme_override_styles/normal = SubResource("StyleBoxFlat_gear")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_gear_hover")
+theme_override_styles/hover = SubResource("StyleBoxFlat_gear_hover")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_gear_focus")
 icon = ExtResource("14_gear")
 icon_alignment = 1
 expand_icon = true
 
-[node name="GameDirWarning" type="PanelContainer" parent="."]
+[node name="GameDirWarning" type="PanelContainer" parent="." unique_id=668933502]
 unique_name_in_owner = true
 visible = false
 layout_mode = 1
@@ -391,11 +402,11 @@ offset_top = 6.0
 grow_horizontal = 2
 script = ExtResource("16_chip")
 
-[node name="Columns" type="HBoxContainer" parent="GameDirWarning"]
+[node name="Columns" type="HBoxContainer" parent="GameDirWarning" unique_id=2069635699]
 layout_mode = 2
 theme_override_constants/separation = 12
 
-[node name="WarningIcon" type="TextureRect" parent="GameDirWarning/Columns"]
+[node name="WarningIcon" type="TextureRect" parent="GameDirWarning/Columns" unique_id=638946492]
 custom_minimum_size = Vector2(32, 32)
 layout_mode = 2
 size_flags_vertical = 4
@@ -403,38 +414,38 @@ texture = ExtResource("17_warning_icon")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="Texts" type="VBoxContainer" parent="GameDirWarning/Columns"]
+[node name="Texts" type="VBoxContainer" parent="GameDirWarning/Columns" unique_id=1708462448]
 layout_mode = 2
 size_flags_vertical = 4
 
-[node name="WarningTitle" type="Label" parent="GameDirWarning/Columns/Texts"]
+[node name="WarningTitle" type="Label" parent="GameDirWarning/Columns/Texts" unique_id=583461444]
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 0.45, 0.4, 1)
 text = "Invalid game directory"
 
-[node name="WarningDir" type="Label" parent="GameDirWarning/Columns/Texts"]
+[node name="WarningDir" type="Label" parent="GameDirWarning/Columns/Texts" unique_id=177474022]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_colors/font_color = Color(0.81, 0.88, 1, 0.8)
 theme_override_font_sizes/font_size = 14
 
-[node name="ConfigureButton" type="Button" parent="GameDirWarning/Columns"]
+[node name="ConfigureButton" type="Button" parent="GameDirWarning/Columns" unique_id=1770594779]
 custom_minimum_size = Vector2(140, 40)
 layout_mode = 2
 size_flags_vertical = 4
 mouse_default_cursor_shape = 2
+text = "Configure"
 script = ExtResource("18_button")
 intent = 2
-text = "Configure"
 
-[node name="DevelopmentNotice" parent="." instance=ExtResource("13_notice")]
+[node name="DevelopmentNotice" parent="." unique_id=624268235 instance=ExtResource("13_notice")]
 unique_name_in_owner = true
 layout_mode = 1
 title = "Development version"
 message = "This is a development version of an alternative port of the MaSzyna simulator. It may contain bugs, scenarios may not run, vehicles may not work fully, graphics may be incomplete."
 confirm_text = "I understand"
 
-[node name="GameDirProblem" parent="." instance=ExtResource("13_notice")]
+[node name="GameDirProblem" parent="." unique_id=1062135946 instance=ExtResource("13_notice")]
 unique_name_in_owner = true
 layout_mode = 1
 title = "Invalid game directory"
@@ -474,13 +485,13 @@ uri = "https://maszyna-reloaded.pl"
 [node name="LanguageSwitcher" parent="Footer" unique_id=1119282794 instance=ExtResource("12_language")]
 layout_mode = 2
 
-[node name="GameDirChangedNotice" parent="." instance=ExtResource("13_notice")]
+[node name="GameDirChangedNotice" parent="." unique_id=571594845 instance=ExtResource("13_notice")]
 unique_name_in_owner = true
 layout_mode = 1
 title = "Game directory changed"
 confirm_text = "OK"
 
-[node name="RestoreTrainsetQuestion" parent="." instance=ExtResource("13_notice")]
+[node name="RestoreTrainsetQuestion" parent="." unique_id=1489837967 instance=ExtResource("13_notice")]
 unique_name_in_owner = true
 layout_mode = 1
 title = "Restore trainset"
@@ -489,7 +500,7 @@ confirm_text = "Restore"
 back_text = "Back"
 confirm_intent = 3
 
-[node name="RemoveVehicleQuestion" parent="." instance=ExtResource("13_notice")]
+[node name="RemoveVehicleQuestion" parent="." unique_id=1742474129 instance=ExtResource("13_notice")]
 unique_name_in_owner = true
 layout_mode = 1
 title = "Remove vehicle"
@@ -497,25 +508,34 @@ confirm_text = "Remove"
 back_text = "Back"
 confirm_intent = 3
 
-[node name="GameDirWindow" parent="." instance=ExtResource("15_game_dir_window")]
+[node name="GameDirWindow" parent="." unique_id=122796399 instance=ExtResource("15_game_dir_window")]
 unique_name_in_owner = true
 layout_mode = 1
 
-[node name="VehicleBrowser" parent="." instance=ExtResource("20_vehicle_browser")]
+[node name="VehicleBrowser" parent="." unique_id=1938904488 instance=ExtResource("20_vehicle_browser")]
 unique_name_in_owner = true
 layout_mode = 1
 
+[connection signal="activated" from="Content/HBoxContainer/LeftSlot/ListPanel/VBoxContainer/ProviderFilterSection" to="." method="focus_scenery_list"]
+[connection signal="cancelled" from="Content/HBoxContainer/LeftSlot/ListPanel/VBoxContainer/ProviderFilterSection" to="." method="request_quit"]
+[connection signal="focus_requested" from="Content/HBoxContainer/LeftSlot/ListPanel/VBoxContainer/ProviderFilterSection" to="." method="focus_provider_filter"]
+[connection signal="navigate_down" from="Content/HBoxContainer/LeftSlot/ListPanel/VBoxContainer/ProviderFilterSection" to="." method="focus_scenery_list"]
+[connection signal="navigate_left" from="Content/HBoxContainer/LeftSlot/ListPanel/VBoxContainer/ProviderFilterSection" to="." method="select_previous_provider"]
+[connection signal="navigate_right" from="Content/HBoxContainer/LeftSlot/ListPanel/VBoxContainer/ProviderFilterSection" to="." method="select_next_provider"]
+[connection signal="item_selected" from="Content/HBoxContainer/LeftSlot/ListPanel/VBoxContainer/ProviderFilterSection/ProviderFilter" to="." method="_on_provider_filter_item_selected"]
+[connection signal="pressed" from="Content/HBoxContainer/LeftSlot/ListPanel/VBoxContainer/ProviderFilterSection/ProviderFilter" to="." method="focus_provider_filter"]
 [connection signal="activated" from="Content/HBoxContainer/LeftSlot/ListPanel/VBoxContainer/SceneryList" to="." method="focus_trainset_list"]
 [connection signal="cancelled" from="Content/HBoxContainer/LeftSlot/ListPanel/VBoxContainer/SceneryList" to="." method="request_quit"]
 [connection signal="focus_requested" from="Content/HBoxContainer/LeftSlot/ListPanel/VBoxContainer/SceneryList" to="." method="focus_scenery_list"]
 [connection signal="item_selected" from="Content/HBoxContainer/LeftSlot/ListPanel/VBoxContainer/SceneryList" to="." method="_on_scenery_list_item_selected"]
-[connection signal="refresh_requested" from="Content/HBoxContainer/LeftSlot/ListPanel/VBoxContainer/SceneryList" to="." method="list_sceneries"]
 [connection signal="navigate_right" from="Content/HBoxContainer/LeftSlot/ListPanel/VBoxContainer/SceneryList" to="." method="focus_previous_section"]
-[connection signal="closed" from="Content/HBoxContainer/LeftSlot/VehicleViewer" to="." method="_on_vehicle_viewer_closed"]
-[connection signal="skin_applied" from="Content/HBoxContainer/LeftSlot/VehicleViewer" to="." method="_on_vehicle_viewer_skin_applied"]
+[connection signal="navigate_up" from="Content/HBoxContainer/LeftSlot/ListPanel/VBoxContainer/SceneryList" to="." method="focus_provider_filter"]
+[connection signal="refresh_requested" from="Content/HBoxContainer/LeftSlot/ListPanel/VBoxContainer/SceneryList" to="." method="list_sceneries"]
 [connection signal="change_requested" from="Content/HBoxContainer/LeftSlot/VehicleViewer" to="." method="_on_vehicle_viewer_change_requested"]
+[connection signal="closed" from="Content/HBoxContainer/LeftSlot/VehicleViewer" to="." method="_on_vehicle_viewer_closed"]
 [connection signal="remove_requested" from="Content/HBoxContainer/LeftSlot/VehicleViewer" to="." method="_on_vehicle_viewer_remove_requested"]
 [connection signal="reverse_requested" from="Content/HBoxContainer/LeftSlot/VehicleViewer" to="." method="_on_vehicle_viewer_reverse_requested"]
+[connection signal="skin_applied" from="Content/HBoxContainer/LeftSlot/VehicleViewer" to="." method="_on_vehicle_viewer_skin_applied"]
 [connection signal="toggled" from="Content/HBoxContainer/DetailsPanel/VBoxContainer/AllTrainsetsSwitch" to="." method="_on_all_trainsets_switch_toggled"]
 [connection signal="activated" from="Content/HBoxContainer/DetailsPanel/VBoxContainer/TrainsetList" to="." method="focus_actions"]
 [connection signal="cancelled" from="Content/HBoxContainer/DetailsPanel/VBoxContainer/TrainsetList" to="." method="focus_scenery_list"]
@@ -525,48 +545,39 @@ layout_mode = 1
 [connection signal="navigate_left" from="Content/HBoxContainer/DetailsPanel/VBoxContainer/TrainsetList" to="." method="focus_scenery_list"]
 [connection signal="navigate_right" from="Content/HBoxContainer/DetailsPanel/VBoxContainer/TrainsetList" to="." method="focus_trainset_vehicles"]
 [connection signal="activated" from="Content/HBoxContainer/DetailsPanel/VBoxContainer/TrainsetRow/TrainsetGrid" to="." method="_on_trainset_grid_item_activated"]
-[connection signal="item_clicked" from="Content/HBoxContainer/DetailsPanel/VBoxContainer/TrainsetRow/TrainsetGrid" to="." method="_on_trainset_grid_item_activated"]
 [connection signal="cancelled" from="Content/HBoxContainer/DetailsPanel/VBoxContainer/TrainsetRow/TrainsetGrid" to="." method="focus_trainset_list"]
+[connection signal="change_requested" from="Content/HBoxContainer/DetailsPanel/VBoxContainer/TrainsetRow/TrainsetGrid" to="." method="open_vehicle_browser_to_change"]
+[connection signal="flip_requested" from="Content/HBoxContainer/DetailsPanel/VBoxContainer/TrainsetRow/TrainsetGrid" to="." method="reverse_vehicle"]
 [connection signal="focus_requested" from="Content/HBoxContainer/DetailsPanel/VBoxContainer/TrainsetRow/TrainsetGrid" to="." method="focus_trainset_vehicles"]
+[connection signal="item_clicked" from="Content/HBoxContainer/DetailsPanel/VBoxContainer/TrainsetRow/TrainsetGrid" to="." method="_on_trainset_grid_item_activated"]
+[connection signal="move_left_requested" from="Content/HBoxContainer/DetailsPanel/VBoxContainer/TrainsetRow/TrainsetGrid" to="." method="move_vehicle_left"]
+[connection signal="move_requested" from="Content/HBoxContainer/DetailsPanel/VBoxContainer/TrainsetRow/TrainsetGrid" to="." method="move_vehicle"]
+[connection signal="move_right_requested" from="Content/HBoxContainer/DetailsPanel/VBoxContainer/TrainsetRow/TrainsetGrid" to="." method="move_vehicle_right"]
 [connection signal="navigate_down" from="Content/HBoxContainer/DetailsPanel/VBoxContainer/TrainsetRow/TrainsetGrid" to="." method="focus_actions"]
 [connection signal="navigate_left" from="Content/HBoxContainer/DetailsPanel/VBoxContainer/TrainsetRow/TrainsetGrid" to="." method="focus_scenery_list"]
 [connection signal="navigate_right" from="Content/HBoxContainer/DetailsPanel/VBoxContainer/TrainsetRow/TrainsetGrid" to="." method="focus_trainset_edit"]
 [connection signal="navigate_up" from="Content/HBoxContainer/DetailsPanel/VBoxContainer/TrainsetRow/TrainsetGrid" to="." method="focus_trainset_list"]
-[connection signal="move_left_requested" from="Content/HBoxContainer/DetailsPanel/VBoxContainer/TrainsetRow/TrainsetGrid" to="." method="move_vehicle_left"]
-[connection signal="move_right_requested" from="Content/HBoxContainer/DetailsPanel/VBoxContainer/TrainsetRow/TrainsetGrid" to="." method="move_vehicle_right"]
-[connection signal="move_requested" from="Content/HBoxContainer/DetailsPanel/VBoxContainer/TrainsetRow/TrainsetGrid" to="." method="move_vehicle"]
-[connection signal="flip_requested" from="Content/HBoxContainer/DetailsPanel/VBoxContainer/TrainsetRow/TrainsetGrid" to="." method="reverse_vehicle"]
-[connection signal="change_requested" from="Content/HBoxContainer/DetailsPanel/VBoxContainer/TrainsetRow/TrainsetGrid" to="." method="open_vehicle_browser_to_change"]
 [connection signal="remove_requested" from="Content/HBoxContainer/DetailsPanel/VBoxContainer/TrainsetRow/TrainsetGrid" to="." method="ask_remove_vehicle"]
-[connection signal="focus_taken" from="Content/HBoxContainer/DetailsPanel/VBoxContainer/TrainsetRow/TrainsetEditSection" to="Content/HBoxContainer/DetailsPanel/VBoxContainer/TrainsetRow/TrainsetEditSection/TrainsetEditButtons" method="grab_button_focus"]
-[connection signal="focus_released" from="Content/HBoxContainer/DetailsPanel/VBoxContainer/TrainsetRow/TrainsetEditSection" to="Content/HBoxContainer/DetailsPanel/VBoxContainer/TrainsetRow/TrainsetEditSection/TrainsetEditButtons" method="release_button_focus"]
 [connection signal="cancelled" from="Content/HBoxContainer/DetailsPanel/VBoxContainer/TrainsetRow/TrainsetEditSection" to="." method="focus_trainset_vehicles"]
-[connection signal="navigate_up" from="Content/HBoxContainer/DetailsPanel/VBoxContainer/TrainsetRow/TrainsetEditSection" to="." method="focus_trainset_list"]
+[connection signal="focus_released" from="Content/HBoxContainer/DetailsPanel/VBoxContainer/TrainsetRow/TrainsetEditSection" to="Content/HBoxContainer/DetailsPanel/VBoxContainer/TrainsetRow/TrainsetEditSection/TrainsetEditButtons" method="release_button_focus"]
+[connection signal="focus_taken" from="Content/HBoxContainer/DetailsPanel/VBoxContainer/TrainsetRow/TrainsetEditSection" to="Content/HBoxContainer/DetailsPanel/VBoxContainer/TrainsetRow/TrainsetEditSection/TrainsetEditButtons" method="grab_button_focus"]
 [connection signal="navigate_down" from="Content/HBoxContainer/DetailsPanel/VBoxContainer/TrainsetRow/TrainsetEditSection" to="." method="focus_actions"]
+[connection signal="navigate_up" from="Content/HBoxContainer/DetailsPanel/VBoxContainer/TrainsetRow/TrainsetEditSection" to="." method="focus_trainset_list"]
 [connection signal="pressed" from="Content/HBoxContainer/DetailsPanel/VBoxContainer/TrainsetRow/TrainsetEditSection/TrainsetEditButtons/RestoreTrainsetButton" to="." method="ask_restore_trainset"]
 [connection signal="pressed" from="Content/HBoxContainer/DetailsPanel/VBoxContainer/TrainsetRow/TrainsetEditSection/TrainsetEditButtons/AddVehicleButton" to="." method="open_vehicle_browser_to_add"]
-[connection signal="confirmed" from="RestoreTrainsetQuestion" to="." method="restore_trainset"]
-[connection signal="confirmed" from="RemoveVehicleQuestion" to="." method="_on_remove_vehicle_question_confirmed"]
 [connection signal="activated" from="Content/HBoxContainer/DetailsPanel/VBoxContainer/ActionsSection" to="." method="load_selected_scenery"]
 [connection signal="cancelled" from="Content/HBoxContainer/DetailsPanel/VBoxContainer/ActionsSection" to="." method="focus_trainset_vehicles"]
 [connection signal="navigate_left" from="Content/HBoxContainer/DetailsPanel/VBoxContainer/ActionsSection" to="." method="focus_scenery_list"]
 [connection signal="navigate_up" from="Content/HBoxContainer/DetailsPanel/VBoxContainer/ActionsSection" to="." method="focus_trainset_vehicles"]
 [connection signal="pressed" from="Content/HBoxContainer/DetailsPanel/VBoxContainer/ActionsSection/Buttons/LoadButton" to="." method="load_selected_scenery"]
-[connection signal="confirmed" from="DevelopmentNotice" to="." method="_on_development_notice_acknowledged"]
-[connection signal="dismissed" from="DevelopmentNotice" to="." method="_on_development_notice_acknowledged"]
 [connection signal="pressed" from="SettingsButton" to="." method="request_settings"]
 [connection signal="pressed" from="GameDirWarning/Columns/ConfigureButton" to="GameDirWindow" method="open"]
+[connection signal="confirmed" from="DevelopmentNotice" to="." method="_on_development_notice_acknowledged"]
+[connection signal="dismissed" from="DevelopmentNotice" to="." method="_on_development_notice_acknowledged"]
 [connection signal="confirmed" from="GameDirProblem" to="GameDirWindow" method="open"]
 [connection signal="dismissed" from="GameDirProblem" to="." method="show_development_notice"]
+[connection signal="confirmed" from="RestoreTrainsetQuestion" to="." method="restore_trainset"]
+[connection signal="confirmed" from="RemoveVehicleQuestion" to="." method="_on_remove_vehicle_question_confirmed"]
 [connection signal="closed" from="GameDirWindow" to="." method="show_development_notice"]
 [connection signal="game_dir_chosen" from="GameDirWindow" to="." method="_on_game_dir_window_game_dir_chosen"]
 [connection signal="vehicle_chosen" from="VehicleBrowser" to="." method="_on_vehicle_browser_vehicle_chosen"]
-[connection signal="focus_requested" from="Content/HBoxContainer/LeftSlot/ListPanel/VBoxContainer/ProviderFilterSection" to="." method="focus_provider_filter"]
-[connection signal="navigate_left" from="Content/HBoxContainer/LeftSlot/ListPanel/VBoxContainer/ProviderFilterSection" to="." method="select_previous_provider"]
-[connection signal="navigate_right" from="Content/HBoxContainer/LeftSlot/ListPanel/VBoxContainer/ProviderFilterSection" to="." method="select_next_provider"]
-[connection signal="navigate_down" from="Content/HBoxContainer/LeftSlot/ListPanel/VBoxContainer/ProviderFilterSection" to="." method="focus_scenery_list"]
-[connection signal="activated" from="Content/HBoxContainer/LeftSlot/ListPanel/VBoxContainer/ProviderFilterSection" to="." method="focus_scenery_list"]
-[connection signal="cancelled" from="Content/HBoxContainer/LeftSlot/ListPanel/VBoxContainer/ProviderFilterSection" to="." method="request_quit"]
-[connection signal="pressed" from="Content/HBoxContainer/LeftSlot/ListPanel/VBoxContainer/ProviderFilterSection/ProviderFilter" to="." method="focus_provider_filter"]
-[connection signal="item_selected" from="Content/HBoxContainer/LeftSlot/ListPanel/VBoxContainer/ProviderFilterSection/ProviderFilter" to="." method="_on_provider_filter_item_selected"]
-[connection signal="navigate_up" from="Content/HBoxContainer/LeftSlot/ListPanel/VBoxContainer/SceneryList" to="." method="focus_provider_filter"]

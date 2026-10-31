@@ -1409,12 +1409,6 @@ msgstr "Dosah záře světel interiéru vozů"
 msgid "Interior lights glow attenuation"
 msgstr "Útlum záře světel interiéru vozů"
 
-msgid "Road traffic density"
-msgstr "Hustota silničního provozu"
-
-msgid "Road traffic vehicles"
-msgstr "Vozidla silničního provozu"
-
 msgid "Smoke"
 msgstr "Kouř"
 
@@ -1459,9 +1453,6 @@ msgstr "Turbulence větru"
 
 msgid "Fog curve"
 msgstr "Křivka mlhy"
-
-msgid "Fog sky height"
-msgstr "Výška mlhy na obloze"
 
 msgid "Aerial perspective"
 msgstr "Vzdušná perspektiva"
@@ -1964,14 +1955,17 @@ msgstr "Autobusy"
 msgid "Cars"
 msgstr "Automobily"
 
-msgid "People"
-msgstr "Lidé"
+msgid "Passenger cars"
+msgstr "Osobní vozy"
 
-msgid "Animals"
-msgstr "Zvířata"
+msgid "Freight cars"
+msgstr "Nákladní vozy"
 
-msgid "Carriages"
-msgstr "Vagóny"
+msgid "Special"
+msgstr "Speciální"
+
+msgid "Other"
+msgstr "Ostatní"
 
 msgid "Unknown"
 msgstr "Neznámé"

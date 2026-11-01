@@ -183,7 +183,10 @@ func _on_vehicle_cabin_built(vehicle_rid: RID) -> void:
 
 ## The box fitted to the models of the cab shown (_fit_rain_exclusion()), and again as each of them
 ## loads - a cab model may come later than its cab
-func _follow_cab_models(_cabin: RID, rain_exclusion: PrecipitationVolume, vehicle_rid: RID) -> void:
+func _follow_cab_models(cabin_rid: RID, rain_exclusion: PrecipitationVolume, vehicle_rid: RID) -> void:
+    # none as the cab leaves the tree, its models on their way out with it
+    if not cabin_rid.is_valid():
+        return
     _fit_rain_exclusion(rain_exclusion, vehicle_rid)
     for model: VisualInstance3D in _cab_models(rain_exclusion.get_parent()):
         if model.has_signal(&"e3d_loaded"):

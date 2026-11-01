@@ -64,7 +64,7 @@ night_fog_color = Color(0.033263337, 0.0491547, 0.10060064, 1)
 [node name="Skydome" type="Node" parent="Sky" unique_id=1530716629]
 script = ExtResource("13_skydome")
 day_light_energy = 2.0
-shader_zenith_color = Color(0.11514282, 0.20309141, 0.3828125, 1)
+shader_zenith_color = Color(0.1762, 0.311, 0.5859, 1)
 shader_horizon_height = 0.178
 shader_night_sky_energy = 0.165
 night_vol_fog_density = 0.02

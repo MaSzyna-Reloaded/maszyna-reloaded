@@ -70,6 +70,12 @@ const MAXIMUM_DAY_OF_YEAR: int = 365
 # Time is pushed to Skydome at a fixed rate and Skydome interpolates in between
 # (same as WorldTimer in forest-test-scene levels/test_biomes.gd:227).
 const TIME_UPDATE_INTERVAL: float = 0.1
+## The sun's size (Skydome softens its shadows by it under an overcast: light_angular_distance) at
+## which it still glints on what shines, and from which on it does not: Godot's specular is full
+## for every normal within that angle of the sun's mirror, so the water's film (roughness 0.02) under
+## a rain's 15 degrees went white over a whole track - a sun behind the clouds has no reflection
+const SUN_GLINT_SHARP_ANGLE: float = 0.5
+const SUN_GLINT_GONE_ANGLE: float = 4.0
 ## The snow a scenery of winter starts under (EnvironmentNode.winter_snow_cover) - the original's
 ## winter textures are snowed in already, the weather's snow lies over them - unless the air is too
 ## warm for it
@@ -420,6 +426,13 @@ func process_time(delta: float) -> void:
         return
     _time_update_elapsed = 0.0
     _push_time(false)
+    _apply_sun_glint()
+
+
+func _apply_sun_glint() -> void:
+    if sun_light:
+        sun_light.light_specular = 1.0 - smoothstep(
+                SUN_GLINT_SHARP_ANGLE, SUN_GLINT_GONE_ANGLE, sun_light.light_angular_distance)
 
 
 # Configuration changes snap immediately; only running time uses Skydome's transition.

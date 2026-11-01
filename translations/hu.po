@@ -1409,12 +1409,6 @@ msgstr "Kocsibelső fényei derengésének hatótávja"
 msgid "Interior lights glow attenuation"
 msgstr "Kocsibelső fényei derengésének csillapítása"
 
-msgid "Road traffic density"
-msgstr "Közúti forgalom sűrűsége"
-
-msgid "Road traffic vehicles"
-msgstr "Közúti forgalom járművei"
-
 msgid "Smoke"
 msgstr "Füst"
 
@@ -1459,9 +1453,6 @@ msgstr "Szélturbulencia"
 
 msgid "Fog curve"
 msgstr "Ködgörbe"
-
-msgid "Fog sky height"
-msgstr "Köd magassága az égen"
 
 msgid "Aerial perspective"
 msgstr "Légperspektíva"
@@ -1964,14 +1955,17 @@ msgstr "Buszok"
 msgid "Cars"
 msgstr "Személyautók"
 
-msgid "People"
-msgstr "Emberek"
+msgid "Passenger cars"
+msgstr "Személykocsik"
 
-msgid "Animals"
-msgstr "Állatok"
+msgid "Freight cars"
+msgstr "Teherkocsik"
 
-msgid "Carriages"
-msgstr "Kocsik"
+msgid "Special"
+msgstr "Különleges"
+
+msgid "Other"
+msgstr "Egyéb"
 
 msgid "Unknown"
 msgstr "Ismeretlen"

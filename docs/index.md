@@ -25,7 +25,7 @@ What lives here:
 * **[HUD](hud)** - `hud/`: the top bar and its menus, the driving aid, the hints, the timetable,
   the vehicle card and selector, the transcripts, the logs; the diagnostic windows are
   libmaszyna's `DebugHud`, instanced by the game's HUD.
-* **The sky** - `world/sky/`: the backends drawing libmaszyna's `EnvironmentNode`
+* **The sky** - `sky/`: the backends drawing libmaszyna's `EnvironmentNode`
   (gnd-skydome with gnd-weather); Tokisan's Sky3D is the separate
   [maszyna-environment-tokisan-sky3d](https://github.com/MaSzyna-Reloaded/maszyna-environment-tokisan-sky3d)
   addon.

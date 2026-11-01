@@ -568,9 +568,8 @@ func open_vehicle_browser_to_add() -> void:
     %VehicleBrowser.open()
 
 
-## The browser chooses among MaSzyna's vehicles (MaszynaVehiclesBank), by their files and skin
-func _on_vehicle_browser_vehicle_chosen(data_path: String, file_name: String, skin: String) -> void:
-    var chosen: VehicleData = SelectorVehicle.of(data_path, file_name, skin, "")
+## The browser chooses among the catalogue's vehicles (VehicleCatalogServer), in their first livery
+func _on_vehicle_browser_vehicle_chosen(chosen: VehicleData) -> void:
     match _vehicle_choice:
         VehicleChoice.CHANGE:
             change_vehicle(chosen)
@@ -589,7 +588,7 @@ func change_vehicle(chosen: VehicleData) -> void:
     vehicle.livery = chosen.livery
     _show_vehicles(_changed_index)
     if _changed_index == _shown_index:
-        %VehicleViewer.show_vehicle(vehicle as MaszynaVehicleData)
+        %VehicleViewer.show_vehicle(vehicle)
 
 
 ## `chosen` after the selected vehicle, with nobody aboard and no name of the scenery
@@ -667,7 +666,7 @@ func _on_trainset_grid_item_activated() -> void:
         _shown_index = index
         %TrainsetGrid.set_marked(index)
         _fade_list_panel(0.0)
-        %VehicleViewer.show_vehicle(_vehicles[index] as MaszynaVehicleData)
+        %VehicleViewer.show_vehicle(_vehicles[index])
         %VehicleViewer.set_removable(_is_removable(index))
     activate_section(Section.SKINS)
 

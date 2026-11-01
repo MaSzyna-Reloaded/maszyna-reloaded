@@ -175,9 +175,17 @@ func _on_vehicle_cabin_built(vehicle_rid: RID) -> void:
     rain_exclusion.precipitation_delta = RAIN_EXCLUSION_PRECIPITATION_DELTA
     rain_exclusion.enclosed = true
     cabin.add_child(rain_exclusion)
+    # another cab of the vehicle shown - its machine room - is built in the same interior, of its own
+    # models: the box fitted to the first cab's alone let it rain in the machine room
+    cabin.cabin_changed.connect(_follow_cab_models.bind(rain_exclusion, vehicle_rid))
+    _follow_cab_models(cabin.get_cabin(), rain_exclusion, vehicle_rid)
+
+
+## The box fitted to the models of the cab shown (_fit_rain_exclusion()), and again as each of them
+## loads - a cab model may come later than its cab
+func _follow_cab_models(_cabin: RID, rain_exclusion: PrecipitationVolume, vehicle_rid: RID) -> void:
     _fit_rain_exclusion(rain_exclusion, vehicle_rid)
-    # a cab model may come later than its cab
-    for model: VisualInstance3D in _cab_models(cabin):
+    for model: VisualInstance3D in _cab_models(rain_exclusion.get_parent()):
         if model.has_signal(&"e3d_loaded"):
             model.connect(&"e3d_loaded", _fit_rain_exclusion.bind(rain_exclusion, vehicle_rid))
 

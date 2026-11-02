@@ -38,6 +38,278 @@
                     "key": "hdr_output",
                     "type": "bool",
                     "default": false
+                },
+                {
+                    "title": "Monitors in use",
+                    "store": "user",
+                    "section": "multimonitor",
+                    "key": "monitor_count",
+                    "type": "int",
+                    "hint": "range",
+                    "hint_string": "1,8,1",
+                    "default": 1
+                },
+                {
+                    "title": "Angle between monitors",
+                    "store": "user",
+                    "section": "multimonitor",
+                    "key": "monitor_angle",
+                    "type": "float",
+                    "hint": "range",
+                    "hint_string": "0,90,0.5,suffix:°",
+                    "default": 0.0
+                },
+                {
+                    "title": "Eye distance from the screen",
+                    "store": "user",
+                    "section": "multimonitor",
+                    "key": "eye_distance",
+                    "type": "float",
+                    "hint": "range",
+                    "hint_string": "0.1,2,0.01,suffix:m",
+                    "default": 0.4
+                },
+                {
+                    "title": "Configured monitor",
+                    "store": "user",
+                    "key": "configured_monitor",
+                    "type": "int",
+                    "hint": "monitor_choice",
+                    "default": 0
+                },
+                {
+                    "title": "Window title",
+                    "store": "user",
+                    "key": "window_title",
+                    "type": "String",
+                    "default": "",
+                    "per_monitor": true
+                },
+                {
+                    "title": "Display number",
+                    "store": "user",
+                    "key": "screen",
+                    "type": "int",
+                    "hint": "range",
+                    "hint_string": "0,7,1",
+                    "default": 0,
+                    "per_monitor": true
+                },
+                {
+                    "title": "Render the cabin",
+                    "store": "user",
+                    "key": "render_interior",
+                    "type": "bool",
+                    "default": true,
+                    "per_monitor": true
+                },
+                {
+                    "title": "View set by",
+                    "store": "user",
+                    "key": "projection_mode",
+                    "type": "int",
+                    "hint": "enum",
+                    "hint_string": "Field of view:0,Screen geometry:1",
+                    "default": 0,
+                    "per_monitor": true
+                },
+                {
+                    "title": "Vertical field of view",
+                    "store": "user",
+                    "key": "fov_vertical",
+                    "type": "float",
+                    "hint": "range",
+                    "hint_string": "20,150,1,suffix:°",
+                    "default": 75.0,
+                    "disabled_by": "projection_mode",
+                    "disabled_by_values": [
+                        1
+                    ],
+                    "per_monitor": true
+                },
+                {
+                    "title": "View yaw",
+                    "store": "user",
+                    "key": "camera_yaw",
+                    "type": "float",
+                    "hint": "range",
+                    "hint_string": "-180,180,0.5,suffix:°",
+                    "default": 0.0,
+                    "disabled_by": "projection_mode",
+                    "disabled_by_values": [
+                        1
+                    ],
+                    "per_monitor": true
+                },
+                {
+                    "title": "View pitch",
+                    "store": "user",
+                    "key": "camera_pitch",
+                    "type": "float",
+                    "hint": "range",
+                    "hint_string": "-90,90,0.5,suffix:°",
+                    "default": 0.0,
+                    "disabled_by": "projection_mode",
+                    "disabled_by_values": [
+                        1
+                    ],
+                    "per_monitor": true
+                },
+                {
+                    "title": "View roll",
+                    "store": "user",
+                    "key": "camera_roll",
+                    "type": "float",
+                    "hint": "range",
+                    "hint_string": "-180,180,0.5,suffix:°",
+                    "default": 0.0,
+                    "disabled_by": "projection_mode",
+                    "disabled_by_values": [
+                        1
+                    ],
+                    "per_monitor": true
+                },
+                {
+                    "title": "Offset to the right",
+                    "store": "user",
+                    "key": "offset_x",
+                    "type": "float",
+                    "hint": "range",
+                    "hint_string": "-2,2,0.01,suffix:m",
+                    "default": 0.0,
+                    "per_monitor": true
+                },
+                {
+                    "title": "Offset up",
+                    "store": "user",
+                    "key": "offset_y",
+                    "type": "float",
+                    "hint": "range",
+                    "hint_string": "-2,2,0.01,suffix:m",
+                    "default": 0.0,
+                    "per_monitor": true
+                },
+                {
+                    "title": "Offset back",
+                    "store": "user",
+                    "key": "offset_z",
+                    "type": "float",
+                    "hint": "range",
+                    "hint_string": "-2,2,0.01,suffix:m",
+                    "default": 0.0,
+                    "per_monitor": true
+                },
+                {
+                    "title": "Screen width",
+                    "store": "user",
+                    "key": "screen_width",
+                    "type": "float",
+                    "hint": "range",
+                    "hint_string": "0.1,5,0.001,suffix:m",
+                    "default": 0.597,
+                    "disabled_by": "projection_mode",
+                    "disabled_by_values": [
+                        0
+                    ],
+                    "per_monitor": true
+                },
+                {
+                    "title": "Screen height",
+                    "store": "user",
+                    "key": "screen_height",
+                    "type": "float",
+                    "hint": "range",
+                    "hint_string": "0.1,5,0.001,suffix:m",
+                    "default": 0.336,
+                    "disabled_by": "projection_mode",
+                    "disabled_by_values": [
+                        0
+                    ],
+                    "per_monitor": true
+                },
+                {
+                    "title": "Screen centre to the right",
+                    "store": "user",
+                    "key": "center_x",
+                    "type": "float",
+                    "hint": "range",
+                    "hint_string": "-5,5,0.01,suffix:m",
+                    "default": 0.0,
+                    "disabled_by": "projection_mode",
+                    "disabled_by_values": [
+                        0
+                    ],
+                    "per_monitor": true
+                },
+                {
+                    "title": "Screen centre up",
+                    "store": "user",
+                    "key": "center_y",
+                    "type": "float",
+                    "hint": "range",
+                    "hint_string": "-5,5,0.01,suffix:m",
+                    "default": 0.0,
+                    "disabled_by": "projection_mode",
+                    "disabled_by_values": [
+                        0
+                    ],
+                    "per_monitor": true
+                },
+                {
+                    "title": "Screen centre back",
+                    "store": "user",
+                    "key": "center_z",
+                    "type": "float",
+                    "hint": "range",
+                    "hint_string": "-5,-0.05,0.01,suffix:m",
+                    "default": -0.7,
+                    "disabled_by": "projection_mode",
+                    "disabled_by_values": [
+                        0
+                    ],
+                    "per_monitor": true
+                },
+                {
+                    "title": "Screen yaw",
+                    "store": "user",
+                    "key": "screen_yaw",
+                    "type": "float",
+                    "hint": "range",
+                    "hint_string": "-180,180,0.5,suffix:°",
+                    "default": 0.0,
+                    "disabled_by": "projection_mode",
+                    "disabled_by_values": [
+                        0
+                    ],
+                    "per_monitor": true
+                },
+                {
+                    "title": "Screen pitch",
+                    "store": "user",
+                    "key": "screen_pitch",
+                    "type": "float",
+                    "hint": "range",
+                    "hint_string": "-90,90,0.5,suffix:°",
+                    "default": 0.0,
+                    "disabled_by": "projection_mode",
+                    "disabled_by_values": [
+                        0
+                    ],
+                    "per_monitor": true
+                },
+                {
+                    "title": "Screen roll",
+                    "store": "user",
+                    "key": "screen_roll",
+                    "type": "float",
+                    "hint": "range",
+                    "hint_string": "-180,180,0.5,suffix:°",
+                    "default": 0.0,
+                    "disabled_by": "projection_mode",
+                    "disabled_by_values": [
+                        0
+                    ],
+                    "per_monitor": true
                 }
             ]
         },

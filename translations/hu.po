@@ -2140,3 +2140,81 @@ msgstr "A pálya nem minden fájlja található meg: a forgatókönyv nem felté
 
 msgid "Not all elements may be displayed correctly."
 msgstr "Nem minden elem jelenhet meg megfelelően."
+
+msgid "Monitors in use"
+msgstr "Használt monitorok"
+
+msgid "Monitor %d"
+msgstr "%d. monitor"
+
+msgid "Window title"
+msgstr "Ablak címe"
+
+msgid "Display number"
+msgstr "Kijelző száma"
+
+msgid "Render the cabin"
+msgstr "Fülke megjelenítése"
+
+msgid "View set by"
+msgstr "Nézet beállítása"
+
+msgid "Field of view"
+msgstr "Látómező"
+
+msgid "Screen geometry"
+msgstr "Kijelző geometriája"
+
+msgid "Vertical field of view"
+msgstr "Függőleges látómező"
+
+msgid "View yaw"
+msgstr "Nézet forgatása jobbra"
+
+msgid "View pitch"
+msgstr "Nézet döntése felfelé"
+
+msgid "View roll"
+msgstr "Nézet oldaldőlése"
+
+msgid "Offset to the right"
+msgstr "Eltolás jobbra"
+
+msgid "Offset up"
+msgstr "Eltolás felfelé"
+
+msgid "Offset back"
+msgstr "Eltolás hátra"
+
+msgid "Screen width"
+msgstr "Kijelző szélessége"
+
+msgid "Screen height"
+msgstr "Kijelző magassága"
+
+msgid "Screen centre to the right"
+msgstr "Kijelző közepe jobbra"
+
+msgid "Screen centre up"
+msgstr "Kijelző közepe felfelé"
+
+msgid "Screen centre back"
+msgstr "Kijelző közepe hátra"
+
+msgid "Screen yaw"
+msgstr "Kijelző forgatása jobbra"
+
+msgid "Screen pitch"
+msgstr "Kijelző döntése felfelé"
+
+msgid "Screen roll"
+msgstr "Kijelző oldaldőlése"
+
+msgid "Configured monitor"
+msgstr "Beállított monitor"
+
+msgid "Angle between monitors"
+msgstr "Monitorok közötti szög"
+
+msgid "Eye distance from the screen"
+msgstr "Szem távolsága a kijelzőtől"

@@ -2140,3 +2140,81 @@ msgstr "Nebyly nalezeny všechny soubory scenérie: scénář nemusí fungovat s
 
 msgid "Not all elements may be displayed correctly."
 msgstr "Ne všechny prvky se mohou zobrazovat správně."
+
+msgid "Monitors in use"
+msgstr "Počet monitorů"
+
+msgid "Monitor %d"
+msgstr "Monitor %d"
+
+msgid "Window title"
+msgstr "Název okna"
+
+msgid "Display number"
+msgstr "Číslo obrazovky"
+
+msgid "Render the cabin"
+msgstr "Zobrazit kabinu"
+
+msgid "View set by"
+msgstr "Způsob nastavení pohledu"
+
+msgid "Field of view"
+msgstr "Zorné pole"
+
+msgid "Screen geometry"
+msgstr "Geometrie obrazovky"
+
+msgid "Vertical field of view"
+msgstr "Svislé zorné pole"
+
+msgid "View yaw"
+msgstr "Otočení pohledu doprava"
+
+msgid "View pitch"
+msgstr "Náklon pohledu nahoru"
+
+msgid "View roll"
+msgstr "Příčný náklon pohledu"
+
+msgid "Offset to the right"
+msgstr "Posun doprava"
+
+msgid "Offset up"
+msgstr "Posun nahoru"
+
+msgid "Offset back"
+msgstr "Posun dozadu"
+
+msgid "Screen width"
+msgstr "Šířka obrazovky"
+
+msgid "Screen height"
+msgstr "Výška obrazovky"
+
+msgid "Screen centre to the right"
+msgstr "Střed obrazovky doprava"
+
+msgid "Screen centre up"
+msgstr "Střed obrazovky nahoru"
+
+msgid "Screen centre back"
+msgstr "Střed obrazovky dozadu"
+
+msgid "Screen yaw"
+msgstr "Otočení obrazovky doprava"
+
+msgid "Screen pitch"
+msgstr "Náklon obrazovky nahoru"
+
+msgid "Screen roll"
+msgstr "Příčný náklon obrazovky"
+
+msgid "Configured monitor"
+msgstr "Nastavovaný monitor"
+
+msgid "Angle between monitors"
+msgstr "Úhel mezi monitory"
+
+msgid "Eye distance from the screen"
+msgstr "Vzdálenost oka od obrazovky"

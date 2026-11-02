@@ -20,3 +20,6 @@
 [submodule "vendor/gnd-biomes"]
 	path = vendor/gnd-biomes
 	url = https://github.com/GamesNotDeveloped/godot-biomes.git
+[submodule "vendor/multimonitor"]
+	path = vendor/multimonitor
+	url = https://github.com/MaSzyna-Reloaded/multimonitor-addon.git

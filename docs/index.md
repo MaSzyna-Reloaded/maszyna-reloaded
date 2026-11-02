@@ -22,6 +22,7 @@ What lives here:
   and `game.tscn`, the scene that loads a scenery into a `SceneryWorld` (`world/`).
 * **[UI components](ui)** - `ui/`: the windows, dialogs, buttons, switches, sliders and chips
   every screen is built from.
+* **[Multimonitor](multimonitor)** - `addons/multimonitor`: one window, viewport and camera per monitor
 * **[HUD](hud)** - `hud/`: the top bar and its menus, the driving aid, the hints, the timetable,
   the vehicle card and selector, the transcripts, the logs; the diagnostic windows are
   libmaszyna's `DebugHud`, instanced by the game's HUD.

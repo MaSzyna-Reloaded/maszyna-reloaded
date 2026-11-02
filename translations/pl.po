@@ -2182,3 +2182,81 @@ msgstr "Nie wszystkie pliki scenerii zostały znalezione: scenariusz może nie d
 
 msgid "Not all elements may be displayed correctly."
 msgstr "Nie wszystkie elementy mogą prawidłowo się wyświetlać."
+
+msgid "Monitors in use"
+msgstr "Liczba monitorów"
+
+msgid "Monitor %d"
+msgstr "Monitor %d"
+
+msgid "Window title"
+msgstr "Tytuł okna"
+
+msgid "Display number"
+msgstr "Numer ekranu"
+
+msgid "Render the cabin"
+msgstr "Wyświetlaj kabinę"
+
+msgid "View set by"
+msgstr "Sposób ustawienia widoku"
+
+msgid "Field of view"
+msgstr "Pole widzenia"
+
+msgid "Screen geometry"
+msgstr "Geometria ekranu"
+
+msgid "Vertical field of view"
+msgstr "Pionowe pole widzenia"
+
+msgid "View yaw"
+msgstr "Obrót widoku w prawo"
+
+msgid "View pitch"
+msgstr "Pochylenie widoku w górę"
+
+msgid "View roll"
+msgstr "Przechylenie widoku"
+
+msgid "Offset to the right"
+msgstr "Przesunięcie w prawo"
+
+msgid "Offset up"
+msgstr "Przesunięcie w górę"
+
+msgid "Offset back"
+msgstr "Przesunięcie do tyłu"
+
+msgid "Screen width"
+msgstr "Szerokość ekranu"
+
+msgid "Screen height"
+msgstr "Wysokość ekranu"
+
+msgid "Screen centre to the right"
+msgstr "Środek ekranu w prawo"
+
+msgid "Screen centre up"
+msgstr "Środek ekranu w górę"
+
+msgid "Screen centre back"
+msgstr "Środek ekranu do tyłu"
+
+msgid "Screen yaw"
+msgstr "Obrót ekranu w prawo"
+
+msgid "Screen pitch"
+msgstr "Pochylenie ekranu w górę"
+
+msgid "Screen roll"
+msgstr "Przechylenie ekranu"
+
+msgid "Configured monitor"
+msgstr "Ustawiany monitor"
+
+msgid "Angle between monitors"
+msgstr "Kąt między monitorami"
+
+msgid "Eye distance from the screen"
+msgstr "Odległość oka od ekranu"

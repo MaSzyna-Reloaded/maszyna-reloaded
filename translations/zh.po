@@ -2140,3 +2140,81 @@ msgstr "未找到场景的全部文件：场景可能无法正常运行。"
 
 msgid "Not all elements may be displayed correctly."
 msgstr "并非所有元素都能正确显示。"
+
+msgid "Monitors in use"
+msgstr "使用的显示器数量"
+
+msgid "Monitor %d"
+msgstr "显示器 %d"
+
+msgid "Window title"
+msgstr "窗口标题"
+
+msgid "Display number"
+msgstr "屏幕编号"
+
+msgid "Render the cabin"
+msgstr "显示驾驶室"
+
+msgid "View set by"
+msgstr "视图设置方式"
+
+msgid "Field of view"
+msgstr "视野"
+
+msgid "Screen geometry"
+msgstr "屏幕几何"
+
+msgid "Vertical field of view"
+msgstr "垂直视野"
+
+msgid "View yaw"
+msgstr "视图向右旋转"
+
+msgid "View pitch"
+msgstr "视图向上俯仰"
+
+msgid "View roll"
+msgstr "视图横滚"
+
+msgid "Offset to the right"
+msgstr "向右偏移"
+
+msgid "Offset up"
+msgstr "向上偏移"
+
+msgid "Offset back"
+msgstr "向后偏移"
+
+msgid "Screen width"
+msgstr "屏幕宽度"
+
+msgid "Screen height"
+msgstr "屏幕高度"
+
+msgid "Screen centre to the right"
+msgstr "屏幕中心向右"
+
+msgid "Screen centre up"
+msgstr "屏幕中心向上"
+
+msgid "Screen centre back"
+msgstr "屏幕中心向后"
+
+msgid "Screen yaw"
+msgstr "屏幕向右旋转"
+
+msgid "Screen pitch"
+msgstr "屏幕向上俯仰"
+
+msgid "Screen roll"
+msgstr "屏幕横滚"
+
+msgid "Configured monitor"
+msgstr "正在设置的显示器"
+
+msgid "Angle between monitors"
+msgstr "显示器之间的角度"
+
+msgid "Eye distance from the screen"
+msgstr "眼睛到屏幕的距离"

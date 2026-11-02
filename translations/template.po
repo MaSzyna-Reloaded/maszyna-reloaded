@@ -2182,3 +2182,81 @@ msgstr ""
 
 msgid "Not all elements may be displayed correctly."
 msgstr ""
+
+msgid "Monitors in use"
+msgstr ""
+
+msgid "Monitor %d"
+msgstr ""
+
+msgid "Window title"
+msgstr ""
+
+msgid "Display number"
+msgstr ""
+
+msgid "Render the cabin"
+msgstr ""
+
+msgid "View set by"
+msgstr ""
+
+msgid "Field of view"
+msgstr ""
+
+msgid "Screen geometry"
+msgstr ""
+
+msgid "Vertical field of view"
+msgstr ""
+
+msgid "View yaw"
+msgstr ""
+
+msgid "View pitch"
+msgstr ""
+
+msgid "View roll"
+msgstr ""
+
+msgid "Offset to the right"
+msgstr ""
+
+msgid "Offset up"
+msgstr ""
+
+msgid "Offset back"
+msgstr ""
+
+msgid "Screen width"
+msgstr ""
+
+msgid "Screen height"
+msgstr ""
+
+msgid "Screen centre to the right"
+msgstr ""
+
+msgid "Screen centre up"
+msgstr ""
+
+msgid "Screen centre back"
+msgstr ""
+
+msgid "Screen yaw"
+msgstr ""
+
+msgid "Screen pitch"
+msgstr ""
+
+msgid "Screen roll"
+msgstr ""
+
+msgid "Configured monitor"
+msgstr ""
+
+msgid "Angle between monitors"
+msgstr ""
+
+msgid "Eye distance from the screen"
+msgstr ""

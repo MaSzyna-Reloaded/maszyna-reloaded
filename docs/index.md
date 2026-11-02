@@ -34,12 +34,13 @@ What lives here:
 * **[Problem reports](bug-reports)** - `bug_report/`: what the game sends to the reporting
   endpoint.
 * **Releases** - `make release-linux`, `release-windows`, `release-android` and the CI workflow
-  keeping each run's games as its artifacts - a pull request's (`maszyna-reloaded-<branch>-<build>`),
-  main's nightly (`maszyna-reloaded-nightly-<build>`) - and publishing a pull request from
-  `release/<name>` as a pre-release (`maszyna-reloaded-rc-<name>-<build>`) on its moving tag
-  `maszyna-reloaded-rc-<name>`, deleted with the pre-release when the pull request closes, and a
-  tag pushed on main as the release on that tag (files `maszyna-reloaded-<tag>`); CI makes no other
-  tag. Discord hears of the nightly, the pre-releases and the releases.
+  keeping each run's games as its artifacts - a pull request's (`maszyna-reloaded-<branch>-<build>`)
+  - and publishing a push on main as the nightly pre-release (`maszyna-reloaded-nightly-<build>`) on
+  its moving tag `maszyna-reloaded-nightly`, a pull request from `release/<name>` as a pre-release
+  (`maszyna-reloaded-rc-<name>-<build>`) on its moving tag `maszyna-reloaded-rc-<name>`, deleted
+  with the pre-release when the pull request closes, and a tag pushed on main as the release on that
+  tag (files `maszyna-reloaded-<tag>`); CI makes no other tag. Discord hears of the nightly, the
+  pre-releases and the releases.
 
 ## Building
 

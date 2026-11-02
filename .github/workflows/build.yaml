@@ -11,11 +11,12 @@ name: build
 # (build-host's "Name the files"): maszyna-reloaded-<branch>-<build> of a pull request,
 # maszyna-reloaded-nightly-<build> of main, maszyna-reloaded-rc-<name>-<build> of a pull request
 # from release/<name>. A tag pushed on main is published as a GitHub release - on that tag itself,
-# its files named maszyna-reloaded-<tag>. A pull request from release/<name> is published as a
-# pre-release on its moving tag maszyna-reloaded-rc-<name> (ci/release-candidate-tag.sh), the only
-# tag CI makes, deleted with its pre-release when the pull request closes
-# (release-candidate-cleanup.yaml). Discord hears of the nightly, the pre-releases and the tags'
-# releases from the publish job (the DISCORD_RELEASES_WEBHOOK secret), never of another pull
+# its files named maszyna-reloaded-<tag>. A push on main is published as the nightly pre-release on
+# its moving tag maszyna-reloaded-nightly. A pull request from release/<name> is published as a
+# pre-release on its moving tag maszyna-reloaded-rc-<name> (ci/release-candidate-tag.sh), deleted
+# with its pre-release when the pull request closes (release-candidate-cleanup.yaml). These two
+# moving tags are the only ones CI makes. Discord hears of the nightly, the pre-releases and the
+# tags' releases from the publish job (the DISCORD_RELEASES_WEBHOOK secret), never of another pull
 # request's build.
 on:
   pull_request:
@@ -290,10 +291,10 @@ jobs:
           if-no-files-found: error
 
   # A tag pushed on main is published as its release, on that tag itself (no tag is made), with the
-  # games the builds named; a pull request from release/<name> as the pre-release on its moving tag;
-  # a branch's run keeps them as its artifacts only. Discord hears of the nightly (its run), a
-  # pre-release and a tag's release. A pull request from a fork has a read-only token: its
-  # release/<name> is never published
+  # games the builds named; a push on main as the nightly on its moving tag; a pull request from
+  # release/<name> as the pre-release on its moving tag; another pull request's run keeps them as
+  # its artifacts only. Discord hears of the nightly, a pre-release and a tag's release. A pull
+  # request from a fork has a read-only token: its release/<name> is never published
   publish:
     needs: [build-host, build]
     if: >-
@@ -306,9 +307,10 @@ jobs:
       pull-requests: read
     concurrency:
       group: publish-${{ github.ref }}
+    env:
+      NIGHTLY_TAG: maszyna-reloaded-nightly
     steps:
       - uses: actions/download-artifact@v8
-        if: github.event_name == 'pull_request' || github.ref_type == 'tag'
         with:
           pattern: ${{ needs.build-host.outputs.prefix }}-*
           path: release
@@ -337,6 +339,31 @@ jobs:
             --notes "Build $BUILD_NUMBER of $GITHUB_SHA" --generate-notes \
             || gh release view "$TAG" > /dev/null
           gh release upload "$TAG" release/* --clobber
+
+      # The nightly is made anew on the commit built: the old one and its tag deleted, the tag made
+      # by the release (a tag the token makes starts no run). Only while this run built main's head
+      # - an older run finishing late publishes nothing
+      - name: Publish the nightly
+        id: nightly
+        if: github.event_name == 'push' && github.ref_type == 'branch'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          PREFIX: ${{ needs.build-host.outputs.prefix }}
+          BUILD_NUMBER: ${{ needs.build-host.outputs.build_number }}
+        run: |
+          ls -l release
+          test -f "release/$PREFIX-windows-setup.exe"
+          if [ "$(gh api "repos/$GH_REPO/commits/main" --jq .sha)" != "$GITHUB_SHA" ]; then
+            echo "::notice::main has a newer head: nothing published"
+            exit 0
+          fi
+          if gh release view "$NIGHTLY_TAG" > /dev/null 2>&1; then
+            gh release delete "$NIGHTLY_TAG" --cleanup-tag --yes
+          fi
+          gh release create "$NIGHTLY_TAG" --target "$GITHUB_SHA" --prerelease --title "$PREFIX" \
+            --notes "Build $BUILD_NUMBER of $GITHUB_SHA" release/*
+          echo "published=true" >> "$GITHUB_OUTPUT"
 
       # The pre-release is made anew on the pull request's head: the old one and its tag deleted,
       # the tag made by the release (a tag the token makes starts no run). Only while the pull
@@ -372,21 +399,19 @@ jobs:
           fi
           echo "published=true" >> "$GITHUB_OUTPUT"
 
-      # the repository's own webhook is not subscribed to releases; a branch's build is its run
+      # the repository's own webhook is not subscribed to releases
       - name: Announce on Discord
-        if: github.event_name == 'push' || steps.pre-release.outputs.published == 'true'
+        if: >-
+          github.ref_type == 'tag' || steps.nightly.outputs.published == 'true'
+          || steps.pre-release.outputs.published == 'true'
         env:
           GH_TOKEN: ${{ github.token }}
           GH_REPO: ${{ github.repository }}
           DISCORD_WEBHOOK: ${{ secrets.DISCORD_RELEASES_WEBHOOK }}
           PREFIX: ${{ needs.build-host.outputs.prefix }}
           BUILD_NUMBER: ${{ needs.build-host.outputs.build_number }}
-          TAG: ${{ needs.build-host.outputs.release_candidate_tag || github.ref_name }}
+          TAG: ${{ needs.build-host.outputs.release_candidate_tag || (github.ref_type == 'tag' && github.ref_name) || env.NIGHTLY_TAG }}
         run: |
-          if [ "$GITHUB_REF_TYPE" = tag ] || [ "$GITHUB_EVENT_NAME" = pull_request ]; then
-            url=$(gh release view "$TAG" --json url --jq .url)
-          else
-            url="$GITHUB_SERVER_URL/$GH_REPO/actions/runs/$GITHUB_RUN_ID"
-          fi
+          url=$(gh release view "$TAG" --json url --jq .url)
           jq -n --arg content "**$PREFIX** - build $BUILD_NUMBER"$'\n'"$url" '{content: $content}' \
             | curl -fsS -H 'Content-Type: application/json' -d @- "$DISCORD_WEBHOOK"

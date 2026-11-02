@@ -25,7 +25,8 @@ extends Control
 ## from being changed while it is on - or, with "disabled_by_values", while it has one of them
 ## (TAA while the upscaling is FSR 2.2). "restart_required": true marks one that takes effect only after
 ## the game restarts - a change of it lights the note above the buttons, and Save asks whether to
-## restart.
+## restart. "hint": "monitor_choice" chooses the monitor the settings marked "per_monitor": true set
+## up, each monitor with a UserSettings section of its own (MonitorSettings).
 
 const DEFINITION: JSON = preload("settings.json")
 const PAGE: PackedScene = preload("settings_page.tscn")
@@ -36,6 +37,7 @@ const RESOLUTION: PackedScene = preload("setting_resolution.tscn")
 const FOLDER: PackedScene = preload("setting_folder.tscn")
 const GAME_DIR: PackedScene = preload("setting_game_dir.tscn")
 const TEXT: PackedScene = preload("setting_text.tscn")
+const MONITOR_CHOICE: PackedScene = preload("setting_monitor_choice.tscn")
 const STORES: Dictionary[String, SettingRow.Store] = {
     "project": SettingRow.Store.PROJECT,
     "user": SettingRow.Store.USER,
@@ -89,6 +91,7 @@ func _ready() -> void:
         # a setting names the ones it excludes or depends on by their key; the rows are known once
         # all are built
         var rows: Dictionary[String, SettingRow] = {}
+        var monitor_choice: SettingMonitorChoice = null
         for setting: Dictionary in settings:
             var row: SettingRow = (
                 TOGGLE if setting["type"] == "bool"
@@ -96,6 +99,7 @@ func _ready() -> void:
                 else RESOLUTION if setting.get("hint") == "resolution"
                 else FOLDER if setting.get("hint") == "folder"
                 else GAME_DIR if setting.get("hint") == "game_dir"
+                else MONITOR_CHOICE if setting.get("hint") == "monitor_choice"
                 else TEXT if setting["type"] == "String"
                 else OPTION
             ).instantiate()
@@ -106,6 +110,10 @@ func _ready() -> void:
             row.default_value = setting["default"]
             row.hint_string = setting.get("hint_string", "")
             row.restart_required = setting.get("restart_required", false)
+            if row is SettingMonitorChoice:
+                monitor_choice = row
+            elif setting.get("per_monitor", false):
+                monitor_choice.monitor_rows.append(row)
             if setting.get("advanced", false):
                 page.add_advanced_row(row)
             else:

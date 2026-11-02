@@ -13,6 +13,23 @@
 * A tile's tooltip shows the vehicle as the catalogue finds it (`VehicleData.vehicle`,
   `dynamic/pkp/su42_v1/su42`), not the directory alone as before.
 
+## Multimonitor
+
+* Several monitors have one fixed exposure (`MultiMonitorRig`): the cab is darker than with auto
+  exposure, and nothing adapts between the cab and the outside. One exposure measured across the
+  windows needs the engine's luminance, per viewport today.
+* The cab's `h_offset` shake reaches no monitor once the rig has made a camera - `rotation.z` is
+  inherited. Monitors set by hand zoom by their field of view alone, so their seams open.
+* The caption of a cab control under the mouse (`CabinControlTooltip`) stands in the HUD, so in the
+  main window, also for a control picked in a window beside it.
+* HDR output of the monitors' windows (`game_window.gd` asks for it on the main window only).
+* Head tracking (TrackIR, OpenTrack): nothing supplies it yet; the monitors follow the player's camera,
+  so it needs to move that camera alone.
+* Single-pass multiview: every monitor is a full pass over the scene.
+* Not checked yet: tearing between the windows on real displays, `PlanarMirror3D` in the side
+  windows, the streaming's reach under wide fields of view, the native Wayland driver (the game runs
+  on X11).
+
 ## HUD
 
 * The HUD keeps copies of the player's state: `DrivingAid.vehicle`, `FollowedVehicleChip.vehicle`,

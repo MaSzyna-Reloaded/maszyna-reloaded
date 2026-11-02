@@ -15,12 +15,29 @@ signal scenery_loaded(first_vehicle_id: String)
 ## (SceneryProvider.scenario_start())
 signal scenario_progress(progress: float)
 
+## A position in the main window no control of the HUD stands under
+const OFF_THE_PICTURE: Vector2 = Vector2(-1.0, -1.0)
+
 ## The scenery's node its provider made (SceneryProvider.create_scenery()); null while there is none
 var _scenery: SceneryContentNode = null
+## The monitors in use (UserSettings), so a change of another setting leaves the windows as they are
+var _monitors: Array[Dictionary] = []
 ## The provider of the scenery, which runs its scenario from its load until it unloads
 var _provider: SceneryProvider = null
 ## The vehicle_id the player starts in (load_scenery()); empty: the scenery's first vehicle
 var _start_vehicle_id: String = ""
+
+
+func _ready() -> void:
+    %MultiMonitorRig.interior_layers = EnvironmentNode.CABIN_RENDER_LAYER
+    %Player.cabin_view.fov_changed.connect(%MultiMonitorRig.rig_update_zoom.unbind(1))
+    %Player.free_view.fov_changed.connect(%MultiMonitorRig.rig_update_zoom.unbind(1))
+    UserSettings.config_changed.connect(_apply_monitor_settings)
+    _apply_monitor_settings()
+
+
+func _exit_tree() -> void:
+    UserSettings.config_changed.disconnect(_apply_monitor_settings)
 
 
 ## Loads the scenery `info` by its provider, the player's trainset as arranged
@@ -40,6 +57,39 @@ func load_scenery(info: SceneryInfo, trainset: Array[VehicleData], vehicle_id: S
 func unload_scenery() -> void:
     PlayerServer.player_stop()
     await _close_scenery()
+
+
+## The monitors of the player's settings onto the rig, with the main window's render settings -
+## the settings screen connected first, so the main window has them already
+func _apply_monitor_settings() -> void:
+    var monitors: Array[Dictionary] = MonitorSettings.monitors_get()
+    if not monitors == _monitors:
+        _monitors = monitors
+        %MultiMonitorRig.rig_configure(monitors)
+    %MultiMonitorRig.rig_copy_viewport_settings(get_viewport())
+
+
+## The mouse picks through the camera of the monitor it is on, the current one in that window
+func _on_multi_monitor_rig_mouse_camera_changed(camera: Camera3D) -> void:
+    CabinHUDMouseSystem.mouse_set_camera(camera.get_instance_id())
+    SceneryHUDMouseServer.mouse_set_camera(camera.get_instance_id())
+
+
+## The mouse in a monitor's window beside the main one: it picks there as Player does in the main
+## window. What it leaves - the look with the right button, the wheel - is the player's: into the
+## main window off its picture, where no control of the HUD stands under it. A motion only while
+## the look holds the mouse, as the picking would take a position off the picture for its own
+func _on_multi_monitor_rig_mouse_input(event: InputEventMouse) -> void:
+    if CabinHUDMouseSystem.mouse_input(event) or SceneryHUDMouseServer.mouse_input(event):
+        return
+    if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT:
+        return
+    if event is InputEventMouseMotion and not Input.mouse_mode == Input.MOUSE_MODE_CAPTURED:
+        return
+    var outside: InputEventMouse = event.duplicate()
+    outside.position = OFF_THE_PICTURE
+    outside.global_position = OFF_THE_PICTURE
+    get_viewport().push_input(outside)
 
 
 ## The node of the scenery `info` its provider makes, in the world under its environment and wired

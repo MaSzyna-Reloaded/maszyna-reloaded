@@ -59,6 +59,14 @@ func _notification(what: int) -> void:
 ## another setting leaves the window be
 func _apply_settings() -> void:
     var window: Window = get_window()
+    var monitors: Array[Dictionary] = MonitorSettings.monitors_get()
+    if monitors:
+        # the main window is the first monitor; the others are MultiMonitorRig's
+        var monitor: MonitorConfig = MonitorConfig.from_dictionary(monitors[0])
+        if monitor.window_title:
+            window.title = monitor.window_title
+        if monitor.screen < DisplayServer.get_screen_count() and not window.current_screen == monitor.screen:
+            window.current_screen = monitor.screen
     var mode: Mode = UserSettings.get_setting(SETTINGS_SECTION, "mode", Mode.FULLSCREEN)
     if mode == Mode.FULLSCREEN:
         if not window.mode == Window.MODE_FULLSCREEN:

@@ -49,6 +49,8 @@ jobs:
         uses: actions/checkout@v7
         with:
           submodules: recursive
+          # vendor/multimonitor is private
+          token: ${{ secrets.MULTIMONITOR_TOKEN }}
 
       # cmake/write_build_number.cmake
       - name: Build number
@@ -112,6 +114,8 @@ jobs:
         uses: actions/checkout@v7
         with:
           submodules: recursive
+          # vendor/multimonitor is private
+          token: ${{ secrets.MULTIMONITOR_TOKEN }}
 
       - name: Fetch the double precision Godot
         run: |
@@ -186,6 +190,8 @@ jobs:
         with:
           ref: ${{ github.event.pull_request.head.sha || github.sha }}
           submodules: recursive
+          # vendor/multimonitor is private
+          token: ${{ secrets.MULTIMONITOR_TOKEN }}
 
       # the build number the game shows and the installer carries, the one build-host stamped
       - name: Build number

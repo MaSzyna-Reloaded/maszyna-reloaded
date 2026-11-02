@@ -821,8 +821,8 @@ msgstr "时刻表"
 msgid "No timetable"
 msgstr ""
 
-msgid "braked %d%%"
-msgstr ""
+msgid "required braking %d%%"
+msgstr "要求制动率 %d%%"
 
 msgid "Line speed %d km/h, no stations"
 msgstr ""

@@ -821,8 +821,8 @@ msgstr "Rozkład jazdy"
 msgid "No timetable"
 msgstr "Brak rozkładu jazdy"
 
-msgid "braked %d%%"
-msgstr "hamowanie %d%%"
+msgid "required braking %d%%"
+msgstr "wymagana masa hamująca %d%%"
 
 msgid "%d t, actual %d t"
 msgstr "%d t, rzeczywiście %d t"

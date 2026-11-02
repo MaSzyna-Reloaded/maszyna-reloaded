@@ -821,7 +821,7 @@ msgstr ""
 msgid "No timetable"
 msgstr ""
 
-msgid "braked %d%%"
+msgid "required braking %d%%"
 msgstr ""
 
 msgid "%d t, actual %d t"

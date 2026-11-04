@@ -45,10 +45,6 @@ const INPUT: PackedScene = preload("setting_input.tscn")
 ## Above a key section's rows: the search of its actions and the titles of their keyboard's and
 ## pad's columns
 const INPUT_HEADER: PackedScene = preload("setting_input_header.tscn")
-const STORES: Dictionary[String, SettingRow.Store] = {
-    "project": SettingRow.Store.PROJECT,
-    "user": SettingRow.Store.USER,
-}
 
 ## The upscaling the player chooses (settings.json "upscaling"): off, or the viewport's mode
 const UPSCALING_OFF: int = 0
@@ -133,7 +129,7 @@ func _ready() -> void:
                 else OPTION
             ).instantiate()
             row.title = setting["title"]
-            row.store = STORES[setting["store"]]
+            row.store = SettingRow.STORES[setting["store"]]
             row.section = setting.get("section", "")
             row.key = setting["key"]
             row.default_value = setting["default"]

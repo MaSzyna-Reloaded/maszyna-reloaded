@@ -35,6 +35,9 @@
   project's account or domain changes that address.
 * A command carries no sender (`VehicleServer.vehicle_command_received`), so the report's command
   audit cannot tell the player's commands from the scenario's or the console's.
+* The report's button stands at the right edge of the screen all the time (#12) until the game is
+  stable; then decide whether it hides again - it slid in when the mouse touched the edge
+  (`bug_report/edge_button.gd`, removed by #12).
 
 ### Settings screen (`settings/`)
 * A light a caller makes by hand (`E3DRenderingServer.spot_light_create()`/`omni_light_create()`)

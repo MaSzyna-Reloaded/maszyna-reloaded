@@ -37,6 +37,16 @@ ANDROID_APK:=bin/android/maszyna-reloaded-android-arm64.apk
 WINDOWS_ZIP:=bin/windows/maszyna-reloaded-win64.zip
 WINDOWS_SETUP:=bin/windows/maszyna-reloaded-win64-setup.exe
 BUILD_NUMBER_FILE:=$(PROJECT_DIR)/build_number.txt
+# What a problem report names the build by (bug_report_snapshot.gd): a public release by its tag
+# alone - the commit's tag, no branch -, any other build by its number and the branch it is made
+# from. The CI, whose checkout is detached, sets both in the environment (empty for none). They
+# reach the recipes only as environment variables, never as recipe text: a name may hold quotes or
+# $(...)
+BUILD_TAG_FILE:=$(PROJECT_DIR)/build_tag.txt
+BUILD_BRANCH_FILE:=$(PROJECT_DIR)/build_branch.txt
+BUILD_TAG?=$(shell git -C $(PROJECT_DIR) describe --tags --exact-match HEAD 2>/dev/null)
+BUILD_BRANCH?=$(if $(BUILD_TAG),,$(shell git -C $(PROJECT_DIR) rev-parse --abbrev-ref HEAD))
+export BUILD_TAG BUILD_BRANCH
 # The extension is built against double precision godot-cpp, so only a Godot built the same way
 # can load it (libreloaded's Makefile). Override when your double precision build is named
 # differently: make release-linux GODOT=godot-double
@@ -96,7 +106,7 @@ plugin-submodule:
 	$(MAKE) links
 
 
-compile-debug compile-release compile-profiling compile-release-symbols compile-release-linux compile-windows-release compile-android-release: $(BUILD_NUMBER_FILE) links
+compile-debug compile-release compile-profiling compile-release-symbols compile-release-linux compile-windows-release compile-android-release: $(BUILD_NUMBER_FILE) $(BUILD_TAG_FILE) $(BUILD_BRANCH_FILE) links
 	$(LIBRELOADED_MAKE) $@
 
 
@@ -116,12 +126,22 @@ terrain3d:
 # a release rather than the last time somebody compiled anything. Bump it deliberately: `make
 # build-number` - the game directory's `upgrade-linux.sh` and `upgrade-windows.sh` do, unless run
 # with KEEP_BUILD_NUMBER=1 to ship another platform with the number already stamped.
+# The tag and the branch are stamped with it.
 build-number:
 	cmake -DOUT=$(BUILD_NUMBER_FILE) -P $(LIBRELOADED)/cmake/write_build_number.cmake
+	printf '%s' "$$BUILD_TAG" > $(BUILD_TAG_FILE)
+	printf '%s' "$$BUILD_BRANCH" > $(BUILD_BRANCH_FILE)
 
-# A checkout that has never been stamped gets a number on its first build, and keeps it.
+# A checkout that has never been stamped gets a number on its first build, and keeps it - and a
+# tag and a branch, which a checkout stamped before they were gets on its own.
 $(BUILD_NUMBER_FILE):
 	$(MAKE) build-number
+
+$(BUILD_TAG_FILE):
+	printf '%s' "$$BUILD_TAG" > $(BUILD_TAG_FILE)
+
+$(BUILD_BRANCH_FILE):
+	printf '%s' "$$BUILD_BRANCH" > $(BUILD_BRANCH_FILE)
 
 
 # The export keeps each scene converted to binary and converts it again only when that scene's own

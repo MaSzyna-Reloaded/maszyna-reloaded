@@ -2,7 +2,6 @@
 
 [ext_resource type="Script" path="res://bug_report/bug_report.gd" id="1_report"]
 [ext_resource type="Script" path="res://bug_report/bug_report_sender.gd" id="3_sender"]
-[ext_resource type="Script" path="res://bug_report/edge_button.gd" id="4_edge"]
 [ext_resource type="Texture2D" path="res://bug_report/bug_icon.svg" id="5_icon"]
 [ext_resource type="Script" path="res://bug_report/report_dialog.gd" id="6_dialog"]
 [ext_resource type="Script" path="res://bug_report/screenshot_annotator.gd" id="7_annotator"]
@@ -11,6 +10,7 @@
 [ext_resource type="Script" path="res://ui/ui_action_buttons.gd" id="13_action_buttons"]
 [ext_resource type="Script" path="res://ui/ui_button.gd" id="14_button"]
 [ext_resource type="Script" path="res://ui/ui_switch.gd" id="ui_switch"]
+[ext_resource type="JSON" path="res://settings/settings.json" id="15_settings"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_edge"]
 content_margin_left = 8.0
@@ -37,6 +37,7 @@ shadow_size = 6
 [node name="BugReport" type="CanvasLayer"]
 layer = 100
 script = ExtResource("1_report")
+settings_definition = ExtResource("15_settings")
 
 [node name="Sender" type="HTTPRequest" parent="."]
 unique_name_in_owner = true
@@ -50,8 +51,8 @@ anchor_left = 1.0
 anchor_top = 0.5
 anchor_right = 1.0
 anchor_bottom = 0.5
+offset_left = -56.0
 offset_top = -28.0
-offset_right = 56.0
 offset_bottom = 28.0
 grow_horizontal = 0
 grow_vertical = 2
@@ -63,7 +64,6 @@ theme_override_styles/pressed = SubResource("StyleBoxFlat_edge")
 icon = ExtResource("5_icon")
 icon_alignment = 1
 expand_icon = true
-script = ExtResource("4_edge")
 
 [node name="ReportDialog" parent="." instance=ExtResource("12_ui_window")]
 unique_name_in_owner = true

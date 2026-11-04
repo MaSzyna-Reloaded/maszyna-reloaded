@@ -3,23 +3,32 @@ extends HTTPRequest
 
 ## Sends a problem report to where Project Setting maszyna/bugtracking/endpoint points.
 ##
-## An http:// or https:// endpoint opens the GitHub issue - report API version API_VERSION: one
-## multipart/form-data POST of text fields and one archive.
-##   fields      "api_version", then the report's own: "title", "description", "build",
-##               "scenery", "vehicle" (UTF-8 text; a field may be empty)
-##   attachments ATTACHMENTS_FILE (application/zip): SNAPSHOT_FILE, and SCREENSHOT_FILE and the logs
-##               (the session's app.log, the game's log files - BugReport) when there are any
-## It answers JSON with the issue's "issue_url". The fields are enough to open the issue; the
+## An http:// or https:// endpoint opens the GitHub issue: one multipart/form-data POST, each part
+## of the Content-Type of what it holds (build_body()). There is no API version - the endpoint
+## reads the parts by their names and types, leaves out of the issue a part a build does not send
+## and ignores one it does not know.
+##   text/plain        a text of the report - "title", "description", "build", "branch",
+##                     "scenery", "vehicle" (UTF-8; may be empty)
+##   application/json  a section of the report - "hardware", "settings" (the snapshot's, as
+##                     objects); a file "<name>.json", as an endpoint reading the form keeps the
+##                     Content-Type only of a part with a filename
+##   application/zip   "attachments" - ATTACHMENTS_FILE: SNAPSHOT_FILE, and SCREENSHOT_FILE and the
+##                     logs (the session's app.log, the game's log files - BugReport) when there
+##                     are any
+##   image/jpeg        "screenshot" - SCREENSHOT_FILE once more, when it is attached, for the issue
+##                     to show
+## It answers JSON with the issue's "issue_url". The texts are enough to open the issue; the
 ## archive is the one file the issue links to.
 ##
 ## Anything else - user://, file:// or a plain path - is a directory: a new directory of the
-## report's own in it gets REPORT_FILE (the fields as JSON) and the same ATTACHMENTS_FILE.
+## report's own in it gets the same parts as files - REPORT_FILE (the texts), "<name>.json" (each
+## section), ATTACHMENTS_FILE and SCREENSHOT_FILE.
 ## Empty - the default, until the endpoint exists - is no reporting at all (is_available()).
 ##
 ## What leaves the machine names nobody: the snapshot and the logs go with the player's home
 ## directory and system user name masked (mask_personal()) - the logs write paths under the home,
-## and a player with no nick is named by the user name. The report's own fields are what the player
-## typed and go as they are.
+## and a player with no nick is named by the user name. Of the report's own fields, those the
+## player typed (PLAYER_FIELDS) go as they are, the rest masked as well - every text in them.
 
 signal report_sent(issue_url: String)
 ## The report was saved into a directory, not sent
@@ -29,8 +38,8 @@ signal report_failed(message: String)
 ## Project Setting: the endpoint that opens the issues, or the directory reports are saved in
 const ENDPOINT_SETTING: String = "maszyna/bugtracking/endpoint"
 const FILE_SCHEME: String = "file://"
-## What the endpoint is told it is sent - raised whenever the fields or the archive change
-const API_VERSION: int = 1
+## The fields of a report that are what the player typed - never masked
+const PLAYER_FIELDS: PackedStringArray = ["title", "description"]
 const REPORT_FILE: String = "report.json"
 const ATTACHMENTS_FILE: String = "report.zip"
 const SNAPSHOT_FILE: String = "snapshot.json"
@@ -68,7 +77,7 @@ func send(
     for log_file: String in logs:
         if logs[log_file]:
             files[log_file] = mask_personal(logs[log_file].get_string_from_utf8()).to_utf8_buffer()
-    var fields: Dictionary = fields_of(report)
+    var sent: Dictionary = report_of(report)
     if not endpoint.begins_with("http://") and not endpoint.begins_with("https://"):
         # a directory per report, named by when it was made
         var directory: String = endpoint.trim_prefix(FILE_SCHEME).path_join(
@@ -76,10 +85,15 @@ func send(
         var made: Error = DirAccess.make_dir_recursive_absolute(directory)
         if made == OK:
             made = pack(files, directory.path_join(ATTACHMENTS_FILE))
-        if made == OK:
-            var file: FileAccess = FileAccess.open(directory.path_join(REPORT_FILE), FileAccess.WRITE)
+        var saved: Dictionary[String, PackedByteArray] = saved_files(sent)
+        if screenshot:
+            saved[SCREENSHOT_FILE] = screenshot
+        for file_name: String in saved:
+            if not made == OK:
+                break
+            var file: FileAccess = FileAccess.open(directory.path_join(file_name), FileAccess.WRITE)
             if file:
-                file.store_string(JSON.stringify(fields, "\t"))
+                file.store_buffer(saved[file_name])
             else:
                 made = FileAccess.get_open_error()
         if not made == OK:
@@ -99,7 +113,7 @@ func send(
     var boundary: String = "%s%d" % [BOUNDARY_PREFIX, randi()]
     var error: Error = request_raw(
             endpoint, PackedStringArray(["Content-Type: multipart/form-data; boundary=" + boundary]),
-            HTTPClient.METHOD_POST, build_body(boundary, fields, archive))
+            HTTPClient.METHOD_POST, build_body(boundary, sent, archive, screenshot))
     if not error == OK:
         report_failed.emit(error_string(error))
 
@@ -121,12 +135,30 @@ static func mask_personal(text: String) -> String:
     return text
 
 
-## The text fields of a report: the API version, then the report's own, each as text
-static func fields_of(report: Dictionary) -> Dictionary:
-    var fields: Dictionary = {"api_version": str(API_VERSION)}
+## What is sent of a report: its values, masked (mask_personal()) unless the player typed them
+static func report_of(report: Dictionary) -> Dictionary:
+    var sent: Dictionary = {}
     for field: Variant in report:
-        fields[field] = str(report[field])
-    return fields
+        sent[field] = report[field] if field in PLAYER_FIELDS else _masked(report[field])
+    return sent
+
+
+## The value with every text in it masked - a dictionary's keys and values, an array's items; a
+## number or a bool as it is
+static func _masked(value: Variant) -> Variant:
+    if value is String:
+        return mask_personal(value)
+    if value is Dictionary:
+        var masked: Dictionary = {}
+        for key: Variant in value:
+            masked[_masked(key)] = _masked(value[key])
+        return masked
+    if value is Array:
+        var masked: Array = []
+        for item: Variant in value:
+            masked.append(_masked(item))
+        return masked
+    return value
 
 
 ## The archive of the files at [param path]
@@ -142,15 +174,43 @@ static func pack(files: Dictionary[String, PackedByteArray], path: String) -> Er
     return packer.close()
 
 
-## The multipart/form-data body: every field as text, then the archive
+## Whether a value of the report goes as a section - application/json - rather than as text
+static func is_section(value: Variant) -> bool:
+    return value is Dictionary or value is Array
+
+
+## The files a report saved into a directory is: REPORT_FILE with its texts, "<name>.json" with
+## each of its sections - the parts build_body() sends, indented
+static func saved_files(report: Dictionary) -> Dictionary[String, PackedByteArray]:
+    var texts: Dictionary = {}
+    var files: Dictionary[String, PackedByteArray] = {}
+    for field: Variant in report:
+        if is_section(report[field]):
+            files["%s.json" % field] = JSON.stringify(report[field], "\t").to_utf8_buffer()
+        else:
+            texts[field] = str(report[field])
+    files[REPORT_FILE] = JSON.stringify(texts, "\t").to_utf8_buffer()
+    return files
+
+
+## The multipart/form-data body: each text of the report as text/plain, each section as an
+## application/json file, then the archive and the screenshot - none when it is empty
 static func build_body(
-        boundary: String, fields: Dictionary, archive: PackedByteArray) -> PackedByteArray:
+        boundary: String, report: Dictionary, archive: PackedByteArray,
+        screenshot: PackedByteArray) -> PackedByteArray:
     var body: PackedByteArray = PackedByteArray()
-    for field: Variant in fields:
-        body.append_array(_part(
-                boundary, str(field), "", "text/plain; charset=utf-8",
-                str(fields[field]).to_utf8_buffer()))
+    for field: Variant in report:
+        var value: Variant = report[field]
+        if is_section(value):
+            body.append_array(_part(
+                    boundary, str(field), "%s.json" % field, "application/json",
+                    JSON.stringify(value).to_utf8_buffer()))
+        else:
+            body.append_array(_part(
+                    boundary, str(field), "", "text/plain; charset=utf-8", str(value).to_utf8_buffer()))
     body.append_array(_part(boundary, "attachments", ATTACHMENTS_FILE, "application/zip", archive))
+    if screenshot:
+        body.append_array(_part(boundary, "screenshot", SCREENSHOT_FILE, "image/jpeg", screenshot))
     body.append_array(("--%s--\r\n" % boundary).to_utf8_buffer())
     return body
 

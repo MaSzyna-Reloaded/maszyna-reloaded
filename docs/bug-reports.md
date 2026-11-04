@@ -4,13 +4,15 @@ title: "Problem Reports"
 ---
 
 The game lets a player report a problem or a suggestion from the scenery selector (the bug
-button at the right edge of the screen) and from a running scenery (the same button, or "Report a
+button at the right edge of the screen, always shown until the game is stable) and from a running
+scenery (the same button, or "Report a
 problem or suggestion" in the top bar). The form pauses the simulation, takes a screenshot the
 player can mark with red rectangles, collects a snapshot of the game's state and - once the player
 has agreed to publish it - hands it to the **reporting endpoint**. The endpoint is a small server,
 not part of this repository, that opens a GitHub issue from it: a Cloudflare Worker in the
 `MaSzyna-Reloaded/reports` repository (`worker/`), which opens the issue in that repository and
-keeps `report.zip` as an asset of the month's release (`reports-YYYY-MM`).
+keeps `report.zip` and the screenshot as assets of the month's release (`reports-YYYY-MM`), the
+screenshot shown in the issue.
 
 This page is the contract between the game (`bug_report/`) and that server.
 
@@ -31,14 +33,17 @@ testing, a directory (`user://bug_reports`) saves the reports locally; on Linux 
 A saved report is a directory of its own, named by the local time it was made
 (`2026-10-04T15-30-12/`), with what the server receives:
 
-* `report.json` - the text fields, as one JSON object (indented)
+* `report.json` - the text parts, as one object, indented
+* `hardware.json`, `settings.json` - the JSON parts, indented
 * `report.zip` - the `attachments` part
+* `screenshot.jpg` - the `screenshot` part, when attached
 
 ## The request
 
-Report API version **1**. One `POST` to the endpoint URL, `multipart/form-data`: the report's
-metadata as text fields, and every file in one zip archive. Godot's `HTTPRequest` adds `Host`,
-`User-Agent: GodotEngine/...` and `Content-Length`; the game adds only the content type:
+One `POST` to the endpoint URL, `multipart/form-data`, each part of the `Content-Type` of what
+it holds: the report's texts as text, its sections as JSON, every file in one zip archive, and the
+screenshot once more on its own. Godot's `HTTPRequest` adds `Host`, `User-Agent: GodotEngine/...`
+and `Content-Length`; the game adds only the content type:
 
 ```
 POST /<endpoint path> HTTP/1.1
@@ -46,24 +51,23 @@ Content-Type: multipart/form-data; boundary=MaSzynaReport1849302847
 ```
 
 The boundary is `MaSzynaReport` followed by a random number, new for every request. Lines of the
-multipart framing end with `\r\n`. The parts come in this order:
+multipart framing end with `\r\n`, and an empty line parts a part's headers from its contents. The
+parts come in this order:
 
-| Part (`name`) | `filename` | `Content-Type` | Always |
+| Part (`name`) | `filename` | `Content-Type` | Contents |
 |---|---|---|---|
-| `api_version` | - | `text/plain; charset=utf-8` | yes - `1` |
-| `title` | - | `text/plain; charset=utf-8` | yes |
-| `description` | - | `text/plain; charset=utf-8` | yes |
-| `build` | - | `text/plain; charset=utf-8` | yes |
-| `scenery` | - | `text/plain; charset=utf-8` | yes, may be empty |
-| `vehicle` | - | `text/plain; charset=utf-8` | yes, may be empty |
-| `attachments` | `report.zip` | `application/zip` | yes |
+| `title` | - | `text/plain; charset=utf-8` | the issue's title: `[<build>] <scenery title> / <vehicle>: <description's first line, 80 characters at most>`; in the selector, without a scenery or a vehicle, `[<build>] <description's first line>` |
+| `description` | - | `text/plain; charset=utf-8` | what the player wrote, whole, trimmed; never empty |
+| `build` | - | `text/plain; charset=utf-8` | what the build is named by: a public release's tag (`build_tag.txt`, e.g. `v0.1.0`), any other build's number (`GameDataServer.build_get_number()`, e.g. `20261003-1708`) |
+| `branch` | - | `text/plain; charset=utf-8` | the branch the build was made from (`build_branch.txt`: a pull request's branch, `main` of the nightly) - empty for a public release, named by its tag alone, and in a checkout never stamped |
+| `scenery` | - | `text/plain; charset=utf-8` | the scenery's file (`stary_jawor_eszelon.scn`), empty in the selector |
+| `vehicle` | - | `text/plain; charset=utf-8` | the vehicle the player drives (its vehicle id), empty when none |
+| `hardware` | `hardware.json` | `application/json` | the snapshot's `hardware` section, an object, for the issue to show without unpacking the archive |
+| `settings` | `settings.json` | `application/json` | the snapshot's `settings` section, an object, the same way |
+| `attachments` | `report.zip` | `application/zip` | below |
+| `screenshot` | `screenshot.jpg` | `image/jpeg` | the screenshot, as in the archive - only when attached |
 
 ```
---MaSzynaReport1849302847
-Content-Disposition: form-data; name="api_version"
-Content-Type: text/plain; charset=utf-8
-
-1
 --MaSzynaReport1849302847
 Content-Disposition: form-data; name="title"
 Content-Type: text/plain; charset=utf-8
@@ -71,28 +75,35 @@ Content-Type: text/plain; charset=utf-8
 [20261003-1708] Stary Jawór / SU46-048: the doors do not open
 ...
 --MaSzynaReport1849302847
+Content-Disposition: form-data; name="hardware"; filename="hardware.json"
+Content-Type: application/json
+
+{"build":"20261003-1708","branch":"main","os":"Linux",...}
+...
+--MaSzynaReport1849302847
 Content-Disposition: form-data; name="attachments"; filename="report.zip"
 Content-Type: application/zip
 
 <zip bytes>
+--MaSzynaReport1849302847
+Content-Disposition: form-data; name="screenshot"; filename="screenshot.jpg"
+Content-Type: image/jpeg
+
+<jpeg bytes>
 --MaSzynaReport1849302847--
 ```
 
-`api_version` is raised whenever the fields or the archive change, so a server can tell which
-shape it was sent. The fields are enough to open the issue without unpacking anything; the archive
-is the one file the issue links to.
+There is no API version. The server reads each part by its name and its `Content-Type`, leaves out
+of the issue a part it was not sent and ignores one it does not know - so a report keeps its shape
+as parts come: builds before the hardware and the settings sent only the texts (with an
+`api_version` of `1`, now ignored) and `attachments`, and are still taken. A JSON part goes with a
+`filename`, as a server reading the form (`request.formData()` of a Cloudflare Worker) keeps the
+`Content-Type` only of a part with one. The texts are enough to open the issue without unpacking
+anything; the archive is the one file the issue links to.
 
-### The fields
-
-Every value is UTF-8 text:
-
-| Field | Value |
-|---|---|
-| `title` | the issue's title: `[<build>] <scenery title> / <vehicle>: <description's first line, 80 characters at most>`; in the selector, without a scenery or a vehicle, `[<build>] <description's first line>` |
-| `description` | what the player wrote, whole, trimmed; never empty |
-| `build` | the build number of the game (`GameDataServer.build_get_number()`, e.g. `20261003-1708`) |
-| `scenery` | the scenery's file (`stary_jawor_eszelon.scn`), empty in the selector |
-| `vehicle` | the vehicle the player drives (its vehicle id), empty when none |
+Every text of `branch`, `hardware` and `settings` goes with the player's home directory and system
+user name masked, as the snapshot and the logs do; `title` and `description` are what the player
+typed and go as they are.
 
 The game sends a report only after the player ticked "I agree to sharing the hardware information
 and the report, and to publishing them on GitHub".
@@ -153,7 +164,8 @@ Logs are arrays of text lines, oldest first, fields separated by single spaces.
 
 | Section | Contents |
 |---|---|
-| `hardware` | `build`, `godot` (engine version), `os`, `os_version`, `distribution`, `architecture`, `debug`, `editor`, `double_precision`, `cpu`, `cpu_threads`, `memory` (`OS.get_memory_info()`, bytes), `gpu_vendor`, `gpu`, `gpu_type` (`DEVICE_TYPE_DISCRETE_GPU`, ...), `gpu_driver`, `graphics_api_version`, `rendering_method`, `rendering_driver`, `screen_size`, `window_size`, `window_mode` (`WINDOW_MODE_FULLSCREEN`, ...), `locale`, `language` |
+| `hardware` | `build` (the number), `tag`, `branch` (`build_tag.txt`, `build_branch.txt`, stamped beside `build_number.txt` by `make build-number` and the CI - a tag's build has a tag and no branch, any other a branch and no tag), `godot` (engine version), `os`, `os_version`, `distribution`, `architecture`, `debug`, `editor`, `double_precision`, `cpu`, `cpu_threads`, `ram` (`OS.get_memory_info()`, bytes), `disk_space_left` (bytes free on the disk of `user://`), `gpu_vendor`, `gpu`, `gpu_type` (`DEVICE_TYPE_DISCRETE_GPU`, ...), `gpu_driver` (name and version; the kernel's release for a Linux driver built into it, as amdgpu), `graphics_api_version`, `rendering_method`, `rendering_driver`, `screen_size`, `window_size`, `window_mode` (`WINDOW_MODE_FULLSCREEN`, ...), `locale`, `language` |
+| `settings` | the value in effect of every setting the settings screen lists (`settings/settings.json`, the advanced ones too) by its name: a project setting's full name (`maszyna/...`), `<section>/<key>` of one of the player's own (`window/mode`); a value never set is its default |
 | `scenario` | `vehicle`, `occupied_cab`; with a scenery also `filename`, `title`, `start_time` (hours), `first_vehicle_id` |
 | `simulation` | `real_seconds_since_start` (wall clock since the scenery started), `simulation_time`, `time_of_day` (hours), `speed` (asked), `current_speed`, `light_level`; with a scenery also `date` (`YYYY-MM-DD`) and `weather`: `weather` (`WEATHER_RAIN`, ...), `season`, `cloudiness`, `precipitation`, `temperature` (the scenery's, °C), `air_temperature` (the simulation's, °C), `wind_direction` (°), `wind_strength`, `fog_enabled`, `fog_density`, `fog_distance` (m) |
 | `camera` | `mode` (`CAMERA_MODE_CABIN`, ...), `target` (vehicle id), `follow_view`, `vehicle_transform` and, with a scenery, `transform` - each `{"origin": [x, y, z], "rotation_radians": [x, y, z]}` |
@@ -215,24 +227,26 @@ A failed report keeps what the player wrote, so it can be sent again.
   installed on the reports repository only, with `Issues: write` and `Contents: write` (the
   release asset), and opens the issues as the app's bot; the repository is the server's
   configuration, not the game's.
-* **Open the issue** with the `title` field as its title, and a body made of `description`, the
+* **Open the issue** with the `title` part as its title, and a body made of `description`, the
   build, scenery and vehicle, the hardware summary and links to the attachments.
 * **Store the archive itself.** GitHub's REST API cannot attach a file to an issue, so the server
-  keeps `report.zip` (its own storage, a release asset) and links it from the issue. It may unpack
-  it to show the screenshot in the issue's body or to summarise the snapshot's `hardware` - an issue
-  body is limited to 65536 characters, the snapshot does not fit in it.
+  keeps `report.zip` (its own storage, a release asset) and links it from the issue, and keeps the
+  `screenshot` the same way, shown in the issue's body. It summarises `hardware` and lists
+  `settings` in the body from their parts - an issue body is limited to 65536 characters, the
+  snapshot does not fit in it.
 * **Limit abuse:** a rate limit per address, a size limit on the request (the archive: a snapshot
   of a few MB and a log of up to 4 MB, which pack small, and a JPEG of a few hundred kB), and a
-  refusal of a request with an unknown `api_version`, without `attachments` or with an empty
-  `description`.
+  refusal of a request without `attachments` or with an empty `description`.
 * **Answer** `2xx` with `{"issue_url": ...}` once the issue exists.
 
 To test a server without the game, a request of the same shape:
 
 ```bash
-curl -F api_version=1 -F 'title=[test] a title' -F 'description=a test' -F build=test \
-     -F scenery= -F vehicle= \
+curl -F 'title=[test] a title' -F 'description=a test' -F build=test -F branch=main \
+     -F 'hardware=@hardware.json;type=application/json' \
+     -F 'settings=@settings.json;type=application/json' \
      -F 'attachments=@report.zip;type=application/zip' \
+     -F 'screenshot=@screenshot.jpg;type=image/jpeg' \
      https://<endpoint>
 ```
 

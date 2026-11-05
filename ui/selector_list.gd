@@ -122,7 +122,8 @@ func release_section_focus() -> void:
 
 ## Rows of the list, given as what they show: a title and the smaller grey note beside it, and
 ## optionally the group of each row. Rows of one group stand together under a folded header, in the
-## order the groups first appear; a group of a single row is no group. The typed search stays and
+## order the groups first appear - unfolded when it is the only thing on the list; a group of a
+## single row is no group. The typed search stays and
 ## filters the new rows. selected_row is selected right away - its group unfolded, the list scrolled
 ## to it - as the screen's own choice (the game directory in use, the scenery chosen before a
 ## refresh); without one, or when it is not on the list, the first visible slot is - nothing here is
@@ -173,7 +174,9 @@ func set_rows(
             continue
         var group: int = _group_rows.size()
         _group_rows.append(members[at])
-        _group_unfolded.append(false)
+        # a group alone on the list stands unfolded - folded, its header would be all the list
+        # shows, with nothing selected, and read as no rows at all (reports#39)
+        _group_unfolded.append(names.size() == 1)
         _group_slots.append(_slots.size())
         _add_slot(_create_header(group, names[at]), -1, group)
         var row_titles: PackedStringArray = _get_group_row_titles(names[at], members[at])

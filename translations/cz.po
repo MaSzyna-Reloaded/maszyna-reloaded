@@ -821,8 +821,8 @@ msgstr "Jízdní řád"
 msgid "No timetable"
 msgstr ""
 
-msgid "braked %d%%"
-msgstr ""
+msgid "required braking %d%%"
+msgstr "požadovaná brzdicí procenta %d%%"
 
 msgid "Line speed %d km/h, no stations"
 msgstr ""

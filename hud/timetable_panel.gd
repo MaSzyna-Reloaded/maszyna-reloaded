@@ -101,7 +101,7 @@ func _follow_trainset() -> void:
             details.append(tr("%d t, actual %d t") % [StationServer.timetable_get_required_mass(timetable),
                     roundi(RailVehicleServer.trainset_get_mass(StationServer.run_get_trainset(_run)) / KILOGRAMS_PER_TONNE)])
         if known and StationServer.timetable_get_required_brake_ratio(timetable) > 0.0:
-            details.append(tr("braked %d%%") % StationServer.timetable_get_required_brake_ratio(timetable))
+            details.append(tr("required braking %d%%") % StationServer.timetable_get_required_brake_ratio(timetable))
         %Details.text = "  ·  ".join(details)
         %Details.visible = details.size() > 0
         var count:int = StationServer.timetable_get_entry_count(timetable) if known else 0

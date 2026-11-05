@@ -10,7 +10,7 @@ extends Control
 
 ## info: the scenery as its provider described it, which loads it (SceneryProvider.create_scenery());
 ## trainset: the shown trainset as arranged here (SceneryContentNode.trainset_override)
-signal scenery_selected(info: SceneryInfo, vehicle_id: String, trainset: Array[VehicleData])
+signal scenery_selected(info: SceneryInfo, vehicle_id: String, trainset: Array[TrainsetMemberData])
 ## Escape - the game fades out and quits
 signal quit_requested
 ## The gear - the settings are the game's, not this screen's
@@ -48,9 +48,27 @@ var _info: SceneryInfo = null
 ## The trainsets of the scenery the list shows, in its order - the occupied ones, or all of them
 ## while the check box asks for those that cannot be driven as well
 var _listed_trainsets: Array[TrainsetData] = []
-## Vehicles of the shown trainset, in the order they run - the arranged ones of _arranged_trainsets
-var _vehicles: Array[VehicleData] = []
-## The trainsets as the player arranged them - copies of the scenery's vehicles, by scenery and
+## How a member couples to the next one, as the player reads it (TrainsetMemberData.coupling_mode -
+## read from the scenery, changed here)
+const COUPLING_MODE_NAMES: Dictionary[RailVehicleController.CouplingMode, String] = {
+    RailVehicleController.COUPLING_MODE_NONE: "Not coupled",
+    RailVehicleController.COUPLING_MODE_COUPLER: "Coupler",
+    RailVehicleController.COUPLING_MODE_BRAKE: "Coupler and brake",
+    RailVehicleController.COUPLING_MODE_FULL: "Fully coupled",
+    RailVehicleController.COUPLING_MODE_PERMANENT: "Permanently coupled",
+}
+## How a member couples to the next one, as its joint between the tiles draws it
+const COUPLING_MODE_ICONS: Dictionary[RailVehicleController.CouplingMode, Texture2D] = {
+    RailVehicleController.COUPLING_MODE_NONE: preload("couplings/coupling_none.svg"),
+    RailVehicleController.COUPLING_MODE_COUPLER: preload("couplings/coupling_coupler.svg"),
+    RailVehicleController.COUPLING_MODE_BRAKE: preload("couplings/coupling_brake.svg"),
+    RailVehicleController.COUPLING_MODE_FULL: preload("couplings/coupling_full.svg"),
+    RailVehicleController.COUPLING_MODE_PERMANENT: preload("couplings/coupling_permanent.svg"),
+}
+
+## The members of the shown trainset, in the order they run - the arranged ones of _arranged_trainsets
+var _members: Array[TrainsetMemberData] = []
+## The trainsets as the player arranged them - copies of the scenery's members, by scenery and
 ## trainset (_get_trainset_key()), kept while the game runs, so going to another scenery and back
 ## finds them as they were left
 var _arranged_trainsets: Dictionary[String, Array] = {}
@@ -355,11 +373,19 @@ func load_selected_scenery() -> void:
 ## The scenery is loaded with the trainset as the grid shows it - its vehicles, their order, their
 ## liveries and directions; a declared vehicle goes with its place in the declared trainset, by which
 ## the scenery pairs it (ids repeat), an added one has no place and no name of the scenery
-func _get_arranged_trainset() -> Array[VehicleData]:
-    var trainset: Array[VehicleData] = []
-    for vehicle: VehicleData in _vehicles:
-        trainset.append(vehicle.duplicate() as VehicleData)
+func _get_arranged_trainset() -> Array[TrainsetMemberData]:
+    var trainset: Array[TrainsetMemberData] = []
+    for member: TrainsetMemberData in _members:
+        trainset.append(_copy_member(member))
     return trainset
+
+
+## A member of its own, its vehicle with it - an arranged trainset changes neither the scenery's
+## members nor the ones the scenery is loaded with
+static func _copy_member(member: TrainsetMemberData) -> TrainsetMemberData:
+    var copy: TrainsetMemberData = member.duplicate() as TrainsetMemberData
+    copy.vehicle = member.vehicle.duplicate() as VehicleData
+    return copy
 
 
 ## The player starts in the headdriver vehicle of the selected trainset
@@ -435,8 +461,8 @@ func _show_trainset(index: int) -> void:
     if %VehicleViewer.visible:
         %VehicleViewer.close()
     _shown_index = -1
-    var vehicles: Array[VehicleData] = []
-    _vehicles = vehicles
+    var members: Array[TrainsetMemberData] = []
+    _members = members
     if _info and index >= 0:
         var trainset: TrainsetData = _listed_trainsets[index]
         %Description.text = (
@@ -444,13 +470,13 @@ func _show_trainset(index: int) -> void:
             if trainset.description
             else _info.description
         )
-        # copies: the scenery's own vehicles are read again with every scenery shown
+        # copies: the scenery's own members are read again with every scenery shown
         var key: String = _get_trainset_key(trainset)
         if not _arranged_trainsets.has(key):
-            for vehicle: VehicleData in trainset.vehicles:
-                vehicles.append(vehicle.duplicate() as VehicleData)
-            _arranged_trainsets[key] = vehicles
-        _vehicles = _arranged_trainsets[key]
+            for member: TrainsetMemberData in trainset.members:
+                members.append(_copy_member(member))
+            _arranged_trainsets[key] = members
+        _members = _arranged_trainsets[key]
     _show_vehicles(0)
 
 
@@ -460,9 +486,14 @@ func _show_vehicles(selected: int) -> void:
     # the tiles are built typed: an untyped [] is refused by a typed parameter, and the refusal is
     # a runtime error - the grid would keep the vehicles of the scenery before
     var tiles: Array[TileGrid.Tile] = []
-    for vehicle: VehicleData in _vehicles:
+    for member: TrainsetMemberData in _members:
+        var vehicle: VehicleData = member.vehicle
         var tile: TileGrid.Tile = TileGrid.Tile.new(vehicle, "%s (%s)" % [_vehicle_name(vehicle), vehicle.vehicle])
-        tile.flipped = vehicle.direction == TrackServer.DIRECTION_REVERSED
+        # the coupling with the next one on their meeting, changed there - the grid shows none after
+        # the last vehicle, wherever it is moved
+        tile.joint_icon = COUPLING_MODE_ICONS[member.coupling_mode]
+        tile.joint_tooltip = tr(COUPLING_MODE_NAMES[member.coupling_mode])
+        tile.flipped = member.direction == TrackServer.DIRECTION_REVERSED
         tile.removable = _is_removable(tiles.size())
         tiles.append(tile)
     %TrainsetGrid.set_tiles(tiles)
@@ -476,6 +507,7 @@ func _show_vehicles(selected: int) -> void:
     %TrainsetGrid.set_marked(_shown_index)
     if _shown_index >= 0:
         %VehicleViewer.set_removable(_is_removable(_shown_index))
+        _show_coupling(_shown_index)
 
 
 ## Whether the trainset is arranged otherwise than the scenario gives it: its note on the list says
@@ -490,17 +522,19 @@ func _show_trainset_changes() -> void:
 
 ## The trainset's own vehicles and the arranged ones differ in their number, order, files or skins
 ## - the same vehicle is the one of the scenery at the same place in the declared trainset, in the
-## same livery and direction
+## same livery and direction, coupled the same way
 func _is_trainset_modified(trainset: TrainsetData) -> bool:
-    var arranged: Array = _arranged_trainsets.get(_get_trainset_key(trainset), trainset.vehicles)
-    if not arranged.size() == trainset.vehicles.size():
+    var arranged: Array = _arranged_trainsets.get(_get_trainset_key(trainset), trainset.members)
+    if not arranged.size() == trainset.members.size():
         return true
     for index: int in arranged.size():
-        var vehicle: VehicleData = arranged[index]
-        var declared: VehicleData = trainset.vehicles[index]
-        if not (vehicle.vehicle_id == declared.vehicle_id and vehicle.trainset_index == declared.trainset_index
-                and vehicle.vehicle_provider == declared.vehicle_provider and vehicle.vehicle == declared.vehicle
-                and vehicle.livery == declared.livery and vehicle.direction == declared.direction):
+        var member: TrainsetMemberData = arranged[index]
+        var declared: TrainsetMemberData = trainset.members[index]
+        var vehicle: VehicleData = member.vehicle
+        if not (vehicle.vehicle_id == declared.vehicle.vehicle_id and member.trainset_index == declared.trainset_index
+                and vehicle.vehicle_provider == declared.vehicle.vehicle_provider
+                and vehicle.vehicle == declared.vehicle.vehicle and vehicle.livery == declared.vehicle.livery
+                and member.direction == declared.direction and member.coupling_mode == declared.coupling_mode):
             return true
     return false
 
@@ -527,7 +561,7 @@ func restore_trainset() -> void:
 
 ## The trash takes neither the vehicle with a driver - the player's - nor the last one
 func _is_removable(index: int) -> bool:
-    return _vehicles.size() > 1 and _vehicles[index].driver_type == VehicleData.DriverType.DRIVER_NOBODY
+    return _members.size() > 1 and _members[index].vehicle.driver_type == VehicleData.DriverType.DRIVER_NOBODY
 
 
 ## "Change vehicle" in the viewer or on a tile: the browser chooses another vehicle for its place
@@ -550,7 +584,7 @@ func ask_remove_vehicle(index: int) -> void:
     if index < 0 or not _is_removable(index):
         return
     _removed_index = index
-    %RemoveVehicleQuestion.message = tr("%s leaves the trainset.") % _vehicle_name(_vehicles[index])
+    %RemoveVehicleQuestion.message = tr("%s leaves the trainset.") % _vehicle_name(_members[index].vehicle)
     %RemoveVehicleQuestion.ask()
 
 
@@ -562,7 +596,32 @@ func _on_vehicle_viewer_reverse_requested() -> void:
     reverse_vehicle(_shown_index)
 
 
-## "+": the browser chooses a vehicle to go after the selected one
+func _on_vehicle_viewer_coupling_change_requested() -> void:
+    change_coupling(_shown_index)
+
+
+## The viewer's coupling button: how the vehicle at `index` couples to the next one
+func _show_coupling(index: int) -> void:
+    %VehicleViewer.set_coupling(tr(COUPLING_MODE_NAMES[_members[index].coupling_mode]), index < _members.size() - 1)
+
+
+## The joint between two tiles, or the viewer's button: the vehicle at `index` couples to the next one
+## by the next coupling mode, the last mode followed by the first - the trainset is loaded so
+## (SceneryContentNode.trainset_override)
+func change_coupling(index: int) -> void:
+    if index < 0 or index >= _members.size() - 1:
+        return
+    var modes: Array = COUPLING_MODE_NAMES.keys()
+    var member: TrainsetMemberData = _members[index]
+    member.coupling_mode = modes[(modes.find(member.coupling_mode) + 1) % modes.size()]
+    %TrainsetGrid.set_tile_joint(
+            index, COUPLING_MODE_ICONS[member.coupling_mode], tr(COUPLING_MODE_NAMES[member.coupling_mode]))
+    _show_trainset_changes()
+    if index == _shown_index:
+        _show_coupling(index)
+
+
+## "+": the browser chooses a vehicle to go at the end of the trainset
 func open_vehicle_browser_to_add() -> void:
     _vehicle_choice = VehicleChoice.ADD
     %VehicleBrowser.open()
@@ -583,7 +642,7 @@ func _on_vehicle_browser_vehicle_chosen(data_path: String, file_name: String, sk
 func change_vehicle(chosen: VehicleData) -> void:
     if _changed_index < 0:
         return
-    var vehicle: VehicleData = _vehicles[_changed_index]
+    var vehicle: VehicleData = _members[_changed_index].vehicle
     vehicle.vehicle_provider = chosen.vehicle_provider
     vehicle.vehicle = chosen.vehicle
     vehicle.livery = chosen.livery
@@ -592,10 +651,18 @@ func change_vehicle(chosen: VehicleData) -> void:
         %VehicleViewer.show_vehicle(vehicle as MaszynaVehicleData)
 
 
-## `chosen` after the selected vehicle, with nobody aboard and no name of the scenery
+## `chosen` at the end of the trainset, with nobody aboard, no name of the scenery and no place in
+## the declared trainset
 func add_vehicle(chosen: VehicleData) -> void:
-    var index: int = %TrainsetGrid.get_selected() + 1
-    _vehicles.insert(index, chosen)
+    var index: int = _members.size()
+    var member: TrainsetMemberData = TrainsetMemberData.new()
+    member.vehicle = chosen
+    member.coupling_mode = RailVehicleController.COUPLING_MODE_FULL
+    # the joint it makes - the last vehicle's to it, none before - couples fully until the player
+    # says otherwise
+    if index > 0:
+        _members[index - 1].coupling_mode = RailVehicleController.COUPLING_MODE_FULL
+    _members.insert(index, member)
     if _shown_index >= index:
         _shown_index += 1
     _show_vehicles(index)
@@ -606,20 +673,20 @@ func add_vehicle(chosen: VehicleData) -> void:
 func remove_vehicle(index: int) -> void:
     if index < 0 or not _is_removable(index):
         return
-    _vehicles.remove_at(index)
+    _members.remove_at(index)
     if index == _shown_index:
         %VehicleViewer.close()
     elif _shown_index > index:
         _shown_index -= 1
-    _show_vehicles(mini(index, _vehicles.size() - 1))
+    _show_vehicles(mini(index, _members.size() - 1))
 
 
 ## Ctrl+R or the tile's button: the vehicle stands the other way round, and its side view with it
 func reverse_vehicle(index: int) -> void:
     if index < 0:
         return
-    var reversed: bool = not _vehicles[index].direction == TrackServer.DIRECTION_REVERSED
-    _vehicles[index].direction = TrackServer.DIRECTION_REVERSED if reversed else TrackServer.DIRECTION_NORMAL
+    var reversed: bool = not _members[index].direction == TrackServer.DIRECTION_REVERSED
+    _members[index].direction = TrackServer.DIRECTION_REVERSED if reversed else TrackServer.DIRECTION_NORMAL
     %TrainsetGrid.set_tile_flipped(index, reversed)
     _show_trainset_changes()
 
@@ -636,11 +703,11 @@ func move_vehicle_right(index: int) -> void:
 ## The vehicle at `from` goes to the place `to` - a key, or a tile dragged onto another - and the
 ## ones between close up; the open one stays open wherever it went
 func move_vehicle(from: int, to: int) -> void:
-    if from < 0 or to < 0 or to >= _vehicles.size() or from == to:
+    if from < 0 or to < 0 or to >= _members.size() or from == to:
         return
-    var shown: VehicleData = _vehicles[_shown_index] if _shown_index >= 0 else null
-    _vehicles.insert(to, _vehicles.pop_at(from))
-    _shown_index = _vehicles.find(shown) if shown else -1
+    var shown: TrainsetMemberData = _members[_shown_index] if _shown_index >= 0 else null
+    _members.insert(to, _members.pop_at(from))
+    _shown_index = _members.find(shown) if shown else -1
     # the tile moves as it is - a rebuilt row would render and scroll anew
     %TrainsetGrid.move_tile(from, to)
     %TrainsetGrid.select(to)
@@ -652,7 +719,7 @@ func _on_vehicle_viewer_skin_applied(skin: String) -> void:
     _ui_sounds.play(&"apply_skin")
     if _shown_index < 0:
         return
-    _vehicles[_shown_index].livery = skin
+    _members[_shown_index].vehicle.livery = skin
     %TrainsetGrid.reload_tile(_shown_index, skin)
     _show_trainset_changes()
 
@@ -667,8 +734,9 @@ func _on_trainset_grid_item_activated() -> void:
         _shown_index = index
         %TrainsetGrid.set_marked(index)
         _fade_list_panel(0.0)
-        %VehicleViewer.show_vehicle(_vehicles[index] as MaszynaVehicleData)
+        %VehicleViewer.show_vehicle(_members[index].vehicle as MaszynaVehicleData)
         %VehicleViewer.set_removable(_is_removable(index))
+        _show_coupling(index)
     activate_section(Section.SKINS)
 
 
@@ -713,7 +781,7 @@ static func _vehicle_name(vehicle: VehicleData) -> String:
 
 ## Its vehicles as arranged, and whether that is not as the scenario gives them
 func _format_trainset_note(trainset: TrainsetData) -> String:
-    var arranged: Array = _arranged_trainsets.get(_get_trainset_key(trainset), trainset.vehicles)
+    var arranged: Array = _arranged_trainsets.get(_get_trainset_key(trainset), trainset.members)
     var note: String = "%d POJAZDÓW" % arranged.size()
     if _is_trainset_modified(trainset):
         note += " · " + tr("modified").to_upper()

@@ -26,6 +26,11 @@ extends Control
 ## (TAA while the upscaling is FSR 2.2). "restart_required": true marks one that takes effect only after
 ## the game restarts - a change of it lights the note above the buttons, and Save asks whether to
 ## restart.
+##
+## A section with an "input_group" in place of its "settings" holds the keys of the input actions
+## of that group (InputBindings.GROUPS), a row each (setting_input.gd): the player's binding of an
+## action is in effect at once, saved and discarded as any setting. A keyboard preset chosen above
+## any key section sets the keys of every key section at once.
 
 const DEFINITION: JSON = preload("settings.json")
 const PAGE: PackedScene = preload("settings_page.tscn")
@@ -36,6 +41,10 @@ const RESOLUTION: PackedScene = preload("setting_resolution.tscn")
 const FOLDER: PackedScene = preload("setting_folder.tscn")
 const GAME_DIR: PackedScene = preload("setting_game_dir.tscn")
 const TEXT: PackedScene = preload("setting_text.tscn")
+const INPUT: PackedScene = preload("setting_input.tscn")
+## Above a key section's rows: the search of its actions and the titles of their keyboard's and
+## pad's columns
+const INPUT_HEADER: PackedScene = preload("setting_input_header.tscn")
 const STORES: Dictionary[String, SettingRow.Store] = {
     "project": SettingRow.Store.PROJECT,
     "user": SettingRow.Store.USER,
@@ -62,12 +71,14 @@ const WINDOW_RATIO: float = 0.76
 ## The bank the screen and its pages play from
 @export var sounds: SfxBank = null
 ## The window the settings stand in, a window of its own so the keys stay in it - none for a panel
-## beside the game, which leaves the game its keys
+## beside the game, which keeps the keys from the game itself (settings_panel.gd)
 @export var window: UIWindow = null
 
 ## One page per section, in the order of the sidebar, and the sections' titles in the same order
 var _pages: Array[SettingsPage] = []
 var _titles: PackedStringArray = []
+## The rows of every key section - a keyboard preset sets them all
+var _input_rows: Array[SettingInput] = []
 ## Page the sidebar has selected
 var _page: int = 0
 var _ui_sounds: SfxPlayer
@@ -81,17 +92,39 @@ func _ready() -> void:
     UserSettings.config_changed.connect(_update_restart_note)
     _apply_graphics()
     var notes: PackedStringArray = []
+    # a key row names the section of an action in conflict with its own, any section's
+    var group_titles: Dictionary[String, String] = {}
     for section: Dictionary in DEFINITION.data["sections"]:
-        var settings: Array = section["settings"]
+        if section.has("input_group"):
+            group_titles[section["input_group"]] = section["title"]
+    for section: Dictionary in DEFINITION.data["sections"]:
+        var settings: Array = section.get("settings", [])
+        # a key section: a row per action of the group, its value the action's events
+        if section.has("input_group"):
+            for action: String in InputBindings.get_actions(section["input_group"]):
+                settings.append({
+                    "title": action.capitalize(),
+                    "store": "user",
+                    "section": InputBindings.SETTINGS_SECTION,
+                    "key": action,
+                    "type": "input",
+                    "default": InputBindings.get_default_events(action),
+                })
         var page: SettingsPage = PAGE.instantiate()
         page.sounds = sounds
         page.visible = false
+        if section.has("input_group"):
+            var header: SettingInputHeader = INPUT_HEADER.instantiate()
+            header.search_changed.connect(page.filter_rows)
+            header.keyboard_preset_chosen.connect(apply_keyboard_preset)
+            page.add_header(header)
         # a setting names the ones it excludes or depends on by their key; the rows are known once
         # all are built
         var rows: Dictionary[String, SettingRow] = {}
         for setting: Dictionary in settings:
             var row: SettingRow = (
                 TOGGLE if setting["type"] == "bool"
+                else INPUT if setting["type"] == "input"
                 else SLIDER if setting.get("hint") == "range"
                 else RESOLUTION if setting.get("hint") == "resolution"
                 else FOLDER if setting.get("hint") == "folder"
@@ -113,6 +146,9 @@ func _ready() -> void:
             rows[row.key] = row
             if row is SettingGameDir:
                 row.game_dir_chosen.connect(choose_game_dir.bind(row))
+            if row is SettingInput:
+                row.group_titles = group_titles
+                _input_rows.append(row)
         for setting: Dictionary in settings:
             var row: SettingRow = rows[setting["key"]]
             for excluded: String in setting.get("excludes", []):
@@ -181,6 +217,17 @@ func restore_defaults() -> void:
     _ui_sounds.play(&"list_item_click")
     for page: SettingsPage in _pages:
         page.restore_defaults()
+
+
+## The keys of every key section set for a keyboard - an InputBindings.KeyboardPreset - in effect at
+## once like any change, applied and drawn once for all the rows; the pad's bindings stay
+func apply_keyboard_preset(preset: int) -> void:
+    _ui_sounds.play(&"list_item_click")
+    InputBindings.change_at_once(
+        func() -> void:
+            for row: SettingInput in _input_rows:
+                row.apply_keyboard_preset(preset)
+    )
 
 
 ## "Discard changes": the changes go once the player confirms it

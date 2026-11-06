@@ -2140,3 +2140,54 @@ msgstr "A pálya nem minden fájlja található meg: a forgatókönyv nem felté
 
 msgid "Not all elements may be displayed correctly."
 msgstr "Nem minden elem jelenhet meg megfelelően."
+
+msgid "Vehicle keys"
+msgstr "Jármű billentyűi"
+
+msgid "Player keys"
+msgstr "Játékos billentyűi"
+
+msgid "Interface keys"
+msgstr "Felület billentyűi"
+
+msgid "Press a key"
+msgstr "Nyomj meg egy billentyűt"
+
+msgid "Press a pad button"
+msgstr "Nyomj meg egy gombot a kontrolleren"
+
+msgid "Search action"
+msgstr "Művelet keresése"
+
+msgid "Remove binding"
+msgstr "Hozzárendelés törlése"
+
+msgid "Keyboard"
+msgstr "Billentyűzet"
+
+msgid "Pad"
+msgstr "Kontroller"
+
+msgid "Not bound"
+msgstr "Nincs hozzárendelve"
+
+msgid "Conflict with: %s"
+msgstr "Ütközés: %s"
+
+msgid "Keyboard 100%"
+msgstr "Billentyűzet 100%"
+
+msgid "Keyboard 60%"
+msgstr "Billentyűzet 60%"
+
+msgid "Keys of a full keyboard, with the numpad"
+msgstr "Teljes billentyűzet billentyűi, numerikus billentyűzettel"
+
+msgid "Keys of a 60% or a laptop's keyboard: the numpad's keys under Left Alt, where a laptop's built-in keypad has them"
+msgstr "60%-os vagy laptop-billentyűzet billentyűi: a numerikus billentyűk a bal Alttal, ahol a laptop beépített numerikus billentyűzete tartja őket"
+
+msgid "Menu"
+msgstr "Menü"
+
+msgid "Heating Toggle"
+msgstr "Fűtés"

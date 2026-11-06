@@ -1,0 +1,105 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://settings/setting_input_header.gd" id="1_header"]
+[ext_resource type="PackedScene" path="res://ui/ui_search_input.tscn" id="2_search"]
+[ext_resource type="Script" path="res://ui/ui_button.gd" id="3_button"]
+
+[node name="SettingInputHeader" type="VBoxContainer"]
+mouse_filter = 2
+theme_override_constants/separation = 6
+script = ExtResource("1_header")
+
+[node name="Toolbar" type="HBoxContainer" parent="."]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 8
+
+[node name="Search" parent="Toolbar" instance=ExtResource("2_search")]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+placeholder_text = "Search action"
+
+[node name="FullKeyboard" type="Button" parent="Toolbar"]
+layout_mode = 2
+tooltip_text = "Keys of a full keyboard, with the numpad"
+mouse_default_cursor_shape = 2
+text = "Keyboard 100%"
+script = ExtResource("3_button")
+
+[node name="CompactKeyboard" type="Button" parent="Toolbar"]
+layout_mode = 2
+tooltip_text = "Keys of a 60% or a laptop's keyboard: the numpad's keys under Left Alt, where a laptop's built-in keypad has them"
+mouse_default_cursor_shape = 2
+text = "Keyboard 60%"
+script = ExtResource("3_button")
+
+[node name="Columns" type="PanelContainer" parent="."]
+self_modulate = Color(1, 1, 1, 0)
+layout_mode = 2
+mouse_filter = 2
+theme_type_variation = &"SettingItem"
+
+[node name="Line" type="HBoxContainer" parent="Columns"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 8
+
+[node name="TitleColumn" type="Control" parent="Columns/Line"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_stretch_ratio = 1.5
+mouse_filter = 2
+
+[node name="KeyboardSlot" type="HBoxContainer" parent="Columns/Line"]
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 2
+theme_override_constants/separation = 2
+
+[node name="Keyboard" type="Label" parent="Columns/Line/KeyboardSlot"]
+modulate = Color(1, 1, 1, 0.7)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 14
+text = "Keyboard"
+horizontal_alignment = 1
+text_overrun_behavior = 3
+
+[node name="ClearColumn" type="Control" parent="Columns/Line/KeyboardSlot"]
+custom_minimum_size = Vector2(24, 0)
+layout_mode = 2
+mouse_filter = 2
+
+[node name="PadSlot" type="HBoxContainer" parent="Columns/Line"]
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 2
+theme_override_constants/separation = 2
+
+[node name="Pad" type="Label" parent="Columns/Line/PadSlot"]
+modulate = Color(1, 1, 1, 0.7)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 14
+text = "Pad"
+horizontal_alignment = 1
+text_overrun_behavior = 3
+
+[node name="ClearColumn" type="Control" parent="Columns/Line/PadSlot"]
+custom_minimum_size = Vector2(24, 0)
+layout_mode = 2
+mouse_filter = 2
+
+[node name="UnitColumn" type="Control" parent="Columns/Line"]
+custom_minimum_size = Vector2(24, 0)
+layout_mode = 2
+mouse_filter = 2
+
+[node name="ResetColumn" type="Control" parent="Columns/Line"]
+custom_minimum_size = Vector2(24, 0)
+layout_mode = 2
+mouse_filter = 2
+
+[connection signal="pressed" from="Toolbar/FullKeyboard" to="." method="choose_keyboard_preset" binds= [0]]
+[connection signal="pressed" from="Toolbar/CompactKeyboard" to="." method="choose_keyboard_preset" binds= [1]]

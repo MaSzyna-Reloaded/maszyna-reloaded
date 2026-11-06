@@ -32,9 +32,16 @@ const CHOSEN_VARIATIONS: Dictionary[Intent, StringName] = {
     Intent.DANGER: &"UIButtonDangerChosen",
 }
 
-@export var intent: Intent = Intent.DEFAULT
+@export var intent: Intent = Intent.DEFAULT:
+    set = set_intent
 
 var _chosen: bool = false
+
+
+## Another colour for what it does now - a settings key row's binding in conflict turns orange
+func set_intent(p_intent: Intent) -> void:
+    intent = p_intent
+    _apply_look()
 
 
 func _ready() -> void:

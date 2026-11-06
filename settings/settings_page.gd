@@ -38,6 +38,25 @@ func add_row(row: SettingRow) -> void:
         _selected = row
 
 
+## A line above the rows that the keyboard does not walk - the key sections' search and column
+## titles
+func add_header(header: Control) -> void:
+    %Content.add_child(header)
+    %Content.move_child(header, 0)
+
+
+## Only the rows whose name holds `text` in any language (SettingRow.matches()) are shown, and
+## "Advanced" only with one of its own; the keyboard goes to the first one shown when its row went
+func filter_rows(text: String) -> void:
+    for row: SettingRow in _rows + _advanced_rows:
+        row.visible = row.matches(text)
+    if _advanced_rows:
+        %Advanced.visible = _advanced_rows.any(func(row: SettingRow) -> bool: return row.visible)
+    var items: Array[Control] = _items()
+    if items and not _selected in items:
+        _select(items[0])
+
+
 ## A row under "Advanced", which shows from the first one on
 func add_advanced_row(row: SettingRow) -> void:
     row.advanced = true
@@ -77,9 +96,10 @@ func _process_dirty() -> void:
 
 
 ## A row is being edited - its keys are its own, Tab included, which goes between its control and
-## its value field (the screen's Tab walks the sections only while no row is edited)
+## its value field, or is bound by a row waiting for a key (the screen's Tab walks the sections only
+## while no row is edited)
 func is_editing() -> bool:
-    return _editing
+    return _editing or (_selected is SettingRow and (_selected as SettingRow).is_taking_keys())
 
 
 func _input(event: InputEvent) -> void:
@@ -142,6 +162,14 @@ func _input(event: InputEvent) -> void:
         get_viewport().set_input_as_handled()
         return
     var items: Array[Control] = _items()
+    # nothing found by the search: down leaves the page, the rest is the section's
+    if items.is_empty():
+        if event.is_action_pressed("menu_down", true, true):
+            navigate_down.emit()
+            get_viewport().set_input_as_handled()
+        else:
+            super(event)
+        return
     var at: int = items.find(_selected)
     if event.is_action_pressed("menu_down", true, true):
         if at == items.size() - 1:
@@ -176,13 +204,18 @@ func _gui_input(event: InputEvent) -> void:
 
 
 ## What the keyboard walks, top to bottom: the rows, the advanced title, the advanced rows unfolded
+## - those the search shows (filter_rows())
 func _items() -> Array[Control]:
     var items: Array[Control] = []
-    items.append_array(_rows)
-    if _advanced_rows:
+    for row: SettingRow in _rows:
+        if row.visible:
+            items.append(row)
+    if %Advanced.visible:
         items.append(%Advanced)
         if not %Advanced.folded:
-            items.append_array(_advanced_rows)
+            for row: SettingRow in _advanced_rows:
+                if row.visible:
+                    items.append(row)
     return items
 
 

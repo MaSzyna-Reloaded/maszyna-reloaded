@@ -30,6 +30,11 @@ func show_refresh_button() -> void:
     %RefreshButton.visible = true
 
 
+## The keyboard types into the field now
+func has_typing_focus() -> bool:
+    return %Field.has_focus()
+
+
 ## The keyboard types into the field
 func grab_typing_focus() -> void:
     %Field.grab_focus()

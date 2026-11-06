@@ -2140,3 +2140,54 @@ msgstr "未找到场景的全部文件：场景可能无法正常运行。"
 
 msgid "Not all elements may be displayed correctly."
 msgstr "并非所有元素都能正确显示。"
+
+msgid "Vehicle keys"
+msgstr "车辆按键"
+
+msgid "Player keys"
+msgstr "玩家按键"
+
+msgid "Interface keys"
+msgstr "界面按键"
+
+msgid "Press a key"
+msgstr "请按一个键"
+
+msgid "Press a pad button"
+msgstr "请按手柄按钮"
+
+msgid "Search action"
+msgstr "搜索操作"
+
+msgid "Remove binding"
+msgstr "移除绑定"
+
+msgid "Keyboard"
+msgstr "键盘"
+
+msgid "Pad"
+msgstr "手柄"
+
+msgid "Not bound"
+msgstr "未绑定"
+
+msgid "Conflict with: %s"
+msgstr "冲突：%s"
+
+msgid "Keyboard 100%"
+msgstr "键盘 100%"
+
+msgid "Keyboard 60%"
+msgstr "键盘 60%"
+
+msgid "Keys of a full keyboard, with the numpad"
+msgstr "全尺寸键盘的按键，含数字小键盘"
+
+msgid "Keys of a 60% or a laptop's keyboard: the numpad's keys under Left Alt, where a laptop's built-in keypad has them"
+msgstr "60% 或笔记本键盘的按键：数字小键盘的按键改为按住左 Alt，位置与笔记本内置小键盘相同"
+
+msgid "Menu"
+msgstr "菜单"
+
+msgid "Heating Toggle"
+msgstr "供暖"

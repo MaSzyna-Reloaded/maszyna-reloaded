@@ -38,7 +38,7 @@ change; it keeps no state of its own about the simulation.
 | Logs | `hud/logs_panel.gd` | The game's logs, a tab per logger of `GameLog` |
 | Simulation speed | `hud/simulation_speed_panel.gd` | Slowed, paused, or the wall clock's times one to thirty |
 | Script editor | `hud/script_editor_panel.gd` | A Lua editor for the scenario being played |
-| Help | `hud/help_panel.gd` | Every input action of the game with its key |
+| Help | `hud/help_panel.gd` | Every input action of the game with its key, as the player bound it (Settings, the key sections) |
 
 The movable cards (timetable, scenario, vehicle card, selector, help, logs, script editor) are
 dragged and resized with libmaszyna's `WindowMoveHandle` and `WindowResizeCorner`.

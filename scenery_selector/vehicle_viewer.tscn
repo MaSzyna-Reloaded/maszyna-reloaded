@@ -133,6 +133,14 @@ icon = ExtResource("9_flip")
 icon_alignment = 1
 script = ExtResource("7_button")
 
+[node name="CouplingButton" type="Button" parent="VBoxContainer/ModelArea/VehicleActions/VehicleActionButtons"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(160, 44)
+layout_mode = 2
+mouse_default_cursor_shape = 2
+tooltip_text = "Coupling with the next vehicle"
+script = ExtResource("7_button")
+
 [node name="ChangeButton" type="Button" parent="VBoxContainer/ModelArea/VehicleActions/VehicleActionButtons"]
 custom_minimum_size = Vector2(160, 44)
 layout_mode = 2
@@ -247,3 +255,4 @@ text = "←"
 [connection signal="pressed" from="VBoxContainer/ModelArea/VehicleActions/VehicleActionButtons/ChangeButton" to="." method="emit_signal" binds= ["change_requested"]]
 [connection signal="pressed" from="VBoxContainer/ModelArea/VehicleActions/VehicleActionButtons/RemoveButton" to="." method="emit_signal" binds= ["remove_requested"]]
 [connection signal="pressed" from="VBoxContainer/ModelArea/VehicleActions/VehicleActionButtons/ReverseButton" to="." method="emit_signal" binds= ["reverse_requested"]]
+[connection signal="pressed" from="VBoxContainer/ModelArea/VehicleActions/VehicleActionButtons/CouplingButton" to="." method="emit_signal" binds= ["coupling_change_requested"]]

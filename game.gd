@@ -70,7 +70,7 @@ const GAME_LOG_LEVELS: Dictionary[String, GameLog.LogLevel] = {
 }
 
 ## The trainsets as the scenery declares them - a start without the selector arranges none
-const DECLARED_TRAINSET: Array[VehicleData] = []
+const DECLARED_TRAINSET: Array[TrainsetMemberData] = []
 
 ## A scenery started at once, without the selector - as "-s" on the command line does
 @export var scenery: String = ""
@@ -146,7 +146,7 @@ func _find_scenery(id: String) -> SceneryInfo:
 ## own driver) - chosen in the selector, or given on the command line; trainset is the player's
 ## trainset as the selector arranged it (SceneryContentNode.trainset_override), empty for the
 ## declared one
-func start_scenery(info: SceneryInfo, vehicle_id: String, trainset: Array[VehicleData]) -> void:
+func start_scenery(info: SceneryInfo, vehicle_id: String, trainset: Array[TrainsetMemberData]) -> void:
     # a name on the command line no provider has: the selector instead
     if not info:
         $ScenerySelectorScreen.open()

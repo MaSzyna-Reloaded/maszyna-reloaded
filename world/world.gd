@@ -26,7 +26,7 @@ var _start_vehicle_id: String = ""
 ## Loads the scenery `info` by its provider, the player's trainset as arranged
 ## (SceneryContentNode.trainset_override), and starts its scenario and the player in `vehicle_id` -
 ## done once the player stands there with its camera (Player.camera_changed)
-func load_scenery(info: SceneryInfo, trainset: Array[VehicleData], vehicle_id: String = "") -> void:
+func load_scenery(info: SceneryInfo, trainset: Array[TrainsetMemberData], vehicle_id: String = "") -> void:
     var scenery: SceneryContentNode = _open_scenery(info)
     scenery.trainset_override.assign(trainset)
     PlayerServer.player_stop()

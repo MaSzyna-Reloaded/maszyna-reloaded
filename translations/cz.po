@@ -2191,3 +2191,21 @@ msgstr "Nabídka"
 
 msgid "Heating Toggle"
 msgstr "Topení"
+
+msgid "Coupling with the next vehicle"
+msgstr ""
+
+msgid "Not coupled"
+msgstr ""
+
+msgid "Coupler"
+msgstr ""
+
+msgid "Coupler and brake"
+msgstr ""
+
+msgid "Fully coupled"
+msgstr ""
+
+msgid "Permanently coupled"
+msgstr ""

@@ -13,3 +13,10 @@ unique_name_in_owner = true
 layout_mode = 2
 theme_type_variation = &"KeyCapLabel"
 horizontal_alignment = 1
+
+[node name="Icon" type="TextureRect" parent="."]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+mouse_filter = 2
+stretch_mode = 5

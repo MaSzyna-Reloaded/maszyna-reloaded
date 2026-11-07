@@ -18,6 +18,9 @@ enum Store {
 
 ## UserSettings.hpp PROJECT_SETTINGS_SECTION
 const PROJECT_SETTINGS_SECTION: String = "project_settings"
+## The project's translations - the game's and libreloaded's, every language - which libreloaded's
+## ReloadedTranslationServer merges (ReloadedTranslationServer.hpp, TRANSLATIONS_SETTING)
+const TRANSLATIONS_SETTING: String = "reloaded/locale/translations"
 
 ## Look of the row, by how lit it is - selector_theme.tres
 const ITEM_IDLE: StringName = &"SettingItem"
@@ -73,6 +76,9 @@ var _hovered: bool = false
 ## as a change, which is not the player's
 var _showing: bool = false
 
+## Every translation the game has, read once by the first search (matches())
+static var _translations: Array[Translation] = []
+
 
 func _ready() -> void:
     %Title.text = title
@@ -119,6 +125,11 @@ func is_edited_by_steps() -> bool:
     return true
 
 
+## The row takes every key itself, Tab included - it waits for a key to bind (SettingInput)
+func is_taking_keys() -> bool:
+    return false
+
+
 ## Puts the stored value back on the control - after a revert, and whenever the screen opens
 func revert() -> void:
     _showing = true
@@ -135,6 +146,23 @@ func remember_value() -> void:
 ## A change of a setting that takes effect after a restart, made since the settings were opened
 func needs_restart() -> bool:
     return restart_required and not _read() == _opened_value
+
+
+## Whether the setting's name holds `text`, case aside, in any language the game has - the one
+## shown, English, or another - so a name is found whatever language the player thinks of it in
+func matches(text: String) -> bool:
+    var needle: String = text.strip_edges().to_lower()
+    if needle.is_empty() or title.to_lower().contains(needle):
+        return true
+    if _translations.is_empty():
+        for path: String in ProjectSettings.get_setting(TRANSLATIONS_SETTING, PackedStringArray()):
+            var translation: Translation = load(path) as Translation
+            if translation:
+                _translations.append(translation)
+    return _translations.any(
+        func(translation: Translation) -> bool:
+            return String(translation.get_message(title)).to_lower().contains(needle)
+    )
 
 
 ## Whether the setting is on - true, or a choice or a number other than 0

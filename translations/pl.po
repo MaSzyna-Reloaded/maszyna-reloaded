@@ -2182,3 +2182,54 @@ msgstr "Nie wszystkie pliki scenerii zostały znalezione: scenariusz może nie d
 
 msgid "Not all elements may be displayed correctly."
 msgstr "Nie wszystkie elementy mogą prawidłowo się wyświetlać."
+
+msgid "Vehicle keys"
+msgstr "Klawisze pojazdu"
+
+msgid "Player keys"
+msgstr "Klawisze gracza"
+
+msgid "Interface keys"
+msgstr "Klawisze interfejsu"
+
+msgid "Press a key"
+msgstr "Naciśnij klawisz"
+
+msgid "Press a pad button"
+msgstr "Naciśnij przycisk pada"
+
+msgid "Search action"
+msgstr "Szukaj akcji"
+
+msgid "Remove binding"
+msgstr "Usuń przypisanie"
+
+msgid "Keyboard"
+msgstr "Klawiatura"
+
+msgid "Pad"
+msgstr "Pad"
+
+msgid "Not bound"
+msgstr "Nieprzypisany"
+
+msgid "Conflict with: %s"
+msgstr "Konflikt z: %s"
+
+msgid "Keyboard 100%"
+msgstr "Klawiatura 100%"
+
+msgid "Keyboard 60%"
+msgstr "Klawiatura 60%"
+
+msgid "Keys of a full keyboard, with the numpad"
+msgstr "Klawisze pełnej klawiatury, z klawiaturą numeryczną"
+
+msgid "Keys of a 60% or a laptop's keyboard: the numpad's keys under Left Alt, where a laptop's built-in keypad has them"
+msgstr "Klawisze klawiatury 60% lub laptopa: klawisze numeryczne pod lewym Altem, tam gdzie ma je wbudowana klawiatura numeryczna laptopa"
+
+msgid "Menu"
+msgstr "Menu"
+
+msgid "Heating Toggle"
+msgstr "Ogrzewanie"

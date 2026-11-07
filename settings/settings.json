@@ -1402,6 +1402,18 @@
             ]
         },
         {
+            "title": "Vehicle keys",
+            "input_group": "Vehicle"
+        },
+        {
+            "title": "Player keys",
+            "input_group": "Player"
+        },
+        {
+            "title": "Interface keys",
+            "input_group": "UI"
+        },
+        {
             "title": "Debug",
             "settings": [
                 {

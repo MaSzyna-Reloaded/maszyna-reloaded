@@ -2182,3 +2182,54 @@ msgstr ""
 
 msgid "Not all elements may be displayed correctly."
 msgstr ""
+
+msgid "Vehicle keys"
+msgstr ""
+
+msgid "Player keys"
+msgstr ""
+
+msgid "Interface keys"
+msgstr ""
+
+msgid "Press a key"
+msgstr ""
+
+msgid "Press a pad button"
+msgstr ""
+
+msgid "Search action"
+msgstr ""
+
+msgid "Remove binding"
+msgstr ""
+
+msgid "Keyboard"
+msgstr ""
+
+msgid "Pad"
+msgstr ""
+
+msgid "Not bound"
+msgstr ""
+
+msgid "Conflict with: %s"
+msgstr ""
+
+msgid "Keyboard 100%"
+msgstr ""
+
+msgid "Keyboard 60%"
+msgstr ""
+
+msgid "Keys of a full keyboard, with the numpad"
+msgstr ""
+
+msgid "Keys of a 60% or a laptop's keyboard: the numpad's keys under Left Alt, where a laptop's built-in keypad has them"
+msgstr ""
+
+msgid "Menu"
+msgstr ""
+
+msgid "Heating Toggle"
+msgstr ""

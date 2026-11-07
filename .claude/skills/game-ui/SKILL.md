@@ -39,6 +39,7 @@ and take its look, size, order and keys:
 | A text or a number the player types | `UITextField` (`ui/ui_text_field.gd` on a `LineEdit`), framed like the search field; the only control that takes Godot's focus - a section that walks keys leaves them alone while a field has it |
 | One of a few named values | `UISelect` (`ui/ui_select.gd` on an `OptionButton`; its list takes the look from it) |
 | A floating tile over the game | `UIChip` (`ui/ui_chip.gd` on a `PanelContainer`, or a chip's own script `extends UIChip` calling `super()` in `_ready()`): `CARD` framed (`set_hovered()` lights it under the mouse), `TEXT` faint background with contrast (`DrivingAid.apply_style()` picks it from `hud/driving_aid/style`). It lays only its panel style on itself, so the theme its content reads stays. Driving aid tiles, simulation speed, streaming spinner, vehicle chips, the F3 frame times |
+| A pad's button or axis shown to the player | `PadIcon` (`ui/pad_icon.gd`, a `Texture2D`): drawn as on the pad last used (`InputBindings.get_pad_layout()`), never its name as text where an icon fits. Settings' key rows, the help, the hints (`KeyCap`) |
 | A keyboard-navigable block | `ui/focus_section.gd` (`FocusSection`) |
 
 Each control component loads `ui/ui_theme.tres` itself (a container component - `UIChip` - lays only its own

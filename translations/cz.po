@@ -2140,3 +2140,54 @@ msgstr "Nebyly nalezeny všechny soubory scenérie: scénář nemusí fungovat s
 
 msgid "Not all elements may be displayed correctly."
 msgstr "Ne všechny prvky se mohou zobrazovat správně."
+
+msgid "Vehicle keys"
+msgstr "Klávesy vozidla"
+
+msgid "Player keys"
+msgstr "Klávesy hráče"
+
+msgid "Interface keys"
+msgstr "Klávesy rozhraní"
+
+msgid "Press a key"
+msgstr "Stiskněte klávesu"
+
+msgid "Press a pad button"
+msgstr "Stiskněte tlačítko ovladače"
+
+msgid "Search action"
+msgstr "Hledat akci"
+
+msgid "Remove binding"
+msgstr "Odebrat přiřazení"
+
+msgid "Keyboard"
+msgstr "Klávesnice"
+
+msgid "Pad"
+msgstr "Ovladač"
+
+msgid "Not bound"
+msgstr "Nepřiřazeno"
+
+msgid "Conflict with: %s"
+msgstr "Konflikt s: %s"
+
+msgid "Keyboard 100%"
+msgstr "Klávesnice 100%"
+
+msgid "Keyboard 60%"
+msgstr "Klávesnice 60%"
+
+msgid "Keys of a full keyboard, with the numpad"
+msgstr "Klávesy plné klávesnice s numerickou částí"
+
+msgid "Keys of a 60% or a laptop's keyboard: the numpad's keys under Left Alt, where a laptop's built-in keypad has them"
+msgstr "Klávesy 60% klávesnice nebo notebooku: numerické klávesy pod levým Altem, kde je má vestavěná numerická klávesnice notebooku"
+
+msgid "Menu"
+msgstr "Nabídka"
+
+msgid "Heating Toggle"
+msgstr "Topení"

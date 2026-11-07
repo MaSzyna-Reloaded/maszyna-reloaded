@@ -175,6 +175,9 @@ func start_scenery(info: SceneryInfo, vehicle_id: String, trainset: Array[Vehicl
     _world.load_files_parsed.connect($LoadingScreen.set_files)
     _world.scenery_loaded.connect(_on_scenery_loaded)
     add_child(_world)
+    # before the settings panel: the root's children take the input from the last one, so the panel
+    # keeps the keys from the world while it is open (settings_panel.gd)
+    move_child(_world, $SettingsPanel.get_index())
     $GameHud.attach_environment(_world.get_environment())
     var log_files: PackedStringArray = []
     if ProjectSettings.get_setting(FILE_LOGGING_SETTING, false):

@@ -21,6 +21,12 @@ func set_windows_shown(_shown: bool) -> void:
     pass
 
 
+## The HUD's diagnostic windows, as the HUD starts - for a window of its own in place of one of
+## them (DebugHud.window_replace())
+func attach_debug_hud(_debug_hud: DebugHud) -> void:
+    pass
+
+
 ## The world being shown, once its scenery has loaded
 func attach_world(_world: SceneryWorld) -> void:
     pass

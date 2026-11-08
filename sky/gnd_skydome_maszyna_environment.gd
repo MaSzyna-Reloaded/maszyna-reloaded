@@ -2,8 +2,9 @@
 extends SkyEnvironment
 class_name GndSkydomeMaszynaEnvironment
 
-## The environment drawn by gnd-skydome (Skydome) with gnd-weather (WeatherNode) - rain, clouds,
-## wind and lightning of their own.
+## The environment drawn by gnd-skydome (Skydome) with gnd-weather (WeatherNode) - rain and snow,
+## clouds, wind and lightning of their own, and the ground's snow and wet over the simulation's
+## time.
 
 ## Skydome's sunshafts, set by the player's Graphics settings (SUNSHAFT_SETTINGS_PREFIX + property)
 ## over the Skydome node's own, and taken whenever they change
@@ -14,9 +15,10 @@ const SUNSHAFT_PROPERTIES: Array[StringName] = [
     &"sunshafts_max_radius", &"sunshafts_cloud_occlusion", &"sunshafts_cloud_falloff",
     &"sunshafts_perf_sample_count",
 ]
-## No rain falls inside the vehicle the player sits in: its body, as FIZ Dimensions give it, takes
-## the precipitation away. Only the shown cab has one - a volume on every vehicle of a scenery was
-## a quarter of the frame (libmaszyna docs/findings-archive.md, 2026-10-03 hundreds of vehicles)
+## No rain nor snow falls inside the vehicle the player sits in: its body, as FIZ Dimensions give
+## it, takes the precipitation away. Only the shown cab has one - a volume on every vehicle of a
+## scenery was a quarter of the frame (libmaszyna docs/findings-archive.md, 2026-10-03 hundreds of
+## vehicles)
 const RAIN_EXCLUSION_NAME: StringName = &"RainExclusion"
 const RAIN_EXCLUSION_PRECIPITATION_DELTA: float = -1.0
 const SUN_LIGHT_NAME: StringName = &"SunLight"
@@ -50,8 +52,8 @@ const FOG_VOLUMETRIC_LENGTH_PROPERTIES: Array[StringName] = [&"day_vol_fog_lengt
 const SKYDOME_VOL_FOG_LENGTH_SHRINK: float = 0.8
 const SKYDOME_VOL_FOG_LENGTH_SHRINK_MIN: float = 0.05
 const FOG_RANGE_PROPERTIES: Array[StringName] = [&"day_fog_distance_begin", &"night_fog_distance_begin"]
-# How much of the depth fog reaches the sky follows the fog distance (FOG_SKY_HEIGHT_SETTING);
-# Skydome's own pull of it towards 1.0 with a growing fog is switched off.
+# How much of the depth fog reaches the sky follows the fog distance (SkyEnvironment.FOG_SKY_NEAR,
+# FOG_SKY_FAR); Skydome's own pull of it towards 1.0 with a growing fog is switched off.
 const FOG_SKY_AFFECT_PROPERTIES: Array[StringName] = [&"day_fog_sky_affect", &"night_fog_sky_affect"]
 # The volumetric fog is a volume right in front of the camera, so it stands in front of the sky as
 # much as in front of anything else: left out of the sky, fog lit by the headlights ends along the
@@ -74,6 +76,18 @@ const TIME_UPDATE_INTERVAL: float = 0.1
 ## the shadows flickered, by a simulated minute's step (0.25 degrees) they jumped visibly
 const LIGHT_UPDATE_STEP_SECONDS: float = 10.0
 
+## The sun's size (Skydome softens its shadows by it under an overcast: light_angular_distance) at
+## which it still glints on what shines, and from which on it does not: Godot's specular is full
+## for every normal within that angle of the sun's mirror, so the water's film (roughness 0.02) under
+## a rain's 15 degrees went white over a whole track - a sun behind the clouds has no reflection
+const SUN_GLINT_SHARP_ANGLE: float = 0.5
+const SUN_GLINT_GONE_ANGLE: float = 4.0
+## The snow a scenery of winter starts under (EnvironmentNode.winter_snow_cover) - the original's
+## winter textures are snowed in already, the weather's snow lies over them - unless the air is too
+## warm for it
+const START_SNOW_DEPTH: float = 0.1
+const START_SNOW_TEMPERATURE_MAX: float = 3.0
+
 ## The sky this environment draws with: the node keeps its look, tuned in the scene; what the
 ## environment sets as it goes (the time, the fog, the light) is set on its sky past it
 ## (SkydomeServer.skydome_set_param()), so none of it is saved with the scene. Its param_changed is
@@ -83,6 +97,8 @@ var sun_light: DirectionalLight3D
 var weather: WeatherNode
 
 var _time_update_elapsed: float = 0.0
+## The scenery's start snow is laid, once (apply_time_configuration())
+var _start_snow_laid: bool = false
 
 
 func create_sky() -> Sky:
@@ -101,6 +117,7 @@ func create_nodes(world_environment: WorldEnvironment, _sky_environment: Environ
     # the light turns by steps, the sky follows every time pushed (LIGHT_UPDATE_STEP_SECONDS)
     _set_skydome_param(&"light_update_mode", SkydomeSky.LightUpdateMode.STEPPED)
     _set_skydome_param(&"light_update_step_seconds", LIGHT_UPDATE_STEP_SECONDS)
+    _set_skydome_param(&"clouds_renderer", _create_clouds_renderer())
 
     # Weather drives Skydome clouds, wind, fog density and lightning on its own - from the generated
     # WorldEnvironment it stands in, two levels under this node
@@ -110,29 +127,113 @@ func create_nodes(world_environment: WorldEnvironment, _sky_environment: Environ
     weather.world_environment_path = NodePath("..")
     # Rain look comes from the gnd_weather/* project settings (WeatherSettings).
     weather.apply_project_settings = true
+    weather.weather_time_scale = SimulationServer.simulation_get_current_speed()
+    # the season is the weather's, by the place and the date: the scenery's materials take it from
+    # SimulationServer
+    weather.season_changed.connect(SimulationServer.season_set)
     world_environment.add_child(weather, false, Node.INTERNAL_MODE_BACK)
+    # the ground's model goes with the world the weather is in
+    if weather.is_inside_tree():
+        _set_ground_model()
+    else:
+        weather.tree_entered.connect(_set_ground_model, CONNECT_ONE_SHOT)
+
+
+## The clouds of a game of more than gnd-skydome's own (a SkydomeClouds); none - its own
+func _create_clouds_renderer() -> SkydomeClouds:
+    return null
+
+
+## The model of the ground of a game of more than gnd-weather's simple one (a WeatherGroundModel);
+## none - its own
+func _create_ground_model() -> WeatherGroundModel:
+    return null
+
+
+func _set_ground_model() -> void:
+    var model: WeatherGroundModel = _create_ground_model()
+    if model:
+        WeatherServer.set_ground_model(weather.get_world_3d(), model)
 
 
 func _enter_tree() -> void:
     super()
-    CabinSystem.vehicle_cabin_built.connect(_on_vehicle_cabin_built)
+    # CabinSystem is no tool script: in the editor its autoload has none of its signals, and a cab
+    # is only built in the game
+    if not Engine.is_editor_hint():
+        CabinSystem.vehicle_cabin_built.connect(_on_vehicle_cabin_built)
+    SimulationServer.simulation_current_speed_changed.connect(_on_simulation_current_speed_changed)
+    SimulationServer.date_changed.connect(_on_date_changed)
 
 
 func _exit_tree() -> void:
     super()
-    CabinSystem.vehicle_cabin_built.disconnect(_on_vehicle_cabin_built)
+    if not Engine.is_editor_hint():
+        CabinSystem.vehicle_cabin_built.disconnect(_on_vehicle_cabin_built)
+    SimulationServer.simulation_current_speed_changed.disconnect(_on_simulation_current_speed_changed)
+    SimulationServer.date_changed.disconnect(_on_date_changed)
 
 
-## The cab's interior keeps the rain out of the vehicle; the vehicle's origin lies on the rail
-## level, so the box is lifted by half of its height, and the cab's own turn about the vertical
-## leaves the box as it is
+## The snow settles and melts and the ground wets and dries as fast as the simulation's clock runs
+func _on_simulation_current_speed_changed() -> void:
+    weather.weather_time_scale = SimulationServer.simulation_get_current_speed()
+
+
+## The cab's interior keeps the rain and the snow out of the vehicle, walls all round - a gale's
+## snow flying flat came in through the sides of a roof. The box is the cab's own, the bounds of its
+## models in its frame (_fit_rain_exclusion()): the vehicle's whole body hid the snow about it, seen
+## from out of it, and over its bonnet, seen from the cab.
 func _on_vehicle_cabin_built(vehicle_rid: RID, cabin: Cabin3D) -> void:
     var rain_exclusion: PrecipitationVolume = PrecipitationVolume.new()
     rain_exclusion.name = RAIN_EXCLUSION_NAME
     rain_exclusion.precipitation_delta = RAIN_EXCLUSION_PRECIPITATION_DELTA
-    rain_exclusion.size = VehicleServer.vehicle_get_dimensions(vehicle_rid)
-    rain_exclusion.position.y = rain_exclusion.size.y * 0.5
+    rain_exclusion.enclosed = true
     cabin.add_child(rain_exclusion)
+    # another cab of the vehicle shown - its machine room - is built in the same interior, of its own
+    # models: the box fitted to the first cab's alone let it rain in the machine room
+    cabin.cabin_changed.connect(_follow_cab_models.bind(rain_exclusion, vehicle_rid))
+    _follow_cab_models(cabin.get_cabin(), rain_exclusion, vehicle_rid)
+
+
+## The box fitted to the models of the cab shown (_fit_rain_exclusion()), and again as each of them
+## loads - a cab model may come later than its cab
+func _follow_cab_models(cabin_rid: RID, rain_exclusion: PrecipitationVolume, vehicle_rid: RID) -> void:
+    # none as the cab leaves the tree, its models on their way out with it
+    if not cabin_rid.is_valid():
+        return
+    _fit_rain_exclusion(rain_exclusion, vehicle_rid)
+    for model: VisualInstance3D in _cab_models(rain_exclusion.get_parent()):
+        if model.has_signal(&"e3d_loaded"):
+            model.connect(&"e3d_loaded", _fit_rain_exclusion.bind(rain_exclusion, vehicle_rid))
+
+
+## The cab's box: the bounds of the cab's models in its frame; without them (yet) the vehicle's
+## dimensions - its origin on the rail level, so the box lifted by half of its height
+func _fit_rain_exclusion(rain_exclusion: PrecipitationVolume, vehicle_rid: RID) -> void:
+    var cabin: Node3D = rain_exclusion.get_parent() as Node3D
+    var to_cabin: Transform3D = cabin.global_transform.affine_inverse()
+    var bounds: AABB = AABB()
+    for model: VisualInstance3D in _cab_models(cabin):
+        var model_bounds: AABB = to_cabin * model.global_transform * model.get_aabb()
+        if model_bounds.has_volume():
+            bounds = model_bounds if not bounds.has_volume() else bounds.merge(model_bounds)
+    if bounds.has_volume():
+        rain_exclusion.size = bounds.size
+        rain_exclusion.position = bounds.get_center()
+        return
+    rain_exclusion.size = VehicleServer.vehicle_get_dimensions(vehicle_rid)
+    rain_exclusion.position = Vector3(0.0, rain_exclusion.size.y * 0.5, 0.0)
+
+
+## What the cab draws itself with, internal children too (the cab's generated interior is
+## internal): its models and meshes, not its lights nor the rain's box
+func _cab_models(node: Node) -> Array[VisualInstance3D]:
+    var models: Array[VisualInstance3D] = []
+    for child: Node in node.get_children(true):
+        if child is GeometryInstance3D or child is ReloadedModel3D:
+            models.append(child as VisualInstance3D)
+        models.append_array(_cab_models(child))
+    return models
 
 
 func pause_weather() -> void:
@@ -171,6 +272,9 @@ func apply_visual_configuration() -> void:
     var precipitation: float = environment_node.precipitation
     weather.cloud_density = environment_node.cloudiness
     weather.precipitation_intensity = precipitation
+    # snow, sleet or rain as the air's temperature makes it
+    weather.snow_from_temperature = true
+    weather.set_air_temperature_celsius(environment_node.temperature)
     weather.cloud_overcast_intensity = precipitation
     weather.storm_intensity = clampf(inverse_lerp(STORM_RAIN_START, 1.0, precipitation), 0.0, 1.0)
     var rain_fog: float = clampf(inverse_lerp(RAIN_FOG_START, 1.0, precipitation), 0.0, 1.0)
@@ -269,6 +373,14 @@ func apply_visual_configuration() -> void:
         / lerpf(reach_scales[1], reach_scales[0], get_day_share())))
     _set_skydome_param(&"day_fog_distance", fog_ends[0])
     _set_skydome_param(&"night_fog_distance", fog_ends[1])
+    _apply_weather_extras()
+
+
+## What a game of more than this one's sky and weather takes of the environment besides (a weather
+## simulation's lightning, rainbow, gusts; its clouds' kinds), as the environment's configuration is
+## applied - after this one's, over it
+func _apply_weather_extras() -> void:
+    pass
 
 
 ## Skydome later overrides shadow opacity from cloud coverage.
@@ -290,6 +402,22 @@ func apply_light_configuration() -> void:
 
 func apply_time_configuration() -> void:
     _push_time(true)
+    weather.latitude = environment_node.latitude
+    _on_date_changed()
+    # with the season the date gives: a scenery of winter starts under its snow
+    if environment_node.winter_snow_cover and not _start_snow_laid:
+        _start_snow_laid = true
+        var winter: bool = SimulationServer.season == SimulationServer.SEASON_WINTER
+        if winter and environment_node.temperature <= START_SNOW_TEMPERATURE_MAX:
+            weather.snow_depth = START_SNOW_DEPTH
+
+
+## The weather's season, by the place and the date - SimulationServer's as it changes, and as it is
+## when the environment is configured
+func _on_date_changed() -> void:
+    weather.set_date(environment_node.year, environment_node.month, environment_node.day)
+    # the weather's seasons stand in SimulationServer's order (WeatherNode.Season)
+    SimulationServer.season_set(weather.season as SimulationServer.Season)
 
 
 ## The environment's running time, pushed to Skydome at TIME_UPDATE_INTERVAL
@@ -301,6 +429,13 @@ func process_time(delta: float) -> void:
         return
     _time_update_elapsed = 0.0
     _push_time(false)
+    _apply_sun_glint()
+
+
+func _apply_sun_glint() -> void:
+    if sun_light:
+        sun_light.light_specular = 1.0 - smoothstep(
+                SUN_GLINT_SHARP_ANGLE, SUN_GLINT_GONE_ANGLE, sun_light.light_angular_distance)
 
 
 # Configuration changes snap immediately; only running time uses Skydome's transition.

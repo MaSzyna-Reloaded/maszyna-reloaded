@@ -364,7 +364,8 @@
                     "store": "project",
                     "key": "reloaded/resources/lazy_loading",
                     "type": "bool",
-                    "restart_required": true
+                    "restart_required": true,
+                    "advanced": true
                 },
                 {
                     "title": "Self-illumination energy",
@@ -977,15 +978,6 @@
                     "type": "float",
                     "hint": "range",
                     "hint_string": "0.01,8,0.01",
-                    "advanced": true
-                },
-                {
-                    "title": "Fog sky height",
-                    "store": "project",
-                    "key": "reloaded/weather/fog/sky_height",
-                    "type": "float",
-                    "hint": "range",
-                    "hint_string": "10,5000,10,or_greater,suffix:m",
                     "advanced": true
                 },
                 {

@@ -48,7 +48,7 @@ func _on_emergency_stop_pressed() -> void:
 ## The trainset moved [m], towards the vehicle's front when positive
 func _on_move_pressed(distance:float) -> void:
     %ActionsPopup.hide()
-    RailVehicleServer.trainset_move(vehicle, distance)
+    RailVehicleServer.vehicle_move(vehicle, distance)
 
 
 func _on_remove_pressed() -> void:

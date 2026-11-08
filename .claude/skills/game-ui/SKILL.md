@@ -3,6 +3,19 @@ name: game-ui
 description: Design and build player-facing UI of the game - screens, side panels, settings pages, popups and confirmation questions, buttons, rows and their disabled/focused states, labels and their translations. Use before adding or changing a screen, a dialog or popup, a button row, a settings entry (settings.json), a control's look or a user-visible text, and when the operator says the UI is inconsistent, jumps, looks like default Godot, or a key does not work in it.
 ---
 
+## Rule zero: only what the operator orders
+
+REQUIRED, ABSOLUTE: **do always and only what the operator orders.** Nothing is edited, reverted,
+"restored", renamed, redesigned or posted (an issue, a comment, a PR) without the operator's
+explicit order - not even one's own work after a complaint. A complaint is not an order: name the
+facts and wait. Never touch an existing, reviewed mechanism outside the task.
+
+REQUIRED, ABSOLUTE: **no separation-of-concerns breach, ever.** Before any new state, API, enum,
+command or read from another layer, name to the operator which layer owns the value, where it is
+read from and why that keeps every layer to its own concern - and write nothing until the operator
+says yes. Data a scenery or a starter hands in is never read as live state; a value is read from
+its owner, never from a plugin's implementation, a dump or a copy.
+
 # Game UI - consistent, keyboard-complete, translated
 
 The operator judges UI by one thing first: **does it look and behave like the rest of the game.**

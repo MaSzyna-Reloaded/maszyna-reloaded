@@ -122,13 +122,13 @@ func _exit_tree() -> void:
 ## The cab's interior keeps the rain out of the vehicle; the vehicle's origin lies on the rail
 ## level, so the box is lifted by half of its height, and the cab's own turn about the vertical
 ## leaves the box as it is
-func _on_vehicle_cabin_built(vehicle_rid: RID) -> void:
+func _on_vehicle_cabin_built(vehicle_rid: RID, cabin: Cabin3D) -> void:
     var rain_exclusion: RainVolume = RainVolume.new()
     rain_exclusion.name = RAIN_EXCLUSION_NAME
     rain_exclusion.precipitation_delta = RAIN_EXCLUSION_PRECIPITATION_DELTA
     rain_exclusion.size = VehicleServer.vehicle_get_dimensions(vehicle_rid)
     rain_exclusion.position.y = rain_exclusion.size.y * 0.5
-    CabinSystem.vehicle_get_cabin(vehicle_rid).add_child(rain_exclusion)
+    cabin.add_child(rain_exclusion)
 
 
 func pause_weather() -> void:

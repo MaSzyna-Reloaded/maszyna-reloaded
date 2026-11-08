@@ -144,7 +144,7 @@ func test_first_streaming_camera_is_already_in_the_selected_cabin() -> void:
     SceneryStreamingServer.streaming_camera_changed.disconnect(observe)
     assert_eq(positions.size(), 1, "no streaming from an intermediate camera")
     assert_eq(driven[0], _vehicle.get_rid(), "seated before streaming starts")
-    var shown:Cabin3D = CabinSystem.vehicle_get_cabin(_vehicle.get_rid())
+    var shown:Cabin3D = _player.cabin_view.get_parent() as Cabin3D
     assert_eq(positions[0], shown.get_camera_transform().origin)
     PlayerCameraServer.camera_toggle_cabin()
     assert_eq(SceneryStreamingServer.streaming_get_camera_position(), _player.free_view.global_position)

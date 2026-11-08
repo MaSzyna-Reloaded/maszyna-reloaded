@@ -102,8 +102,8 @@ func start() -> void:
     VehicleServer.cabin_person_role_changed.connect(_on_cabin_person_role_changed)
     VehicleServer.vehicle_configured.connect(_on_vehicle_configured)
     VehicleServer.vehicle_freed.connect(_on_vehicle_freed)
-    RailVehicleServer.vehicle_trainset_changed.connect(_on_vehicle_trainset_changed)
-    RailVehicleServer.vehicle_pantograph_contact_lost.connect(_on_vehicle_pantograph_contact_lost)
+    RailVehicleServer.trainset_vehicles_changed.connect(_on_trainset_vehicles_changed)
+    RailVehicleServer.pantograph_contact_lost.connect(_on_pantograph_contact_lost)
     RailVehicleServer.vehicle_derailed.connect(_on_vehicle_derailed)
     # the player is made with the game, before any scenery
     _write_person(PlayerServer.player_get_person(), "present")
@@ -134,8 +134,8 @@ func _close(subject: String, what: String) -> void:
     VehicleServer.cabin_person_role_changed.disconnect(_on_cabin_person_role_changed)
     VehicleServer.vehicle_configured.disconnect(_on_vehicle_configured)
     VehicleServer.vehicle_freed.disconnect(_on_vehicle_freed)
-    RailVehicleServer.vehicle_trainset_changed.disconnect(_on_vehicle_trainset_changed)
-    RailVehicleServer.vehicle_pantograph_contact_lost.disconnect(_on_vehicle_pantograph_contact_lost)
+    RailVehicleServer.trainset_vehicles_changed.disconnect(_on_trainset_vehicles_changed)
+    RailVehicleServer.pantograph_contact_lost.disconnect(_on_pantograph_contact_lost)
     RailVehicleServer.vehicle_derailed.disconnect(_on_vehicle_derailed)
     for vehicle: RID in _engines:
         if is_instance_valid(_engines[vehicle]):
@@ -212,7 +212,7 @@ func _on_cabin_person_left(cabin: RID, person: RID) -> void:
     _write_person(person, "left %s" % _cabin_text(cabin))
 
 
-func _on_cabin_person_moved(person: RID, cabin: RID, previous: RID) -> void:
+func _on_cabin_person_moved(cabin: RID, person: RID, previous: RID) -> void:
     _write_person(person, "moved %s from_%s" % [_cabin_text(cabin), _cabin_text(previous).replace(" ", " from_")])
 
 
@@ -265,7 +265,7 @@ func _on_engine_stop(vehicle: RID) -> void:
             "opened cause=%s" % cause))
 
 
-func _on_vehicle_pantograph_contact_lost(vehicle: RID, pantograph: int,
+func _on_pantograph_contact_lost(vehicle: RID, pantograph: int,
         cause: RailVehicleServer.PantographContactLoss) -> void:
     var position: Dictionary = RailVehicleServer.vehicle_get_track_position(vehicle)
     var track: RID = position.get("track_rid", RID())
@@ -294,11 +294,13 @@ func _trainset_log(vehicle: RID) -> GameLogger:
     return _ai_log
 
 
-func _on_vehicle_trainset_changed(vehicle: RID) -> void:
+func _on_trainset_vehicles_changed(changed: RID) -> void:
     var members: Array[String] = []
-    for coupled: RID in RailVehicleServer.vehicle_get_coupled(
-            vehicle, RailVehicleController.COUPLER_END_FRONT, RailVehicleController.COUPLING_FLAG_COUPLER):
+    for coupled: RID in RailVehicleServer.trainset_get_vehicles(changed):
         members.append(_named(coupled, VehicleServer.vehicle_get_id(coupled)))
+    # a scenery's trainset all of whose vehicles went elsewhere
+    if not members:
+        return
     var trainset: String = ",".join(members)
     # the same trainset from its other vehicles, or read from its other end
     var reversed_members: Array[String] = members.duplicate()

@@ -109,7 +109,7 @@ func test_a_main_switch_opening_and_a_pantograph_loss_are_logged() -> void:
             vehicle, VehicleComponentType.COMPONENT_ENGINE) as RailVehicleEngine
 
     engine.engine_stop.emit()
-    RailVehicleServer.vehicle_pantograph_contact_lost.emit(
+    RailVehicleServer.pantograph_contact_lost.emit(
             vehicle, RailVehicleEnginePowerSource.PANTOGRAPH_SECOND, RailVehicleServer.PANTOGRAPH_CONTACT_LOSS_NOT_REACHING)
     PlayerServer.player_leave_vehicle()
     _recorder.stop()

@@ -24,7 +24,7 @@ const LIGHT_LETTERS: Dictionary[SignallingServer.LightState, String] = {
 
 ## Everything, by section; the world is null when no scenery is running
 static func collect(world: SceneryWorld, started_msec: int, settings_definition: JSON) -> Dictionary:
-    var origin: Vector3 = RailVehicleServer.vehicle_get_transform(PlayerServer.player_get_vehicle()).origin
+    var origin: Vector3 = VehicleServer.vehicle_get_transform(PlayerServer.player_get_vehicle()).origin
     return {
         "hardware": hardware(),
         "settings": settings(settings_definition),
@@ -174,7 +174,7 @@ static func camera(world: SceneryWorld) -> Dictionary:
         "follow_view": enum_name(
                 &"PlayerCameraServer", &"CameraFollowView", PlayerCameraServer.camera_get_follow_view()),
         "vehicle_transform": transform_to_dictionary(
-                RailVehicleServer.vehicle_get_transform(PlayerServer.player_get_vehicle())),
+                VehicleServer.vehicle_get_transform(PlayerServer.player_get_vehicle())),
     }
     var viewport_camera: Camera3D = world.get_viewport().get_camera_3d() if world else null
     if viewport_camera:
@@ -206,12 +206,12 @@ static func vehicles(origin: Vector3) -> Dictionary:
     for rid: RID in coupled:
         trainset.append({
             "vehicle_id": VehicleServer.vehicle_get_id(rid),
-            "position": vector_to_array(RailVehicleServer.vehicle_get_transform(rid).origin),
+            "position": vector_to_array(VehicleServer.vehicle_get_transform(rid).origin),
             "state": VehicleServer.vehicle_dump_state(rid),
             "config": VehicleServer.vehicle_dump_config(rid),
         })
     for rid: RID in VehicleServer.vehicle_get_rids():
-        var position: Vector3 = RailVehicleServer.vehicle_get_transform(rid).origin
+        var position: Vector3 = VehicleServer.vehicle_get_transform(rid).origin
         if rid in coupled or position.distance_to(origin) > NEARBY_RADIUS:
             continue
         nearby.append({

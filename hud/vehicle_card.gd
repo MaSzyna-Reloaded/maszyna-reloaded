@@ -65,8 +65,10 @@ func _on_player_vehicle_changed(_vehicle:RID, _previous:RID) -> void:
 
 ## A coupling changed in the trainset: its side views again, and the vehicle shown kept while it is
 ## still in it
-func _on_vehicle_trainset_changed(p_vehicle:RID) -> void:
-    if not _coupled.has(p_vehicle):
+func _on_trainset_vehicles_changed(trainset:RID) -> void:
+    var vehicles:Array[RID] = []
+    vehicles.assign(RailVehicleServer.trainset_get_vehicles(trainset))
+    if not _coupled.any(func(coupled:RID) -> bool: return vehicles.has(coupled)):
         return
     _show_trainset()
     _show_trainset_vehicle(_shown if _trainset.has(_shown) else vehicle)
@@ -134,13 +136,13 @@ func _on_trainset_activated() -> void:
 func _ready() -> void:
     PlayerCameraServer.camera_changed.connect(_on_camera_changed)
     PlayerServer.player_vehicle_changed.connect(_on_player_vehicle_changed)
-    RailVehicleServer.vehicle_trainset_changed.connect(_on_vehicle_trainset_changed)
+    RailVehicleServer.trainset_vehicles_changed.connect(_on_trainset_vehicles_changed)
 
 
 func _exit_tree() -> void:
     PlayerCameraServer.camera_changed.disconnect(_on_camera_changed)
     PlayerServer.player_vehicle_changed.disconnect(_on_player_vehicle_changed)
-    RailVehicleServer.vehicle_trainset_changed.disconnect(_on_vehicle_trainset_changed)
+    RailVehicleServer.trainset_vehicles_changed.disconnect(_on_trainset_vehicles_changed)
 
 
 ## The label of an enum property's value, from the property's own hint ("Name" or "Name:value")

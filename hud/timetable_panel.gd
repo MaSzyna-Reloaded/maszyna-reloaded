@@ -37,7 +37,7 @@ func _ready() -> void:
     for progress:Signal in [StationServer.run_entry_changed, StationServer.run_arrived,
             StationServer.run_departed, StationServer.run_passed]:
         progress.connect(_on_run_progress)
-    RailVehicleServer.vehicle_trainset_changed.connect(_on_vehicle_trainset_changed)
+    RailVehicleServer.trainset_vehicles_changed.connect(_on_trainset_vehicles_changed)
     _follow_trainset()
 
 
@@ -47,7 +47,7 @@ func _exit_tree() -> void:
     for progress:Signal in [StationServer.run_entry_changed, StationServer.run_arrived,
             StationServer.run_departed, StationServer.run_passed]:
         progress.disconnect(_on_run_progress)
-    RailVehicleServer.vehicle_trainset_changed.disconnect(_on_vehicle_trainset_changed)
+    RailVehicleServer.trainset_vehicles_changed.disconnect(_on_trainset_vehicles_changed)
 
 
 ## The player drives another vehicle, or none
@@ -68,8 +68,8 @@ func _on_run_progress(run:RID, _entry:int) -> void:
 
 
 ## The player's vehicle was coupled or uncoupled: its trainset, and the run, may be another one
-func _on_vehicle_trainset_changed(vehicle:RID) -> void:
-    if vehicle == _vehicle:
+func _on_trainset_vehicles_changed(trainset:RID) -> void:
+    if trainset == RailVehicleServer.vehicle_get_trainset(_vehicle):
         _follow_trainset()
 
 

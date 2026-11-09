@@ -34,7 +34,7 @@ Where the game is not libmaszyna:
   `VehicleLivery`, `VehicleInfo`, `VehicleCatalogServer`, ...); its plugins (libmaszyna) only
   supply backends and their own classes behind them - no cast to `MaszynaVehicleData`, no
   `MaszynaVehiclesBank` or `MaszynaRailVehicle3DInstancer` in a screen (libreloaded's
-  `.claude/skills/maszyna-architecture/SKILL.md`, "The core's data is the interface")
+  `.claude/skills/architecture/SKILL.md`, "The core's data is the interface")
 * player-facing UI follows the `game-ui` skill (`.claude/skills/game-ui/SKILL.md`)
 * every key is an action of this `project.godot`; the input map holds libmaszyna's actions as
   well, as Godot keeps no input map per addon

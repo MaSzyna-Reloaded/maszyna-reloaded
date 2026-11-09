@@ -2233,3 +2233,21 @@ msgstr ""
 
 msgid "Heating Toggle"
 msgstr ""
+
+msgid "Coupling with the next vehicle"
+msgstr ""
+
+msgid "Not coupled"
+msgstr ""
+
+msgid "Coupler"
+msgstr ""
+
+msgid "Coupler and brake"
+msgstr ""
+
+msgid "Fully coupled"
+msgstr ""
+
+msgid "Permanently coupled"
+msgstr ""

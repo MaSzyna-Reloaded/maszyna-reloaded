@@ -22,6 +22,9 @@ signal flip_requested(index: int)
 ## A tile's buttons: the owner puts something else in its place, or takes it away
 signal change_requested(index: int)
 signal remove_requested(index: int)
+## The joint after a tile (Tile.joint_icon) was pressed: the owner changes how what the tile at
+## `index` stands for joins the next one
+signal joint_pressed(index: int)
 ## A tile was dragged onto another (reorderable): the owner moves what the first stands for to the
 ## place of the second
 signal move_requested(from: int, to: int)
@@ -60,6 +63,8 @@ const MOVE_RIGHT_ICON: Texture2D = preload("arrow_right_icon.svg")
 const FLIP_ICON: Texture2D = preload("flip_icon.svg")
 const CHANGE_ICON: Texture2D = preload("folder_icon.svg")
 const REMOVE_ICON: Texture2D = preload("trash_icon.svg")
+## The size of the joint's icon on the meeting of two tiles (Tile.joint_icon)
+const JOINT_SIZE: float = 24.0
 ## Where a dragged tile would land: an orange line in the gap between two tiles
 const DROP_MARKER_COLOR: Color = Color(1.0, 0.6, 0.15)
 const DROP_MARKER_WIDTH: float = 3.0
@@ -76,6 +81,10 @@ class Tile:
     var flipped: bool = false
     ## Its button (tile_actions) can ask for it to be taken away
     var removable: bool = true
+    ## How it joins the next tile - the coupling of a vehicle with the next one: an icon on the
+    ## meeting of the two, pressed there (joint_pressed); the last tile has no next and shows none
+    var joint_icon: Texture2D = null
+    var joint_tooltip: String = ""
 
     func _init(p_vehicle: VehicleData, p_tooltip: String = "", p_caption: String = "") -> void:
         vehicle = p_vehicle.duplicate()
@@ -167,6 +176,7 @@ func set_tiles(tiles: Array[Tile]) -> void:
         var control: Control = _create_tile(index)
         _controls.append(control)
         _container.add_child(control)
+    _place_joints()
     %Scroll.scroll_horizontal = 0
     %Scroll.scroll_vertical = 0
     if _controls:
@@ -192,6 +202,7 @@ func move_tile(from: int, to: int) -> void:
     _tiles.insert(to, _tiles.pop_at(from))
     _controls.insert(to, _controls.pop_at(from))
     _container.move_child(_controls[to], to)
+    _place_joints()
     _selected = _moved_index(_selected, from, to)
     _marked = _moved_index(_marked, from, to)
 
@@ -405,6 +416,56 @@ func _create_tile(index: int) -> Control:
     label.add_theme_font_size_override("font_size", 13)
     control.add_child(label)
     return control
+
+
+## The joints on the meetings of the tiles as they stand now: each tile's joint (Tile.joint_icon)
+## on the next tile's front, half over each - a child of the next tile, so it is drawn over both and
+## takes the pointer on both halves; the row keeps its spacing. After new tiles and a moved one
+func _place_joints() -> void:
+    for index: int in _controls.size():
+        var control: Control = _controls[index]
+        var joint: TextureButton = control.get_node_or_null("Joint")
+        var before: Tile = _tiles[index - 1] if index > 0 else null
+        if not before or not before.joint_icon:
+            if joint:
+                # out of the tile at once: a joint wanted on it again in the same frame is a new one
+                control.remove_child(joint)
+                joint.queue_free()
+            continue
+        if not joint:
+            joint = _create_joint(control)
+            control.add_child(joint)
+        joint.texture_normal = before.joint_icon
+        joint.tooltip_text = before.joint_tooltip
+
+
+func _create_joint(control: Control) -> TextureButton:
+    var joint := TextureButton.new()
+    joint.name = "Joint"
+    joint.ignore_texture_size = true
+    joint.stretch_mode = TextureButton.STRETCH_KEEP_ASPECT_CENTERED
+    joint.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
+    joint.set_anchors_preset(Control.PRESET_CENTER_LEFT)
+    joint.offset_left = -JOINT_SIZE * 0.5
+    joint.offset_right = JOINT_SIZE * 0.5
+    joint.offset_top = -JOINT_SIZE * 0.5
+    joint.offset_bottom = JOINT_SIZE * 0.5
+    # bound to the tile and not to its index - a moved tile has its joints placed anew (move_tile())
+    joint.pressed.connect(_on_joint_pressed.bind(control))
+    return joint
+
+
+## The joint before `control` is the joint of the tile before it
+func _on_joint_pressed(control: Control) -> void:
+    _ui_sounds.play(click_event)
+    joint_pressed.emit(_controls.find(control) - 1)
+
+
+## The joint after a tile anew - its owner changed it (joint_pressed, the vehicle viewer)
+func set_tile_joint(index: int, icon: Texture2D, tooltip: String) -> void:
+    _tiles[index].joint_icon = icon
+    _tiles[index].joint_tooltip = tooltip
+    _place_joints()
 
 
 ## The tile's buttons in its bottom right corner, hidden until the pointer is over the tile. Each

@@ -14,6 +14,8 @@ signal change_requested
 signal remove_requested
 ## Turned round - its owner stands the vehicle the other way
 signal reverse_requested
+## The coupling with the next vehicle - its owner takes the next coupling mode
+signal coupling_change_requested
 
 const ROTATION_SPEED: float = 0.35
 
@@ -135,6 +137,13 @@ func get_vehicle_actions_section() -> FocusSection:
 ## owner knows the trainset
 func set_removable(removable: bool) -> void:
     %RemoveButton.disabled = not removable
+
+
+## How the vehicle couples to the next one of the trainset, as the button shows it; the last one has
+## no next and its button cannot be pressed
+func set_coupling(text: String, has_next: bool) -> void:
+    %CouplingButton.text = text if has_next else ""
+    %CouplingButton.disabled = not has_next
 
 
 func _on_back_button_pressed() -> void:

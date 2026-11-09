@@ -2233,3 +2233,21 @@ msgstr "Menu"
 
 msgid "Heating Toggle"
 msgstr "Ogrzewanie"
+
+msgid "Coupling with the next vehicle"
+msgstr "Sprzęg z następnym pojazdem"
+
+msgid "Not coupled"
+msgstr "Bez sprzęgu"
+
+msgid "Coupler"
+msgstr "Sam sprzęg"
+
+msgid "Coupler and brake"
+msgstr "Sprzęg i hamulec"
+
+msgid "Fully coupled"
+msgstr "Pełne sprzęgnięcie"
+
+msgid "Permanently coupled"
+msgstr "Sprzęg stały"

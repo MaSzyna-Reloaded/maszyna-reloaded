@@ -159,7 +159,7 @@ func test_world_initializes_on_each_scenery_load_and_detaches_on_unload() -> voi
     _player = _world.get_node("Player") as Player
     watch_signals(PlayerServer)
     assert_false(SceneryStreamingServer.streaming_has_camera())
-    var trainset:Array[VehicleData] = []
+    var trainset:Array[TrainsetMemberData] = []
     var ep07:SceneryInfo = SceneryInfo.new()
     ep07.provider = MaszynaSceneryProvider.NAME
     ep07.id = "ep07.scn"

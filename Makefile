@@ -158,8 +158,11 @@ windows-installer-image-push: windows-installer-image
 
 # The export is run by the editor, which loads the debug library (libreloaded.gdextension, the
 # editor's own feature tag), so that one is built as well - a stale one fails the scripts that use
-# a newer API
-release-linux: release-clear-godot-cache compile-debug compile-release-linux $(LINUX_TEMPLATE_INSTALLED)
+# a newer API. LINUX_HOST=1 builds the release library on the host (compile-release) instead of in
+# the Linux SDK container: no Docker, no ghcr.io and no network, but the release starts only on a
+# glibc as new as the host's - a build for this machine, never one to ship
+RELEASE_LINUX_LIBRARY=$(if $(LINUX_HOST),compile-release,compile-release-linux)
+release-linux: release-clear-godot-cache compile-debug $(RELEASE_LINUX_LIBRARY) $(LINUX_TEMPLATE_INSTALLED)
 	mkdir -p bin/linux
 	$(GODOT) --headless --path . --export-release "linux_x86_64" bin/linux/reloaded.zip
 	mv bin/linux/reloaded.zip $(LINUX_ZIP)

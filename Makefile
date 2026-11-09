@@ -65,7 +65,9 @@ WINDOWS_TEMPLATE_INSTALLED:=$(HOME)/.local/share/godot/export_templates/$(GODOT_
 # Published on ghcr.io and tagged by its Dockerfile: the CI pulls it, and a changed Dockerfile is a
 # new tag the CI builds once and publishes itself (make windows-installer-image-push)
 WINDOWS_INSTALLER_IMAGE:=ghcr.io/maszyna-reloaded/windows-installer:$(shell sha256sum ci/docker/windows-installer/Dockerfile | cut -c1-12)
-WINDOWS_INSTALLER_RUN=docker run --rm --user $(shell id -u):$(shell id -g) -v $(CURDIR):$(CURDIR) -w $(CURDIR) $(WINDOWS_INSTALLER_IMAGE)
+# The container runs under Docker's init (tini), which hands Ctrl+C on to the whole process group of
+# its command: the command itself, as PID 1, would ignore it and keep the container running
+WINDOWS_INSTALLER_RUN=docker run --rm --init -e TINI_KILL_PROCESS_GROUP=1 --user $(shell id -u):$(shell id -g) -v $(CURDIR):$(CURDIR) -w $(CURDIR) $(WINDOWS_INSTALLER_IMAGE)
 
 
 # addons/libreloaded, addons/gnd_sfx and addons/<plugin> lead to the checkout in use - the submodule, or a local one

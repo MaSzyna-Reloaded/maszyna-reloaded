@@ -647,6 +647,9 @@ msgstr "Külső nézet"
 msgid "Hud Toggle"
 msgstr "HUD"
 
+msgid "Hud Visibility Toggle"
+msgstr "A teljes HUD elrejtése"
+
 msgid "Change Vehicle"
 msgstr "Jármű váltása"
 

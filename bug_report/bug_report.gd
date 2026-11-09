@@ -3,7 +3,7 @@ extends CanvasLayer
 ## Reporting a problem or a suggestion from the scenery selector or a running scenery, as a GitHub
 ## issue through the reporting endpoint (BugReportSender). The top bar's entry and the button at
 ## the right edge both open it; the game shows that button wherever a report can be made
-## (game.gd), always out at the edge until the game is stable (TODO.md). The report pauses the
+## (game.gd); it slides out when the mouse touches the edge (edge_button.gd). The report pauses the
 ## simulation while its form is open and resumes it on closing, unless it was paused already. It
 ## is the one owner of that state - the form and its buttons only ask (bug_report.tscn). What
 ## happened before the report was opened is in the logs it attaches: the engine's (app.log) and

@@ -647,6 +647,9 @@ msgstr "外部视角"
 msgid "Hud Toggle"
 msgstr "HUD"
 
+msgid "Hud Visibility Toggle"
+msgstr "隐藏全部 HUD"
+
 msgid "Change Vehicle"
 msgstr "切换车辆"
 

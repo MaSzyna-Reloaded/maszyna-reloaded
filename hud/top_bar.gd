@@ -2,29 +2,34 @@ extends PanelContainer
 class_name TopBar
 
 ## The game's menus as a brow in the middle of the top edge (MenuBrow), clear of the HUD's tiles
-## in the corners. It waits above the screen and slides in when the mouse touches the top edge,
-## anywhere along it, and back out once the mouse is below it and none of its menus is open - also
-## right after an entry was chosen. It slides rather than hides: a hidden MenuBar would stop
-## handling the keys of its entries.
+## in the corners. It waits above the screen with PEEK_HEIGHT of its bottom in sight and slides in
+## when the mouse touches the top edge, anywhere along it, and back out once the mouse is below it
+## and none of its menus is open - also right after an entry was chosen. It slides rather than
+## hides: a hidden MenuBar would stop handling the keys of its entries. Put away (put_away()) it
+## waits wholly above the screen and does not come in.
 
 ## Pixels from the top edge of the screen that bring the bar in
 const REVEAL_EDGE: float = 2.0
+## Pixels of the bar's bottom in sight while it waits above the screen
+const PEEK_HEIGHT: float = 4.0
 ## Seconds of the slide in or out
 const SLIDE_TIME: float = 0.15
 
 var _shown: bool = false
+## Put away with the whole HUD hidden (put_away())
+var _put_away: bool = false
 ## Menus of the bar open now - a menu opened from another one may come before that one closes
 var _open_menus: int = 0
 var _slide_tween: Tween = null
 
 
 func _ready() -> void:
-    position.y = -get_combined_minimum_size().y
+    position.y = PEEK_HEIGHT - get_combined_minimum_size().y
 
 
 func _input(event: InputEvent) -> void:
     var motion: InputEventMouseMotion = event as InputEventMouseMotion
-    if not motion:
+    if not motion or _put_away:
         return
     if motion.global_position.y <= REVEAL_EDGE:
         _slide(true)
@@ -44,6 +49,16 @@ func _on_menu_popup_hide() -> void:
         _slide(false)
 
 
+## Wholly above the screen at once and kept there while `away` - the whole HUD hidden by
+## Shift+F12 (GameHud); its menus' keys still work
+func put_away(away: bool) -> void:
+    _put_away = away
+    _shown = false
+    if _slide_tween:
+        _slide_tween.kill()
+    position.y = -size.y if away else PEEK_HEIGHT - size.y
+
+
 func _slide(shown: bool) -> void:
     if shown == _shown:
         return
@@ -51,4 +66,5 @@ func _slide(shown: bool) -> void:
     if _slide_tween:
         _slide_tween.kill()
     _slide_tween = create_tween()
-    _slide_tween.tween_property(self, "position:y", 0.0 if shown else -size.y, SLIDE_TIME)
+    var top: float = 0.0 if shown else PEEK_HEIGHT - size.y
+    _slide_tween.tween_property(self, "position:y", top, SLIDE_TIME)

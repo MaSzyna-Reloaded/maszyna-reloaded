@@ -647,6 +647,9 @@ msgstr "Vnější pohled"
 msgid "Hud Toggle"
 msgstr "HUD"
 
+msgid "Hud Visibility Toggle"
+msgstr "Skrýt celý HUD"
+
 msgid "Change Vehicle"
 msgstr "Změnit vozidlo"
 

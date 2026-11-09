@@ -647,6 +647,9 @@ msgstr "Widok zewnętrzny"
 msgid "Hud Toggle"
 msgstr "HUD"
 
+msgid "Hud Visibility Toggle"
+msgstr "Ukryj cały HUD"
+
 msgid "Change Vehicle"
 msgstr "Zmień pojazd"
 

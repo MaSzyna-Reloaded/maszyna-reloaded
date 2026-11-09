@@ -10,6 +10,8 @@ signal settings_requested
 signal problem_report_requested
 ## "Simulator" > "Exit to menu"
 signal exit_to_menu_requested
+## The whole HUD hidden by Shift+F12, or shown again
+signal all_hidden_changed(hidden: bool)
 
 ## The entries of the "Simulator" menu, by their ids - a separator (id 3) stands before EXIT_TO_MENU
 enum SimulatorItem { SETTINGS = 0, PROBLEM_REPORT = 1, EXIT_TO_MENU = 2, HELP = 4 }
@@ -68,10 +70,9 @@ func _ready() -> void:
     # the windows of a game built on this one after them: the DebugHud takes no other's windows
     for scene: PackedScene in GameExtensions.hud_extension_get_all():
         var extension: GameHudExtension = scene.instantiate() as GameHudExtension
-        add_child(extension)
+        %Content.add_child(extension)
         _extensions.append(extension)
         extension.fill_menu(%Diagnostics)
-        %Diagnostics.index_pressed.connect(extension.menu_index_pressed)
         %DebugHud.windows_visibility_changed.connect(extension.set_windows_shown)
     # the menus show their keys and handle them: a key picks its entry as a click would
     %Simulator.set_item_shortcut(
@@ -97,10 +98,11 @@ func _ready() -> void:
     # all (drivermode.cpp:994-1020)
     %View.set_item_shortcut(ViewItem.CARD, ActionShortcut.create(&"vehicle_card_toggle"))
     %View.set_item_shortcut(ViewItem.TRAINSETS, ActionShortcut.create(&"trainsets_toggle"))
-    # the transcripts, the driving aid and the hints are open from the start
+    # the transcripts, the driving aid, the hints and the simulation speed are open from the start
     HUDServer.panel_set_visible(PANEL_TRANSCRIPTS, true)
     HUDServer.panel_set_visible(PANEL_DRIVING_AID, true)
     HUDServer.panel_set_visible(PANEL_HINTS, true)
+    HUDServer.panel_set_visible(PANEL_SIMULATION_SPEED, true)
 
 
 func _exit_tree() -> void:
@@ -112,9 +114,17 @@ func _exit_tree() -> void:
     SceneryHUDMouseServer.vehicle_pressed.disconnect(HUDServer.card_open)
 
 
+## The "Diagnostics" menu: the DebugHud's entries, the frame time statistics and the extensions'.
+## With all of the HUD hidden (Shift+F12) an entry only shows it back
 func _on_diagnostics_menu_index_pressed(index: int) -> void:
+    if not %Content.visible:
+        _show_all()
+        return
+    %DebugHud.menu_index_pressed(index)
     if index == _frame_times_index:
         DebugMenu.cycle_style()
+    for extension: GameHudExtension in _extensions:
+        extension.menu_index_pressed(index)
 
 
 func _on_simulator_menu_id_pressed(id: int) -> void:
@@ -131,8 +141,12 @@ func _on_simulator_menu_id_pressed(id: int) -> void:
 
 ## The "View" menu: its entries show or hide the transcripts, the driving aid, the hints, the timetable, the
 ## scenario, all the control windows at once, the Lua editor, the trainset list, the vehicle card,
-## the simulation speed and the logs
+## the simulation speed and the logs. With all of the HUD hidden (Shift+F12) an entry only shows it
+## back
 func _on_view_menu_index_pressed(index: int) -> void:
+    if not %Content.visible:
+        _show_all()
+        return
     # the card of the player's vehicle, or the open one closed
     if index == ViewItem.CARD:
         if HUDServer.card_get_vehicle().is_valid():
@@ -148,11 +162,13 @@ func _on_view_menu_index_pressed(index: int) -> void:
 
 ## The DebugHud's windows shown or hidden all at once: the View menu's "Controls" ticked
 func _on_debug_hud_windows_visibility_changed(shown: bool) -> void:
+    _show_all()
     %View.set_item_checked(ViewItem.CONTROLS, shown)
 
 
 ## A HUD element opened or closed in HUDServer: its View menu entry ticked, the element shown
 func _on_panel_visibility_changed(panel: StringName, shown: bool) -> void:
+    _show_all()
     var item: Variant = VIEW_PANELS.find_key(panel)
     if not item == null:
         %View.set_item_checked(item, shown)
@@ -181,6 +197,31 @@ func _on_panel_visibility_changed(panel: StringName, shown: bool) -> void:
 
 func _on_hud_visibility_changed(shown: bool) -> void:
     visible = shown
+    _show_all()
+
+
+## Shift+F12 while the HUD is shown: all of it hidden, or shown again - a clean screenshot of the
+## scenery
+func _unhandled_input(event: InputEvent) -> void:
+    if not visible or not event.is_action_pressed("hud_visibility_toggle", false, true):
+        return
+    get_viewport().set_input_as_handled()
+    if %Content.visible:
+        %Content.visible = false
+        %TopBar.put_away(true)
+        all_hidden_changed.emit(true)
+    else:
+        _show_all()
+
+
+## Everything hidden by Shift+F12 back - by an entry of the menus, or as soon as anything of the
+## HUD is opened or closed otherwise (a timetable received, a script, the DebugHud's F12)
+func _show_all() -> void:
+    if %Content.visible:
+        return
+    %Content.visible = true
+    %TopBar.put_away(false)
+    all_hidden_changed.emit(false)
 
 
 func _on_timetable_panel_close_requested() -> void:
@@ -233,6 +274,7 @@ func _on_followed_vehicle_chip_action_pressed() -> void:
 ## the last one was closed, and takes the place of the followed vehicle's floating button. Closed,
 ## it is remembered where it stood and no row is lit.
 func _on_card_changed(vehicle: RID) -> void:
+    _show_all()
     %VehicleSelectorPanel.show_active_vehicle(vehicle)
     %View.set_item_checked(ViewItem.CARD, vehicle.is_valid())
     if not vehicle.is_valid():

@@ -77,6 +77,7 @@ const GROUPS: Dictionary = {
     ],
     "UI": [
         "hud_toggle",
+        "hud_visibility_toggle",
         "minimap_toggle",
         "toggle_weather_controls",
         "timetable_toggle",

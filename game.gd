@@ -88,6 +88,8 @@ var _log_handlers: Dictionary[String, GameLogFileHandler] = {}
 var _surroundings_area_ready: bool = false
 ## ...and so are the vehicles within the draw distance
 var _surroundings_vehicles_built: bool = false
+## The simulation was running when the exit confirmation was asked, so taking it back resumes it
+var _paused_by_exit_confirmation: bool = false
 
 
 func _exit_tree() -> void:
@@ -295,8 +297,26 @@ func _on_scenery_selector_quit_requested() -> void:
 ## Unloading a scenery stalls the main thread (thousands of nodes), so it happens behind the
 ## spinner: the game fades into it, and it fades into the scenario selector
 func _on_exit_to_menu_pressed() -> void:
+    # the game stands while it asks, as it does under the problem report's form (BugReport)
+    _paused_by_exit_confirmation = not SimulationServer.simulation_is_paused()
+    SimulationServer.simulation_pause()
     # it takes every key while shown, so the vigilance button's space does not reach the cab
     %ExitConfirmation.ask()
+
+
+## The whole HUD hidden by Shift+F12 (GameHud): the report's edge button with it, back with it
+func _on_game_hud_all_hidden_changed(hidden: bool) -> void:
+    if hidden:
+        $BugReport.hide_edge_button()
+    else:
+        $BugReport.show_edge_button()
+
+
+## "Back" or Escape: the scenery goes on, unless it was paused already
+func _on_exit_confirmation_dismissed() -> void:
+    if _paused_by_exit_confirmation:
+        SimulationServer.simulation_unpause()
+    _paused_by_exit_confirmation = false
 
 
 ## "Exit to menu", and another game directory chosen in a game: set once the scenery read from the

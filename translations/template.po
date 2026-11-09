@@ -647,6 +647,9 @@ msgstr ""
 msgid "Hud Toggle"
 msgstr ""
 
+msgid "Hud Visibility Toggle"
+msgstr ""
+
 msgid "Change Vehicle"
 msgstr ""
 

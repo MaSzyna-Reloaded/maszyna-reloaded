@@ -13,8 +13,10 @@ make links              # addons/libreloaded and addons/libmaszyna, not versione
 make terrain3d          # addons/terrain_3d, not versioned
 make compile-debug      # libreloaded with libmaszyna into bin/libreloaded/, for the editor and the tests
 make run-tests
-make release-linux      # bin/linux/maszyna-reloaded-linux64.zip
-make release-windows    # bin/windows/maszyna-reloaded-win64.zip and -setup.exe
+make release-linux      # bin/linux/maszyna-reloaded-linux64.zip, with the Python runtimes
+make release-windows    # bin/windows/maszyna-reloaded-win64.zip and -setup.exe, with them
+make release-linux-nopython     # bin/linux/maszyna-reloaded-linux64-nopython.zip
+make release-windows-nopython   # bin/windows/maszyna-reloaded-win64-nopython.zip and -nopython-setup.exe
 make release-android    # bin/android/maszyna-reloaded-android-arm64.apk
 ```
 

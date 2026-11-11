@@ -101,7 +101,7 @@ func test_a_line_below_the_handlers_level_is_left_out() -> void:
 ## reports#16: a main switch that tripped and the pantograph that lost the wire before it left
 ## nothing in the log - in the player's trainset both go to the gameplay log
 func test_a_main_switch_opening_and_a_pantograph_loss_are_logged() -> void:
-    var description: VehicleController = FizVehicleBuilder.build_description_at(MOTOR_CAR_PATH)
+    var description: VehicleController = MaszynaFizManager.load_description_at(MOTOR_CAR_PATH)
     var vehicle: RID = build_vehicle("RecorderMotorCar", description, 0.0,
             MaszynaVehicleData.DriverType.DRIVER_HEAD).get_rid()
     PlayerServer.player_take_over_vehicle(vehicle)

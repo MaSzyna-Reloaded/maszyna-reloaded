@@ -174,18 +174,23 @@ jobs:
       fail-fast: false
       matrix:
         include:
+          # the game with the CPython runtimes of the cab Python screens beside it, the game without
+          # them, and the runtimes alone
           - platform: linux
             arch: x86_64
             templates: godot.linuxbsd.template_release.double.x86_64
-            output: bin/linux/maszyna-reloaded-linux64.zip
+            release: release-linux
+            output: bin/linux/maszyna-reloaded-*.zip
           - platform: windows
             arch: x86_64
             templates: godot.windows.template_release.double.x86_64.exe
-            # the zip and the installer beside it
-            output: bin/windows/maszyna-reloaded-win64*
+            release: release-windows
+            # the zips and the installers beside them
+            output: bin/windows/maszyna-reloaded-*
           - platform: android
             arch: arm64
             templates: android_release.apk
+            release: release-android
             output: bin/android/maszyna-reloaded-android-arm64.apk
     runs-on: ubuntu-24.04
     steps:
@@ -273,11 +278,30 @@ jobs:
       - name: Link the addons
         run: make links
 
-      - name: Build and export ${{ matrix.platform }}
-        run: make -o compile-debug release-${{ matrix.platform }}
+      # The CPython runtimes of the release with Python (libmaszyna's make python-runtime-linux,
+      # python-runtime-windows): built or fetched again only when libmaszyna's scripts that make
+      # them change
+      - name: Restore the Python runtimes
+        id: python-runtime
+        if: matrix.platform != 'android'
+        uses: actions/cache@v4
+        with:
+          path: vendor/libmaszyna/build-python-runtime/${{ matrix.platform }}
+          key: python-runtime-${{ matrix.platform }}-${{ hashFiles('vendor/libmaszyna/scripts/build-python-runtime', 'vendor/libmaszyna/scripts/fetch-python-runtime-windows') }}
 
-      # each game as <prefix>-<platform>-<target>-<arch>.zip or .apk, the Windows installer as
-      # <prefix>-windows-setup.exe, each its own artifact of the same name
+      # make compares a runtime with the script that makes it, which the checkout wrote after the
+      # restored runtime was made; the key says the script is the same
+      - name: Keep the restored Python runtimes
+        if: steps.python-runtime.outputs.cache-hit == 'true'
+        run: touch vendor/libmaszyna/build-python-runtime/${{ matrix.platform }}/python*
+
+      - name: Build and export ${{ matrix.platform }}
+        run: make -o compile-debug ${{ matrix.release }}
+
+      # each game as <prefix>-<platform>-<target>-<arch>.zip or .apk, with the Python runtimes
+      # (-nopython.zip without them), the Windows installers as <prefix>-windows-setup.exe and
+      # <prefix>-windows-nopython-setup.exe, the runtimes alone as <prefix>-<platform>-python-runtime.zip,
+      # each its own artifact of the same name
       - name: Name the files
         env:
           PREFIX: ${{ needs.build-host.outputs.prefix }}
@@ -286,7 +310,10 @@ jobs:
           mkdir release
           for file in ${{ matrix.output }}; do
             case "$file" in
+              *-python-runtime-*) cp "$file" "release/$PREFIX-${{ matrix.platform }}-python-runtime.zip" ;;
+              *-nopython-setup.exe) cp "$file" "release/$PREFIX-windows-nopython-setup.exe" ;;
               *-setup.exe) cp "$file" "release/$PREFIX-windows-setup.exe" ;;
+              *-nopython.zip) cp "$file" "release/$GAME-nopython.zip" ;;
               *) cp "$file" "release/$GAME.${file##*.}" ;;
             esac
           done
@@ -303,6 +330,20 @@ jobs:
         with:
           name: ${{ needs.build-host.outputs.prefix }}-windows-setup
           path: release/*-windows-setup.exe
+          if-no-files-found: error
+
+      - uses: actions/upload-artifact@v7
+        if: matrix.platform == 'windows'
+        with:
+          name: ${{ needs.build-host.outputs.prefix }}-windows-nopython-setup
+          path: release/*-windows-nopython-setup.exe
+          if-no-files-found: error
+
+      - uses: actions/upload-artifact@v7
+        if: matrix.platform != 'android'
+        with:
+          name: ${{ needs.build-host.outputs.prefix }}-${{ matrix.platform }}-python-runtime
+          path: release/*-python-runtime.zip
           if-no-files-found: error
 
   # A tag pushed on main is published as its release, on that tag itself (no tag is made), with the

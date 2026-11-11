@@ -1,4 +1,4 @@
-.PHONY: terrain3d links libreloaded-local libreloaded-submodule plugin-local plugin-submodule compile-debug compile-release compile-profiling compile-release-symbols compile-release-linux compile-windows-release compile-android-release build-number release release-linux release-linux-symbols release-windows release-android release-clear-godot-cache windows-installer-image windows-installer-image-push run-tests check-staged-uids install-git-hooks
+.PHONY: terrain3d links libreloaded-local libreloaded-submodule plugin-local plugin-submodule compile-debug compile-release compile-profiling compile-release-symbols compile-release-linux compile-windows-release compile-android-release build-number release release-linux release-linux-nopython release-linux-symbols release-windows release-windows-nopython release-android release-clear-godot-cache windows-installer-image windows-installer-image-push run-tests check-staged-uids install-git-hooks
 .DEFAULT_GOAL = compile-debug
 
 # libreloaded is the vendor/libreloaded submodule, built with its plugin libmaszyna - MaSzyna's
@@ -36,6 +36,15 @@ LINUX_ZIP:=bin/linux/maszyna-reloaded-linux64.zip
 ANDROID_APK:=bin/android/maszyna-reloaded-android-arm64.apk
 WINDOWS_ZIP:=bin/windows/maszyna-reloaded-win64.zip
 WINDOWS_SETUP:=bin/windows/maszyna-reloaded-win64-setup.exe
+# The release is the export with the CPython runtimes of the cab Python screens beside the executable
+# (python2.7/, python3.14/ - libmaszyna's make python-runtime-linux and python-runtime-windows), made
+# of the export without them (make release-linux-nopython, release-windows-nopython); the runtimes
+# alone are zipped too, to unpack beside a release without them
+LINUX_NOPYTHON_ZIP:=bin/linux/maszyna-reloaded-linux64-nopython.zip
+LINUX_PYTHON_RUNTIME_ZIP:=bin/linux/maszyna-reloaded-python-runtime-linux64.zip
+WINDOWS_NOPYTHON_ZIP:=bin/windows/maszyna-reloaded-win64-nopython.zip
+WINDOWS_NOPYTHON_SETUP:=bin/windows/maszyna-reloaded-win64-nopython-setup.exe
+WINDOWS_PYTHON_RUNTIME_ZIP:=bin/windows/maszyna-reloaded-python-runtime-win64.zip
 BUILD_NUMBER_FILE:=$(PROJECT_DIR)/build_number.txt
 # What a problem report names the build by (bug_report_snapshot.gd): a public release by its tag
 # alone - the commit's tag, no branch -, any other build by its number and the branch it is made
@@ -70,6 +79,17 @@ WINDOWS_INSTALLER_IMAGE:=ghcr.io/maszyna-reloaded/windows-installer:$(shell sha2
 # The container runs under Docker's init (tini), which hands Ctrl+C on to the whole process group of
 # its command: the command itself, as PID 1, would ignore it and keep the container running
 WINDOWS_INSTALLER_RUN=docker run --rm --init -e TINI_KILL_PROCESS_GROUP=1 --user $(shell id -u):$(shell id -g) -v $(CURDIR):$(CURDIR) -w $(CURDIR) $(WINDOWS_INSTALLER_IMAGE)
+# The installer $(2) of the export in the zip $(1)
+WINDOWS_INSTALLER_BUILD=$(WINDOWS_INSTALLER_RUN) sh -c 'rm -rf bin/windows/installer && unzip -q $(1) -d bin/windows/installer \
+	    && makensis -V2 -DSOURCE_DIR=$(CURDIR)/bin/windows/installer -DBUILD_NUMBER=$$(cat $(BUILD_NUMBER_FILE)) \
+	       -DOUTFILE=$(CURDIR)/$(2) ci/windows/maszyna-reloaded.nsi \
+	    && rm -rf bin/windows/installer'
+# The runtimes of $(1) (linux, windows) zipped alone into $(2), and with the export $(3) into $(4);
+# zip -y keeps the links of the Linux runtime's libraries
+PYTHON_RELEASE_BUILD=$(MAKE) -C $(LIBMASZYNA) python-runtime-$(1) LIBRELOADED=$(abspath $(LIBRELOADED)) \
+	&& rm -f $(2) $(4) && cp $(3) $(4) \
+	&& cd $(LIBMASZYNA)/build-python-runtime/$(1) \
+	&& zip -qry9 $(CURDIR)/$(2) python2.7 python3.14 && zip -qry9 $(CURDIR)/$(4) python2.7 python3.14
 
 
 # addons/libreloaded, addons/gnd_sfx and addons/<plugin> lead to the checkout in use - the submodule, or a local one
@@ -186,30 +206,38 @@ windows-installer-image-push: windows-installer-image
 # the Linux SDK container: no Docker, no ghcr.io and no network, but the release starts only on a
 # glibc as new as the host's - a build for this machine, never one to ship
 RELEASE_LINUX_LIBRARY=$(if $(LINUX_HOST),compile-release,compile-release-linux)
-release-linux: release-clear-godot-cache compile-debug $(RELEASE_LINUX_LIBRARY) $(LINUX_TEMPLATE_INSTALLED)
+release-linux-nopython: release-clear-godot-cache compile-debug $(RELEASE_LINUX_LIBRARY) $(LINUX_TEMPLATE_INSTALLED)
 	mkdir -p bin/linux
 	$(GODOT) --headless --path . --export-release "linux_x86_64" bin/linux/reloaded.zip
-	mv bin/linux/reloaded.zip $(LINUX_ZIP)
-	@echo "Exported: $(LINUX_ZIP)"
+	mv bin/linux/reloaded.zip $(LINUX_NOPYTHON_ZIP)
+	@echo "Exported: $(LINUX_NOPYTHON_ZIP)"
+
+
+release-linux: release-linux-nopython
+	$(call PYTHON_RELEASE_BUILD,linux,$(LINUX_PYTHON_RUNTIME_ZIP),$(LINUX_NOPYTHON_ZIP),$(LINUX_ZIP))
+	@echo "Exported: $(LINUX_ZIP), $(LINUX_PYTHON_RUNTIME_ZIP)"
 
 
 release-linux-symbols: release-clear-godot-cache compile-debug compile-release-symbols
 	mkdir -p bin/linux
 	$(GODOT) --headless --path . --export-release "linux_x86_64" bin/linux/reloaded.zip
-	mv bin/linux/reloaded.zip $(LINUX_ZIP)
-	@echo "Exported with symbols: $(LINUX_ZIP)"
+	mv bin/linux/reloaded.zip $(LINUX_NOPYTHON_ZIP)
+	@echo "Exported with symbols: $(LINUX_NOPYTHON_ZIP)"
 
 
-release-windows: release-clear-godot-cache compile-debug compile-windows-release $(WINDOWS_TEMPLATE_INSTALLED) windows-installer-image
+release-windows-nopython: release-clear-godot-cache compile-debug compile-windows-release $(WINDOWS_TEMPLATE_INSTALLED) windows-installer-image
 	mkdir -p bin/windows
 	$(GODOT) --headless --path . --export-release "windows_x86_64" bin/windows/reloaded.zip
-	mv bin/windows/reloaded.zip $(WINDOWS_ZIP)
-	@echo "Exported: $(WINDOWS_ZIP)"
-	$(WINDOWS_INSTALLER_RUN) sh -c 'rm -rf bin/windows/installer && unzip -q $(WINDOWS_ZIP) -d bin/windows/installer \
-	    && makensis -V2 -DSOURCE_DIR=$(CURDIR)/bin/windows/installer -DBUILD_NUMBER=$$(cat $(BUILD_NUMBER_FILE)) \
-	       -DOUTFILE=$(CURDIR)/$(WINDOWS_SETUP) ci/windows/maszyna-reloaded.nsi \
-	    && rm -rf bin/windows/installer'
-	@echo "Exported: $(WINDOWS_SETUP)"
+	mv bin/windows/reloaded.zip $(WINDOWS_NOPYTHON_ZIP)
+	@echo "Exported: $(WINDOWS_NOPYTHON_ZIP)"
+	$(call WINDOWS_INSTALLER_BUILD,$(WINDOWS_NOPYTHON_ZIP),$(WINDOWS_NOPYTHON_SETUP))
+	@echo "Exported: $(WINDOWS_NOPYTHON_SETUP)"
+
+
+release-windows: release-windows-nopython
+	$(call PYTHON_RELEASE_BUILD,windows,$(WINDOWS_PYTHON_RUNTIME_ZIP),$(WINDOWS_NOPYTHON_ZIP),$(WINDOWS_ZIP))
+	$(call WINDOWS_INSTALLER_BUILD,$(WINDOWS_ZIP),$(WINDOWS_SETUP))
+	@echo "Exported: $(WINDOWS_ZIP), $(WINDOWS_SETUP), $(WINDOWS_PYTHON_RUNTIME_ZIP)"
 
 
 release-android: release-clear-godot-cache compile-debug compile-android-release

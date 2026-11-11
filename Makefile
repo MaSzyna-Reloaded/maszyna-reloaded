@@ -52,10 +52,12 @@ export BUILD_TAG BUILD_BRANCH
 # differently: make release-linux GODOT=godot-double
 GODOT?=godot-double
 # The engine the release is exported with - libreloaded's; the export looks its template up by its
-# version, and libreloaded builds it under the name of its build: the version and its godot-patches
+# version, and libreloaded builds it under the name of its build: the version and its godot-patches.
+# Its files land outside this checkout (GODOT_BUILDS_DIR, shared with every checkout of the
+# machine): libreloaded's own `godot-bin` says where
 GODOT_VERSION:=$(shell sed -n 's/^GODOT_VERSION:=//p' $(LIBRELOADED)/Makefile)
 GODOT_BUILD:=$(shell MAKEFLAGS= $(MAKE) -s --no-print-directory -C $(LIBRELOADED) godot-build)
-GODOT_BIN:=$(LIBRELOADED)/build-godot-$(GODOT_BUILD)/bin
+GODOT_BIN:=$(shell MAKEFLAGS= $(MAKE) -s --no-print-directory -C $(LIBRELOADED) godot-bin)
 LINUX_TEMPLATE:=$(GODOT_BIN)/godot.linuxbsd.template_release.double.x86_64
 LINUX_TEMPLATE_INSTALLED:=$(HOME)/.local/share/godot/export_templates/$(GODOT_VERSION).stable.double/linux_release.x86_64
 WINDOWS_TEMPLATE:=$(GODOT_BIN)/godot.windows.template_release.double.x86_64.exe

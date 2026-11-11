@@ -637,8 +637,9 @@ func _on_vehicle_browser_vehicle_chosen(data_path: String, file_name: String, sk
             add_vehicle(chosen)
 
 
-## The vehicle the browser was opened for becomes `chosen`, in its livery; its place, name,
-## direction and crew stay, and the viewer shows the new one when it was open on it
+## The vehicle the browser was opened for becomes `chosen`, in its livery and named after it - the
+## scenery's name was the other vehicle's; its place, id, direction and crew stay, and the viewer
+## shows the new one when it was open on it
 func change_vehicle(chosen: VehicleData) -> void:
     if _changed_index < 0:
         return
@@ -646,6 +647,7 @@ func change_vehicle(chosen: VehicleData) -> void:
     vehicle.vehicle_provider = chosen.vehicle_provider
     vehicle.vehicle = chosen.vehicle
     vehicle.livery = chosen.livery
+    vehicle.name = chosen.livery
     _show_vehicles(_changed_index)
     if _changed_index == _shown_index:
         %VehicleViewer.show_vehicle(vehicle as MaszynaVehicleData)
@@ -714,12 +716,15 @@ func move_vehicle(from: int, to: int) -> void:
     _show_trainset_changes()
 
 
-## A skin accepted in the viewer: the trainset shows it and the scenery is loaded with it
+## A skin accepted in the viewer: the trainset shows it and the scenery is loaded with it, named
+## after it
 func _on_vehicle_viewer_skin_applied(skin: String) -> void:
     _ui_sounds.play(&"apply_skin")
     if _shown_index < 0:
         return
-    _members[_shown_index].vehicle.livery = skin
+    var vehicle: VehicleData = _members[_shown_index].vehicle
+    vehicle.name = skin
+    vehicle.livery = skin
     %TrainsetGrid.reload_tile(_shown_index, skin)
     _show_trainset_changes()
 

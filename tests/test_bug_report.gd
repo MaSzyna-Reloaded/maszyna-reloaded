@@ -54,7 +54,7 @@ func test_a_snapshot_without_a_scenery_is_valid_json() -> void:
     var parsed: Variant = JSON.parse_string(JSON.stringify(snapshot))
     assert_true(parsed is Dictionary, "the snapshot should survive JSON")
     for section: String in ["hardware", "settings", "scenario", "simulation", "camera", "streaming", "vehicles",
-            "signal_heads", "events"]:
+            "signal_heads", "events", "plugins"]:
         assert_has(parsed, section, "the snapshot should have its %s" % section)
 
 
@@ -254,3 +254,13 @@ func _definition() -> JSON:
         {"title": "Player keys", "input_group": "Player"},
     ]}
     return definition
+
+
+## maszyna-reloaded#55: each plugin's own state by its name - libmaszyna's memory cells, as a
+## scenario that waits on one is told from a report (reports#84)
+func test_a_snapshot_carries_each_plugins_state() -> void:
+    var plugins: Dictionary = BugReportSnapshot.plugins()
+
+    for plugin: ReloadedPlugin in ReloadedPluginServer.plugin_get_list():
+        assert_has(plugins, plugin.get_name(), "the snapshot should have %s's state" % plugin.get_name())
+        assert_eq(plugins[plugin.get_name()], plugin.dump_state())

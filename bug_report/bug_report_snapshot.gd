@@ -3,8 +3,8 @@ extends RefCounted
 
 ## The state of the game a problem report carries, read at the moment the report is opened: the
 ## hardware, the player's settings, the scenario, the simulation and its weather, the camera, the
-## streaming, the vehicles and signal heads around the player and the events ahead (what already
-## happened is in the recorder's gameplay log). Read once per report - the vehicles' dumps are no hot path here.
+## streaming, the vehicles and signal heads around the player, the events ahead (what already
+## happened is in the recorder's gameplay log) and each plugin's own state. Read once per report - the vehicles' dumps are no hot path here.
 
 ## What a report names the build by, stamped beside build_number.txt (make build-number, the CI):
 ## a public release's tag - its builds have no branch -, else the branch the build was made from
@@ -37,6 +37,7 @@ static func collect(world: SceneryWorld, started_msec: int, settings_definition:
         "events": {
             "upcoming": upcoming_events(),
         },
+        "plugins": plugins(),
     }
 
 
@@ -261,6 +262,15 @@ static func upcoming_events() -> Array[Dictionary]:
             "event": str(ScenarioEventServer.event_get_name(event)),
             "seconds_left": ScenarioEventServer.event_get_run_time(event) - now,
         })
+    return result
+
+
+## Each plugin's own state by its name - what it keeps that the core knows not, as a scenario
+## plugin's memory cells (ReloadedPlugin.dump_state())
+static func plugins() -> Dictionary:
+    var result: Dictionary = {}
+    for plugin: ReloadedPlugin in ReloadedPluginServer.plugin_get_list():
+        result[plugin.get_name()] = plugin.dump_state()
     return result
 
 

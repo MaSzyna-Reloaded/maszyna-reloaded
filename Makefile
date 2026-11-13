@@ -1,4 +1,4 @@
-.PHONY: terrain3d links libreloaded-local libreloaded-submodule plugin-local plugin-submodule compile-debug compile-release compile-profiling compile-release-symbols compile-release-linux compile-windows-release compile-android-release build-number release release-linux release-linux-nopython release-linux-symbols release-windows release-windows-nopython release-android release-clear-godot-cache export-template-linux export-template-windows windows-installer-image windows-installer-image-push run-tests check-staged-uids install-git-hooks
+.PHONY: terrain3d links libreloaded-local libreloaded-submodule plugin-local plugin-submodule compile-debug compile-release compile-profiling compile-release-symbols compile-release-linux compile-windows-release compile-android-release build-number release release-linux release-linux-nopython release-linux-symbols release-windows release-windows-nopython release-android release-clear-godot-cache export-template-linux export-template-windows windows-installer-image windows-installer-image-push run-tests check-staged-uids install-git-hooks FORCE
 .DEFAULT_GOAL = compile-debug
 
 # libreloaded is the vendor/libreloaded submodule, built with its plugin libmaszyna - MaSzyna's
@@ -180,18 +180,23 @@ release-clear-godot-cache:
 
 # The templates of the engine's build - its version and its godot-patches: libreloaded builds the
 # one missing (its Makefile), which takes hours and is done once per build (vendor/libreloaded/
-# ci/fetch-godot.sh fetches CI's instead), and the one newer than the installed one is installed -
-# a patch added is a new template, which upgrade-linux.sh and upgrade-windows.sh export with
+# ci/fetch-godot.sh fetches CI's instead), and installed whenever it is not the one installed - a
+# patch added is a new template, which upgrade-linux.sh and upgrade-windows.sh export with. By its
+# content, not its date: every build is kept (libreloaded's make godot-bin), so the template of a
+# build made before - another branch's patches - is older than the one installed
 $(LINUX_TEMPLATE) $(WINDOWS_TEMPLATE) $(LINUX_EDITOR):
 	$(MAKE) -C $(LIBRELOADED) $@
 
 
-$(LINUX_TEMPLATE_INSTALLED): $(LINUX_TEMPLATE)
-	install -D $< $@
+$(LINUX_TEMPLATE_INSTALLED): $(LINUX_TEMPLATE) FORCE
+	cmp -s $< $@ || install -D $< $@
 
 
-$(WINDOWS_TEMPLATE_INSTALLED): $(WINDOWS_TEMPLATE)
-	install -D $< $@
+$(WINDOWS_TEMPLATE_INSTALLED): $(WINDOWS_TEMPLATE) FORCE
+	cmp -s $< $@ || install -D $< $@
+
+
+FORCE:
 
 
 # The installed template of a platform by name: what a release exports with, a game built on this

@@ -1292,6 +1292,12 @@ msgstr ""
 msgid "Shadow texture quality"
 msgstr ""
 
+msgid "Texture quality"
+msgstr ""
+
+msgid "Cab texture quality"
+msgstr ""
+
 msgid "Low"
 msgstr ""
 

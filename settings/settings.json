@@ -336,6 +336,28 @@
                     "hint": "enum",
                     "hint_string": "Off:0,Very low:1,Low:2,Medium:3,High:4,Ultra:5",
                     "advanced": true
+                },
+                {
+                    "title": "Texture quality",
+                    "store": "project",
+                    "key": "maszyna/import/dds_max_texture_size",
+                    "type": "int",
+                    "hint": "enum",
+                    "hint_string": "Low:1024,Medium:2048,High:4096,Maximum:8192",
+                    "default": 4096,
+                    "advanced": true,
+                    "restart_required": true
+                },
+                {
+                    "title": "Cab texture quality",
+                    "store": "project",
+                    "key": "maszyna/import/dds_max_cab_texture_size",
+                    "type": "int",
+                    "hint": "enum",
+                    "hint_string": "Low:1024,Medium:2048,High:4096,Maximum:8192",
+                    "default": 4096,
+                    "advanced": true,
+                    "restart_required": true
                 }
             ]
         },

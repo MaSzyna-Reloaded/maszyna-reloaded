@@ -1277,6 +1277,12 @@ msgstr "Režim stínů"
 msgid "Shadow texture quality"
 msgstr "Kvalita textury stínů"
 
+msgid "Texture quality"
+msgstr "Kvalita textur"
+
+msgid "Cab texture quality"
+msgstr "Kvalita textur kabiny"
+
 msgid "Low"
 msgstr "Nízká"
 

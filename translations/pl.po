@@ -1292,6 +1292,12 @@ msgstr "Tryb cieni"
 msgid "Shadow texture quality"
 msgstr "Jakość tekstury cieni"
 
+msgid "Texture quality"
+msgstr "Jakość tekstur"
+
+msgid "Cab texture quality"
+msgstr "Jakość tekstur kabiny"
+
 msgid "Low"
 msgstr "Niska"
 

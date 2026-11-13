@@ -892,6 +892,7 @@ scenery/lights/energy=2.0
 scenery/lights/volumetric_fog_energy=16.0
 scenery/lights/lamp_attenuation=0.10000000000000002
 smoke/generator_mode=1
+import/dds_max_texture_size=4096
 
 [physics]
 

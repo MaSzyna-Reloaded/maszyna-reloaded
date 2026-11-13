@@ -1277,6 +1277,12 @@ msgstr "Árnyékmód"
 msgid "Shadow texture quality"
 msgstr "Árnyéktextúra minősége"
 
+msgid "Texture quality"
+msgstr "Textúraminőség"
+
+msgid "Cab texture quality"
+msgstr "Fülketextúra-minőség"
+
 msgid "Low"
 msgstr "Alacsony"
 

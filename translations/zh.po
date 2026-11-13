@@ -1277,6 +1277,12 @@ msgstr "阴影模式"
 msgid "Shadow texture quality"
 msgstr "阴影纹理质量"
 
+msgid "Texture quality"
+msgstr "纹理质量"
+
+msgid "Cab texture quality"
+msgstr "驾驶室纹理质量"
+
 msgid "Low"
 msgstr "低"
 

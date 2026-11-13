@@ -63,7 +63,7 @@ func _ready() -> void:
 ## A tile laid out in the Style the project chooses - Style.TEXT: the chip's text look (UIChip).
 ## For every tile of the HUD alike (SimulationSpeedPanel, the streaming spinner).
 static func apply_style(tile:UIChip) -> void:
-    if not ProjectSettings.get_setting(STYLE_SETTING, Style.CARDS) == Style.TEXT:
+    if not ProjectSettings.get_setting(STYLE_SETTING) == Style.TEXT:
         return
     tile.set_look(UIChip.Look.TEXT)
 

@@ -182,7 +182,7 @@ func start_scenery(info: SceneryInfo, vehicle_id: String, trainset: Array[Trains
     move_child(_world, $SettingsPanel.get_index())
     $GameHud.attach_environment(_world.get_environment())
     var log_files: PackedStringArray = []
-    if ProjectSettings.get_setting(FILE_LOGGING_SETTING, false):
+    if ProjectSettings.get_setting(FILE_LOGGING_SETTING):
         var log_directory: String = String(ProjectSettings.get_setting(LOG_PATH_SETTING)).get_base_dir()
         if DisplayServer.get_name() == "headless":
             log_directory = log_directory.path_join(HEADLESS_LOG_DIRECTORY)

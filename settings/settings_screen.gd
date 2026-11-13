@@ -13,7 +13,7 @@ extends Control
 ## settings.json lists "sections", each with a "title" and its "settings". A setting has a "title",
 ## a "store" ("project": "key" is the full name of a project setting; "user": "section" and "key"
 ## of UserSettings), a "type" ("bool", "int", "float", "String" - a text typed into a field), a
-## "default" (a project setting its library registers leaves it out: SettingRow.get_default_value())
+## "default" for a "user" one (a project setting has the project's own: SettingRow.get_default_value())
 ## and, for a number, a "hint"
 ## with its "hint_string" as a property hint of that kind has it: "range" "min,max,step,suffix:m",
 ## "enum" "Name:value,Name:value"; "hint": "resolution" is the window's size, its choices made from

@@ -22,6 +22,7 @@ const RAIN_EXCLUSION_PRECIPITATION_DELTA: float = -1.0
 const SUN_LIGHT_NAME: StringName = &"SunLight"
 const WEATHER_NAME: StringName = &"Weather"
 const WIND_TURBULENCE_SETTING: StringName = &"reloaded/weather/wind_turbulence"
+const WIND_TURBULENCE_DEFAULT: float = 1.0
 # Weather response to rain and wind strength, as in forest-test-scene ui/WeatherControlsCanvas.gd.
 const WIND_STRENGTH_MIN: float = 0.4
 const WIND_STRENGTH_MAX: float = 5.0
@@ -157,8 +158,7 @@ func apply_visual_configuration() -> void:
         return
     # only what differs: each of them makes Skydome set its effect up again
     for property: StringName in SUNSHAFT_PROPERTIES:
-        var value: Variant = ProjectSettings.get_setting(
-            SUNSHAFT_SETTINGS_PREFIX + property, skydome.get(property))
+        var value: Variant = ProjectSettings.get_setting(SUNSHAFT_SETTINGS_PREFIX + property)
         if not value == SkydomeServer.skydome_get_param(skydome.get_rid(), property):
             _set_skydome_param(property, value)
     # the rain look of the player's Weather settings (gnd_weather/<property>) - WeatherNode reads its
@@ -175,16 +175,16 @@ func apply_visual_configuration() -> void:
     weather.storm_intensity = clampf(inverse_lerp(STORM_RAIN_START, 1.0, precipitation), 0.0, 1.0)
     var rain_fog: float = clampf(inverse_lerp(RAIN_FOG_START, 1.0, precipitation), 0.0, 1.0)
     var fog_density: float = lerpf(environment_node.fog_density, maxf(environment_node.fog_density, float(
-        ProjectSettings.get_setting(RAIN_FOG_DENSITY_SETTING, RAIN_FOG_DENSITY_DEFAULT))), rain_fog)
+        ProjectSettings.get_setting(RAIN_FOG_DENSITY_SETTING))), rain_fog)
     var fog_distance: float = lerpf(environment_node.fog_distance, minf(environment_node.fog_distance, float(
-        ProjectSettings.get_setting(RAIN_FOG_DISTANCE_SETTING, RAIN_FOG_DISTANCE_DEFAULT))), rain_fog)
+        ProjectSettings.get_setting(RAIN_FOG_DISTANCE_SETTING))), rain_fog)
     weather.global_wind_direction = Vector2.from_angle(deg_to_rad(environment_node.wind_direction))
     weather.global_wind_speed = environment_node.get_wind_speed()
     weather.global_wind_strength = lerpf(
         WIND_STRENGTH_MIN, WIND_STRENGTH_MAX, environment_node.wind_strength
     )
     weather.global_wind_turbulence = float(
-        ProjectSettings.get_setting(WIND_TURBULENCE_SETTING, 1.0)
+        ProjectSettings.get_setting(WIND_TURBULENCE_SETTING)
     )
     _set_skydome_param(&"rainbow_intensity", (
         RAINBOW_INTENSITY_MAX
@@ -225,16 +225,13 @@ func apply_visual_configuration() -> void:
     var distance_ratio: float = 1.0 / range_scale
     var volumetric_scale: float = distance_ratio
     if distance_ratio < 1.0:
-        volumetric_scale = pow(distance_ratio, float(ProjectSettings.get_setting(
-            FOG_VOLUMETRIC_FAR_FALLOFF_SETTING, FOG_VOLUMETRIC_FAR_FALLOFF_DEFAULT)))
+        volumetric_scale = pow(distance_ratio, float(ProjectSettings.get_setting(FOG_VOLUMETRIC_FAR_FALLOFF_SETTING)))
         # ...but never all the way to nothing, or a scenery declaring a fog of kilometres leaves
         # the lamps with no haze to light (see FOG_VOLUMETRIC_MINIMUM_SETTING)
-        volumetric_scale = maxf(volumetric_scale, clampf(float(ProjectSettings.get_setting(
-            FOG_VOLUMETRIC_MINIMUM_SETTING, FOG_VOLUMETRIC_MINIMUM_DEFAULT)), 0.0, 1.0))
+        volumetric_scale = maxf(volumetric_scale, clampf(float(ProjectSettings.get_setting(FOG_VOLUMETRIC_MINIMUM_SETTING)), 0.0, 1.0))
     # Stretching the volume and thinning the fog by the same factor keeps the optical depth, so the
     # fog reaches out to where the lamps hang without looking any thicker (see the constant).
-    var length_scale: float = maxf(0.1, float(ProjectSettings.get_setting(
-        FOG_VOLUMETRIC_LENGTH_SCALE_SETTING, FOG_VOLUMETRIC_LENGTH_SCALE_DEFAULT)))
+    var length_scale: float = maxf(0.1, float(ProjectSettings.get_setting(FOG_VOLUMETRIC_LENGTH_SCALE_SETTING)))
     # What the length property ends up multiplied by, Skydome's own shrink included. The optical
     # depth is the density times the length, so the density has to be divided by this whole factor
     # and not by length_scale alone, or undoing the shrink thickens the fog by the shrink again.
@@ -245,10 +242,8 @@ func apply_visual_configuration() -> void:
     if not is_equal_approx(length_scale, 1.0):
         volume_scale = length_scale / length_shrink
     var fog_ends: Array[float] = [
-        fog_distance * float(ProjectSettings.get_setting(
-            FOG_DAY_DISTANCE_FACTOR_SETTING, FOG_DAY_DISTANCE_FACTOR_DEFAULT)),
-        fog_distance * float(ProjectSettings.get_setting(
-            FOG_NIGHT_DISTANCE_FACTOR_SETTING, FOG_NIGHT_DISTANCE_FACTOR_DEFAULT)),
+        fog_distance * float(ProjectSettings.get_setting(FOG_DAY_DISTANCE_FACTOR_SETTING)),
+        fog_distance * float(ProjectSettings.get_setting(FOG_NIGHT_DISTANCE_FACTOR_SETTING)),
     ]
     # The volume reaches no further than the depth fog: the volumetric fog is darker than the depth
     # fog's colour, and past the depth fog's end, where everything is that colour, an object in the

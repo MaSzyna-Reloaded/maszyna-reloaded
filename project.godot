@@ -39,6 +39,7 @@ general/3d_panning_strength=0.55
 ReloadedPlugins="*res://addons/libreloaded/plugins/reloaded_plugins.gd"
 SkydomeServer="*res://addons/gnd_skydome/SkydomeServer.gd"
 WeatherServer="*res://addons/gnd_weather/WeatherServer.gd"
+GameProjectSettings="*res://settings/game_project_settings.gd"
 BiomesServer="*res://addons/gnd_biomes/biomes_server.gd"
 TractionRenderingServer="*res://addons/libreloaded/traction/traction_rendering_server.gd"
 VehicleCatalogServer="*res://addons/libreloaded/vehicles/vehicle_catalog_server.gd"

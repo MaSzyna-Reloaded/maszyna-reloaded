@@ -160,7 +160,7 @@ func matches(text: String) -> bool:
     if needle.is_empty() or title.to_lower().contains(needle):
         return true
     if _translations.is_empty():
-        for path: String in ProjectSettings.get_setting(TRANSLATIONS_SETTING, PackedStringArray()):
+        for path: String in ProjectSettings.get_setting(TRANSLATIONS_SETTING):
             var translation: Translation = load(path) as Translation
             if translation:
                 _translations.append(translation)
@@ -316,11 +316,20 @@ func _read() -> Variant:
     return read_setting(store, section, key, default_value)
 
 
-## The value a setting has now - setting_default when it was never set; a PROJECT setting has no
-## section of its own
+## A setting's default value: of a PROJECT setting the project's own value - project.godot's, or the
+## one its owner registers it with (UserSettings.get_project_value()) - and of a USER one its
+## "default" in settings.json, so every default is written down in one place
+static func get_default_value(setting: Dictionary) -> Variant:
+    if STORES[setting["store"]] == Store.PROJECT:
+        return UserSettings.get_project_value(setting["key"])
+    return setting.get("default")
+
+
+## The value a setting has now - of a USER one setting_default when it was never set; a PROJECT
+## setting has a value of the project's own and no section
 static func read_setting(
         setting_store: Store, setting_section: String, setting_key: String,
         setting_default: Variant) -> Variant:
     if setting_store == Store.PROJECT:
-        return ProjectSettings.get_setting(setting_key, setting_default)
+        return ProjectSettings.get_setting(setting_key)
     return UserSettings.get_setting(setting_section, setting_key, setting_default)

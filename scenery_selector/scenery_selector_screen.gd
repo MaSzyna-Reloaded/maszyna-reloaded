@@ -159,7 +159,7 @@ func _show_list(selected: SceneryInfo) -> void:
         notes.append("%s%s%s" % [_get_provider(info.provider).title.to_upper(),
                 SceneryInfo.TITLE_PART_SEPARATOR, info.id.get_basename().to_upper()])
     var groups: PackedStringArray = []
-    if ProjectSettings.get_setting(GROUP_SETTING, true):
+    if ProjectSettings.get_setting(GROUP_SETTING):
         # "Bałtyk · SKM1" goes under "Bałtyk"
         var names: PackedStringArray = []
         for title: String in titles:

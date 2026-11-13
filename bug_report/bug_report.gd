@@ -98,7 +98,7 @@ func send_report() -> void:
     # the log of this session, its last part - only while it is written: with file logging off the
     # file is an earlier session's (EngineOverrides, the Debug settings), and there are no game logs
     var logs: Dictionary[String, PackedByteArray] = {}
-    if ProjectSettings.get_setting(FILE_LOGGING_SETTING, false):
+    if ProjectSettings.get_setting(FILE_LOGGING_SETTING):
         var session_log: String = ProjectSettings.get_setting(LOG_PATH_SETTING)
         logs[session_log.get_file()] = _read_tail(session_log, LOG_TAIL_BYTES)
     for log_file: String in _log_files:

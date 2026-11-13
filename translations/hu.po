@@ -1274,6 +1274,36 @@ msgstr "Árnyékok"
 msgid "Shadow mode"
 msgstr "Árnyékmód"
 
+msgid "Shadow texture quality"
+msgstr "Árnyéktextúra minősége"
+
+msgid "Texture quality"
+msgstr "Textúraminőség"
+
+msgid "Cab texture quality"
+msgstr "Fülketextúra-minőség"
+
+msgid "Low"
+msgstr "Alacsony"
+
+msgid "Medium"
+msgstr "Közepes"
+
+msgid "High"
+msgstr "Magas"
+
+msgid "Maximum"
+msgstr "Maximális"
+
+msgid "Shadow softness"
+msgstr "Árnyékok lágysága"
+
+msgid "Very low"
+msgstr "Nagyon alacsony"
+
+msgid "Ultra"
+msgstr "Ultra"
+
 msgid "Orthogonal"
 msgstr "Ortogonális"
 

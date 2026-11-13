@@ -61,7 +61,7 @@ const REGEX_SPECIAL_CHARACTERS: String = "\\.^$|?*+()[]{}-"
 
 ## Whether a report has anywhere to go
 static func is_available() -> bool:
-    return not ProjectSettings.get_setting(ENDPOINT_SETTING, "") == ""
+    return not ProjectSettings.get_setting(ENDPOINT_SETTING) == ""
 
 
 ## An empty screenshot or log is left out of the archive; the logs by their file names

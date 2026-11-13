@@ -13,7 +13,8 @@ extends Control
 ## settings.json lists "sections", each with a "title" and its "settings". A setting has a "title",
 ## a "store" ("project": "key" is the full name of a project setting; "user": "section" and "key"
 ## of UserSettings), a "type" ("bool", "int", "float", "String" - a text typed into a field), a
-## "default" and, for a number, a "hint"
+## "default" for a "user" one (a project setting has the project's own: SettingRow.get_default_value())
+## and, for a number, a "hint"
 ## with its "hint_string" as a property hint of that kind has it: "range" "min,max,step,suffix:m",
 ## "enum" "Name:value,Name:value"; "hint": "resolution" is the window's size, its choices made from
 ## the screen, and "folder" a project setting naming a file, shown as its folder with a button that
@@ -132,7 +133,7 @@ func _ready() -> void:
             row.store = SettingRow.STORES[setting["store"]]
             row.section = setting.get("section", "")
             row.key = setting["key"]
-            row.default_value = setting["default"]
+            row.default_value = SettingRow.get_default_value(setting)
             row.hint_string = setting.get("hint_string", "")
             row.restart_required = setting.get("restart_required", false)
             if setting.get("advanced", false):

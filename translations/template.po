@@ -1289,6 +1289,36 @@ msgstr ""
 msgid "Shadow mode"
 msgstr ""
 
+msgid "Shadow texture quality"
+msgstr ""
+
+msgid "Texture quality"
+msgstr ""
+
+msgid "Cab texture quality"
+msgstr ""
+
+msgid "Low"
+msgstr ""
+
+msgid "Medium"
+msgstr ""
+
+msgid "High"
+msgstr ""
+
+msgid "Maximum"
+msgstr ""
+
+msgid "Shadow softness"
+msgstr ""
+
+msgid "Very low"
+msgstr ""
+
+msgid "Ultra"
+msgstr ""
+
 msgid "Orthogonal"
 msgstr ""
 

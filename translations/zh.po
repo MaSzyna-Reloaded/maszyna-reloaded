@@ -1274,6 +1274,36 @@ msgstr "阴影"
 msgid "Shadow mode"
 msgstr "阴影模式"
 
+msgid "Shadow texture quality"
+msgstr "阴影纹理质量"
+
+msgid "Texture quality"
+msgstr "纹理质量"
+
+msgid "Cab texture quality"
+msgstr "驾驶室纹理质量"
+
+msgid "Low"
+msgstr "低"
+
+msgid "Medium"
+msgstr "中"
+
+msgid "High"
+msgstr "高"
+
+msgid "Maximum"
+msgstr "最高"
+
+msgid "Shadow softness"
+msgstr "阴影柔和度"
+
+msgid "Very low"
+msgstr "很低"
+
+msgid "Ultra"
+msgstr "超高"
+
 msgid "Orthogonal"
 msgstr "正交"
 

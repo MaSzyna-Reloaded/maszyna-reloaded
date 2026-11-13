@@ -37,6 +37,9 @@ general/3d_panning_strength=0.55
 [autoload]
 
 ReloadedPlugins="*res://addons/libreloaded/plugins/reloaded_plugins.gd"
+SkydomeServer="*res://addons/gnd_skydome/SkydomeServer.gd"
+WeatherServer="*res://addons/gnd_weather/WeatherServer.gd"
+GameProjectSettings="*res://settings/game_project_settings.gd"
 BiomesServer="*res://addons/gnd_biomes/biomes_server.gd"
 TractionRenderingServer="*res://addons/libreloaded/traction/traction_rendering_server.gd"
 VehicleCatalogServer="*res://addons/libreloaded/vehicles/vehicle_catalog_server.gd"
@@ -81,36 +84,12 @@ text_editor/behavior/files/trim_trailing_whitespace_on_save=true
 
 enabled=PackedStringArray("res://addons/debug_menu/plugin.cfg", "res://addons/gnd_sfx/plugin.cfg", "res://addons/gut/plugin.cfg", "res://addons/libreloaded/editor/scenery_streaming/plugin.cfg", "res://addons/libmaszyna/editor/maszyna_vehicles/plugin.cfg", "res://addons/libmaszyna/editor/e3d_toolbar/plugin.cfg", "res://addons/libmaszyna/editor/fiz_toolbar/plugin.cfg", "res://addons/libmaszyna/editor/nodebank/plugin.cfg", "res://addons/libmaszyna/editor/scenery_info/plugin.cfg", "res://addons/libmaszyna/editor/scn_toolbar/plugin.cfg", "res://addons/libreloaded/editor/scenery_toolbar/plugin.cfg", "res://addons/libreloaded/editor/tracks/plugin.cfg", "res://addons/libreloaded/plugin.cfg", "res://addons/libmaszyna/plugin.cfg", "res://addons/gnd_skydome/plugin.cfg", "res://addons/gnd_weather/plugin.cfg")
 
-[gnd_skydome]
-
-clouds_mode=1
-day_light_energy=2.0
-shader_zenith_color=Color(0.11514282, 0.20309141, 0.3828125, 1)
-shader_horizon_height=0.178
-shader_night_sky_energy=0.165
-clouds_color_shadow=Color(0.8515625, 0.8515625, 0.8515625, 1)
-clouds_shadow_angular_distance_clear=0.53
-sunshafts_intensity=0.45
-sunshafts_cloud_occlusion=0.35
-sunshafts_cloud_falloff=0.45
-clouds_shadow_angular_distance_overcast=0.53
-clouds_evolution_strength=0.775
-clouds_evolution_scale=0.198
-clouds_scroll_b=Vector2(0.002, 0)
-sun_halo_strength=0.14
-sun_atmosphere_strength=0.07
-moon_glow_strength=0.01
-moon_glow_size=0.2
-shader_atmosphere_sunset_boost=0.47
-vol_fog_density_boost=0.006
-night_vol_fog_density=0.02
-
 [gnd_weather]
 
 precipitation_wind_strength=10.0
 wind_influence=0.5
 follow_height=0.855
-rain_mesh_density=2.0
+precipitation_mesh_density=2.0
 near_layer_speed_multiplier=2.0
 near_rain_blur=0.7
 near_rain_glow=1.0
@@ -121,8 +100,6 @@ visual_intensity=5.0
 rain_roughness=0.5
 rain_specular_fade_start=0.1
 rain_specular_fade_end=3.0
-rain_probe_max_count=64
-rain_probe_distance=4.0
 
 [hud]
 
@@ -916,6 +893,7 @@ scenery/lights/energy=2.0
 scenery/lights/volumetric_fog_energy=16.0
 scenery/lights/lamp_attenuation=0.10000000000000002
 smoke/generator_mode=1
+import/dds_max_texture_size=4096
 
 [physics]
 
@@ -926,8 +904,6 @@ common/max_physics_steps_per_frame=2
 
 user_settings/declarations="res://settings/settings.json"
 locale/translations=PackedStringArray("res://addons/libreloaded/translations/cz.po", "res://addons/libreloaded/translations/hu.po", "res://addons/libreloaded/translations/pl.po", "res://addons/libreloaded/translations/zh.po", "res://translations/cz.po", "res://translations/hu.po", "res://translations/pl.po", "res://translations/zh.po")
-scenery/shadows/blur=0.4
-cabin/shadows/blur=0.4
 scenery/track_curve_bake_interval=0.5
 weather/fog/volumetric_energy=4.0
 weather/fog/curve=2.0
@@ -942,7 +918,6 @@ smoke/modern/atlas="res://vfx/smoke_atlas.png"
 [rendering]
 
 textures/vram_compression/import_etc2_astc=true
-lights_and_shadows/directional_shadow/soft_shadow_filter_quality=0
 textures/default_filters/anisotropic_filtering_level=3
 environment/volumetric_fog/volume_size=96
 environment/volumetric_fog/volume_depth=96
@@ -1042,4 +1017,72 @@ sgt_motion_texture={
 gnd_high_quality_foliage={
 "type": "bool",
 "value": true
+}
+gnd_snow_cover={
+"type": "float",
+"value": 0.0
+}
+gnd_snow_depth={
+"type": "float",
+"value": 0.0
+}
+gnd_snow_wetness={
+"type": "float",
+"value": 0.0
+}
+gnd_wetness={
+"type": "float",
+"value": 0.0
+}
+gnd_air_temperature={
+"type": "float",
+"value": 10.0
+}
+gnd_rain={
+"type": "float",
+"value": 0.0
+}
+gnd_puddles={
+"type": "float",
+"value": 0.0
+}
+gnd_weather_ground={
+"type": "sampler3D",
+"value": ""
+}
+gnd_weather_probes={
+"type": "sampler3D",
+"value": ""
+}
+gnd_weather_probe_origin={
+"type": "vec3",
+"value": Vector3(0, 0, 0)
+}
+gnd_weather_probe_size={
+"type": "vec3",
+"value": Vector3(1, 1, 1)
+}
+gnd_weather_probes_enabled={
+"type": "float",
+"value": 0.0
+}
+gnd_weather_wet_exists={
+"type": "bool",
+"value": false
+}
+gnd_weather_snow_exists={
+"type": "bool",
+"value": false
+}
+gnd_weather_puddles_exist={
+"type": "bool",
+"value": false
+}
+gnd_weather_rain_exists={
+"type": "bool",
+"value": false
+}
+gnd_weather_surfaces_active={
+"type": "bool",
+"value": false
 }

@@ -1274,6 +1274,36 @@ msgstr "Stíny"
 msgid "Shadow mode"
 msgstr "Režim stínů"
 
+msgid "Shadow texture quality"
+msgstr "Kvalita textury stínů"
+
+msgid "Texture quality"
+msgstr "Kvalita textur"
+
+msgid "Cab texture quality"
+msgstr "Kvalita textur kabiny"
+
+msgid "Low"
+msgstr "Nízká"
+
+msgid "Medium"
+msgstr "Střední"
+
+msgid "High"
+msgstr "Vysoká"
+
+msgid "Maximum"
+msgstr "Maximální"
+
+msgid "Shadow softness"
+msgstr "Měkkost stínů"
+
+msgid "Very low"
+msgstr "Velmi nízká"
+
+msgid "Ultra"
+msgstr "Ultra"
+
 msgid "Orthogonal"
 msgstr "Ortogonální"
 

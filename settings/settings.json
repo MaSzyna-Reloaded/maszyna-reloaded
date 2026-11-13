@@ -166,8 +166,7 @@
                     "title": "Sunshafts",
                     "store": "project",
                     "key": "gnd_skydome/sunshafts_enabled",
-                    "type": "bool",
-                    "default": true
+                    "type": "bool"
                 },
                 {
                     "title": "Sunshaft intensity",
@@ -176,7 +175,6 @@
                     "type": "float",
                     "hint": "range",
                     "hint_string": "0,4,0.01,or_greater",
-                    "default": 0.45,
                     "advanced": true,
                     "depends_on": "gnd_skydome/sunshafts_enabled"
                 },
@@ -187,7 +185,6 @@
                     "type": "float",
                     "hint": "range",
                     "hint_string": "0,2,0.005",
-                    "default": 0.485,
                     "advanced": true,
                     "depends_on": "gnd_skydome/sunshafts_enabled"
                 },
@@ -198,7 +195,6 @@
                     "type": "float",
                     "hint": "range",
                     "hint_string": "0,1,0.001",
-                    "default": 0.182,
                     "advanced": true,
                     "depends_on": "gnd_skydome/sunshafts_enabled"
                 },
@@ -209,7 +205,6 @@
                     "type": "float",
                     "hint": "range",
                     "hint_string": "0,0.2,0.0005",
-                    "default": 0.0355,
                     "advanced": true,
                     "depends_on": "gnd_skydome/sunshafts_enabled"
                 },
@@ -220,7 +215,6 @@
                     "type": "float",
                     "hint": "range",
                     "hint_string": "0.5,1,0.001",
-                    "default": 0.93,
                     "advanced": true,
                     "depends_on": "gnd_skydome/sunshafts_enabled"
                 },
@@ -231,7 +225,6 @@
                     "type": "float",
                     "hint": "range",
                     "hint_string": "0,5,0.01",
-                    "default": 1.59,
                     "advanced": true,
                     "depends_on": "gnd_skydome/sunshafts_enabled"
                 },
@@ -242,7 +235,6 @@
                     "type": "float",
                     "hint": "range",
                     "hint_string": "0,4,0.001",
-                    "default": 1.377,
                     "advanced": true,
                     "depends_on": "gnd_skydome/sunshafts_enabled"
                 },
@@ -253,7 +245,6 @@
                     "type": "float",
                     "hint": "range",
                     "hint_string": "0,1,0.01",
-                    "default": 0.35,
                     "advanced": true,
                     "depends_on": "gnd_skydome/sunshafts_enabled"
                 },
@@ -264,7 +255,6 @@
                     "type": "float",
                     "hint": "range",
                     "hint_string": "0.1,4,0.01",
-                    "default": 0.45,
                     "advanced": true,
                     "depends_on": "gnd_skydome/sunshafts_enabled"
                 },
@@ -275,7 +265,6 @@
                     "type": "int",
                     "hint": "range",
                     "hint_string": "4,100,1",
-                    "default": 8,
                     "advanced": true,
                     "depends_on": "gnd_skydome/sunshafts_enabled"
                 },
@@ -318,6 +307,44 @@
                     "hint": "range",
                     "hint_string": "0.5,2,0.01",
                     "default": 1.0
+                },
+                {
+                    "title": "Shadow texture quality",
+                    "store": "project",
+                    "key": "reloaded/shadows/texture_quality",
+                    "type": "int",
+                    "hint": "enum",
+                    "hint_string": "Low:0,Medium:1,High:2,Maximum:3",
+                    "advanced": true
+                },
+                {
+                    "title": "Shadow softness",
+                    "store": "project",
+                    "key": "rendering/lights_and_shadows/directional_shadow/soft_shadow_filter_quality",
+                    "type": "int",
+                    "hint": "enum",
+                    "hint_string": "Off:0,Very low:1,Low:2,Medium:3,High:4,Ultra:5",
+                    "advanced": true
+                },
+                {
+                    "title": "Texture quality",
+                    "store": "project",
+                    "key": "maszyna/import/dds_max_texture_size",
+                    "type": "int",
+                    "hint": "enum",
+                    "hint_string": "Low:1024,Medium:2048,High:4096,Maximum:8192",
+                    "advanced": true,
+                    "restart_required": true
+                },
+                {
+                    "title": "Cab texture quality",
+                    "store": "project",
+                    "key": "maszyna/import/dds_max_cab_texture_size",
+                    "type": "int",
+                    "hint": "enum",
+                    "hint_string": "Low:1024,Medium:2048,High:4096,Maximum:8192",
+                    "advanced": true,
+                    "restart_required": true
                 }
             ]
         },
@@ -330,15 +357,13 @@
                     "key": "reloaded/scenery/tracks/distance",
                     "type": "float",
                     "hint": "range",
-                    "hint_string": "100,20000,10,suffix:m",
-                    "default": 2000.0
+                    "hint_string": "100,20000,10,suffix:m"
                 },
                 {
                     "title": "Lazy loading (experimental)",
                     "store": "project",
                     "key": "reloaded/resources/lazy_loading",
                     "type": "bool",
-                    "default": false,
                     "restart_required": true
                 },
                 {
@@ -348,15 +373,13 @@
                     "type": "float",
                     "hint": "range",
                     "hint_string": "0,2,0.01",
-                    "default": 0.2,
                     "advanced": true
                 },
                 {
                     "title": "Improved railway lights visibility",
                     "store": "project",
                     "key": "maszyna/scenery/railway_lights_visibility_improved",
-                    "type": "bool",
-                    "default": true
+                    "type": "bool"
                 },
                 {
                     "title": "Railway lights point size multiplier",
@@ -364,8 +387,7 @@
                     "key": "maszyna/scenery/railway_lights_point_size_multiplier",
                     "type": "float",
                     "hint": "range",
-                    "hint_string": "0.5,8,0.1",
-                    "default": 2.0
+                    "hint_string": "0.5,8,0.1"
                 },
                 {
                     "title": "Railway lights glare intensity",
@@ -374,7 +396,6 @@
                     "type": "float",
                     "hint": "range",
                     "hint_string": "0,1,0.05",
-                    "default": 0.5,
                     "advanced": true
                 },
                 {
@@ -384,7 +405,6 @@
                     "type": "float",
                     "hint": "range",
                     "hint_string": "0,1,0.05",
-                    "default": 0.5,
                     "advanced": true
                 },
                 {
@@ -394,7 +414,6 @@
                     "type": "float",
                     "hint": "range",
                     "hint_string": "0,4,0.1",
-                    "default": 1.0,
                     "advanced": true
                 },
                 {
@@ -404,7 +423,6 @@
                     "type": "float",
                     "hint": "range",
                     "hint_string": "0,1,0.05",
-                    "default": 0.4,
                     "advanced": true
                 },
                 {
@@ -414,15 +432,13 @@
                     "type": "float",
                     "hint": "range",
                     "hint_string": "0,0.2,0.005",
-                    "default": 0.03,
                     "advanced": true
                 },
                 {
                     "title": "Shadows",
                     "store": "project",
                     "key": "reloaded/scenery/shadows/enabled",
-                    "type": "bool",
-                    "default": true
+                    "type": "bool"
                 },
                 {
                     "title": "Shadow mode",
@@ -430,8 +446,7 @@
                     "key": "reloaded/scenery/shadows/mode",
                     "type": "int",
                     "hint": "enum",
-                    "hint_string": "Orthogonal:0,PSSM 2 Splits:1,PSSM 4 Splits:2",
-                    "default": 2
+                    "hint_string": "Orthogonal:0,PSSM 2 Splits:1,PSSM 4 Splits:2"
                 },
                 {
                     "title": "Shadow distance",
@@ -440,7 +455,6 @@
                     "type": "float",
                     "hint": "range",
                     "hint_string": "0,10000,1,suffix:m",
-                    "default": 250.0,
                     "advanced": true
                 },
                 {
@@ -450,7 +464,6 @@
                     "type": "float",
                     "hint": "range",
                     "hint_string": "0,10,0.01,or_greater",
-                    "default": 1.0,
                     "advanced": true
                 },
                 {
@@ -460,7 +473,6 @@
                     "type": "float",
                     "hint": "range",
                     "hint_string": "0,1,0.01",
-                    "default": 1.0,
                     "advanced": true
                 },
                 {
@@ -470,7 +482,6 @@
                     "type": "float",
                     "hint": "range",
                     "hint_string": "0,10,0.001,or_greater",
-                    "default": 0.1,
                     "advanced": true
                 },
                 {
@@ -480,7 +491,6 @@
                     "type": "float",
                     "hint": "range",
                     "hint_string": "0,32,0.001,or_greater",
-                    "default": 1.0,
                     "advanced": true
                 },
                 {
@@ -488,7 +498,6 @@
                     "store": "project",
                     "key": "reloaded/scenery/shadows/blend_splits",
                     "type": "bool",
-                    "default": true,
                     "advanced": true
                 },
                 {
@@ -498,7 +507,6 @@
                     "type": "float",
                     "hint": "range",
                     "hint_string": "0,1,0.001",
-                    "default": 0.03125,
                     "advanced": true
                 },
                 {
@@ -508,7 +516,6 @@
                     "type": "float",
                     "hint": "range",
                     "hint_string": "0,1,0.001",
-                    "default": 0.125,
                     "advanced": true
                 },
                 {
@@ -518,7 +525,6 @@
                     "type": "float",
                     "hint": "range",
                     "hint_string": "0,1,0.001",
-                    "default": 0.5,
                     "advanced": true
                 },
                 {
@@ -527,8 +533,7 @@
                     "key": "maszyna/scenery/lights/mode",
                     "type": "int",
                     "hint": "enum",
-                    "hint_string": "Lights off:0,Economy:1,High quality:2",
-                    "default": 1
+                    "hint_string": "Lights off:0,Economy:1,High quality:2"
                 },
                 {
                     "title": "Scenery lights distance",
@@ -537,15 +542,13 @@
                     "type": "float",
                     "hint": "range",
                     "hint_string": "10,1000,5,suffix:m",
-                    "default": 400.0,
                     "advanced": true
                 },
                 {
                     "title": "Scenery lights cast shadows",
                     "store": "project",
                     "key": "maszyna/scenery/lights/cast_shadows",
-                    "type": "bool",
-                    "default": true
+                    "type": "bool"
                 },
                 {
                     "title": "Economy light height offset",
@@ -554,7 +557,6 @@
                     "type": "float",
                     "hint": "range",
                     "hint_string": "-2,5,0.1,suffix:m",
-                    "default": 1.0,
                     "advanced": true
                 },
                 {
@@ -564,7 +566,6 @@
                     "type": "float",
                     "hint": "range",
                     "hint_string": "0.5,3,0.05",
-                    "default": 1.2,
                     "advanced": true
                 },
                 {
@@ -574,7 +575,6 @@
                     "type": "float",
                     "hint": "range",
                     "hint_string": "0,3,0.05,suffix:m",
-                    "default": 0.25,
                     "advanced": true
                 },
                 {
@@ -583,8 +583,7 @@
                     "key": "maszyna/scenery/lights/energy",
                     "type": "float",
                     "hint": "range",
-                    "hint_string": "0,10,0.05",
-                    "default": 1.0
+                    "hint_string": "0,10,0.05"
                 },
                 {
                     "title": "Light tint",
@@ -593,7 +592,6 @@
                     "type": "float",
                     "hint": "range",
                     "hint_string": "0,1,0.05",
-                    "default": 0.5,
                     "advanced": true
                 },
                 {
@@ -603,7 +601,6 @@
                     "type": "float",
                     "hint": "range",
                     "hint_string": "0,16,0.1",
-                    "default": 4.0,
                     "advanced": true
                 },
                 {
@@ -613,7 +610,6 @@
                     "type": "float",
                     "hint": "range",
                     "hint_string": "-2,5,0.1,suffix:m",
-                    "default": 0.5,
                     "advanced": true
                 },
                 {
@@ -623,7 +619,6 @@
                     "type": "float",
                     "hint": "range",
                     "hint_string": "0.5,4,0.05",
-                    "default": 1.5,
                     "advanced": true
                 },
                 {
@@ -633,7 +628,6 @@
                     "type": "float",
                     "hint": "range",
                     "hint_string": "0.01,8,0.01",
-                    "default": 0.5,
                     "advanced": true
                 }
             ]
@@ -645,15 +639,13 @@
                     "title": "Improved cabin shadows",
                     "store": "project",
                     "key": "reloaded/cabin/improve_shadows_quality",
-                    "type": "bool",
-                    "default": true
+                    "type": "bool"
                 },
                 {
                     "title": "Indicator glow",
                     "store": "project",
                     "key": "maszyna/cabin/indicator_glow_enabled",
-                    "type": "bool",
-                    "default": true
+                    "type": "bool"
                 },
                 {
                     "title": "Indicator glow energy",
@@ -662,7 +654,6 @@
                     "type": "float",
                     "hint": "range",
                     "hint_string": "0,2,0.005",
-                    "default": 0.05,
                     "advanced": true
                 },
                 {
@@ -672,15 +663,13 @@
                     "type": "float",
                     "hint": "range",
                     "hint_string": "0.01,2,0.01,suffix:m",
-                    "default": 0.1,
                     "advanced": true
                 },
                 {
                     "title": "Real instrument lights",
                     "store": "project",
                     "key": "maszyna/cabin/real_instruments_lights",
-                    "type": "bool",
-                    "default": true
+                    "type": "bool"
                 },
                 {
                     "title": "Instrument glow energy",
@@ -689,7 +678,6 @@
                     "type": "float",
                     "hint": "range",
                     "hint_string": "0,1,0.001",
-                    "default": 0.002,
                     "advanced": true
                 },
                 {
@@ -699,15 +687,13 @@
                     "type": "float",
                     "hint": "range",
                     "hint_string": "0.01,2,0.01,suffix:m",
-                    "default": 0.564628,
                     "advanced": true
                 },
                 {
                     "title": "Cab display glow",
                     "store": "project",
                     "key": "maszyna/cabin/screen_glow_enabled",
-                    "type": "bool",
-                    "default": true
+                    "type": "bool"
                 },
                 {
                     "title": "Cab display glow energy",
@@ -716,7 +702,6 @@
                     "type": "float",
                     "hint": "range",
                     "hint_string": "0,2,0.005",
-                    "default": 0.05,
                     "advanced": true
                 },
                 {
@@ -726,7 +711,6 @@
                     "type": "float",
                     "hint": "range",
                     "hint_string": "0.05,4,0.05,suffix:m",
-                    "default": 1.0,
                     "advanced": true
                 },
                 {
@@ -734,7 +718,6 @@
                     "store": "project",
                     "key": "reloaded/cabin/shadows/enabled",
                     "type": "bool",
-                    "default": true,
                     "depends_on": "reloaded/cabin/improve_shadows_quality"
                 },
                 {
@@ -744,7 +727,6 @@
                     "type": "int",
                     "hint": "enum",
                     "hint_string": "Orthogonal:0,PSSM 2 Splits:1,PSSM 4 Splits:2",
-                    "default": 1,
                     "depends_on": "reloaded/cabin/improve_shadows_quality"
                 },
                 {
@@ -754,7 +736,6 @@
                     "type": "float",
                     "hint": "range",
                     "hint_string": "0,10000,1,suffix:m",
-                    "default": 8.0,
                     "advanced": true
                 },
                 {
@@ -764,7 +745,6 @@
                     "type": "float",
                     "hint": "range",
                     "hint_string": "0,10,0.01,or_greater",
-                    "default": 1.0,
                     "advanced": true
                 },
                 {
@@ -774,7 +754,6 @@
                     "type": "float",
                     "hint": "range",
                     "hint_string": "0,1,0.01",
-                    "default": 1.0,
                     "advanced": true
                 },
                 {
@@ -784,7 +763,6 @@
                     "type": "float",
                     "hint": "range",
                     "hint_string": "0,10,0.001,or_greater",
-                    "default": 0.1,
                     "advanced": true
                 },
                 {
@@ -794,7 +772,6 @@
                     "type": "float",
                     "hint": "range",
                     "hint_string": "0,32,0.001,or_greater",
-                    "default": 5.0,
                     "advanced": true
                 },
                 {
@@ -802,7 +779,6 @@
                     "store": "project",
                     "key": "reloaded/cabin/shadows/blend_splits",
                     "type": "bool",
-                    "default": true,
                     "advanced": true
                 },
                 {
@@ -812,7 +788,6 @@
                     "type": "float",
                     "hint": "range",
                     "hint_string": "0,1,0.001",
-                    "default": 0.25,
                     "advanced": true
                 },
                 {
@@ -822,7 +797,6 @@
                     "type": "float",
                     "hint": "range",
                     "hint_string": "0,1,0.001",
-                    "default": 0.5,
                     "advanced": true
                 },
                 {
@@ -832,7 +806,6 @@
                     "type": "float",
                     "hint": "range",
                     "hint_string": "0,1,0.001",
-                    "default": 0.75,
                     "advanced": true
                 }
             ]
@@ -846,15 +819,13 @@
                     "key": "reloaded/vehicles/detail_distance",
                     "type": "float",
                     "hint": "range",
-                    "hint_string": "50,10000,10,suffix:m",
-                    "default": 350.0
+                    "hint_string": "50,10000,10,suffix:m"
                 },
                 {
                     "title": "Real mirrors",
                     "store": "project",
                     "key": "maszyna/rendering/real_mirrors",
-                    "type": "bool",
-                    "default": true
+                    "type": "bool"
                 },
                 {
                     "title": "Interior lights energy",
@@ -863,7 +834,6 @@
                     "type": "float",
                     "hint": "range",
                     "hint_string": "0,4,0.05",
-                    "default": 0.5,
                     "advanced": true
                 },
                 {
@@ -871,7 +841,6 @@
                     "store": "project",
                     "key": "maszyna/vehicles/interior_lights/shadows",
                     "type": "bool",
-                    "default": false,
                     "advanced": true
                 },
                 {
@@ -881,7 +850,6 @@
                     "type": "float",
                     "hint": "range",
                     "hint_string": "0,2,0.01",
-                    "default": 0.1,
                     "advanced": true
                 },
                 {
@@ -891,7 +859,6 @@
                     "type": "float",
                     "hint": "range",
                     "hint_string": "0,40,0.1",
-                    "default": 20.0,
                     "advanced": true
                 },
                 {
@@ -901,7 +868,6 @@
                     "type": "float",
                     "hint": "range",
                     "hint_string": "0,8,0.05",
-                    "default": 2.4,
                     "advanced": true
                 }
             ]
@@ -913,8 +879,7 @@
                     "title": "Smoke enabled",
                     "store": "project",
                     "key": "reloaded/smoke/enabled",
-                    "type": "bool",
-                    "default": true
+                    "type": "bool"
                 },
                 {
                     "title": "Smoke generator",
@@ -922,8 +887,7 @@
                     "key": "maszyna/smoke/generator_mode",
                     "type": "int",
                     "hint": "enum",
-                    "hint_string": "Original:0,Modern:1",
-                    "default": 0
+                    "hint_string": "Original:0,Modern:1"
                 },
                 {
                     "title": "Vehicle smoke distance",
@@ -931,8 +895,7 @@
                     "key": "reloaded/smoke/dynamic/distance",
                     "type": "float",
                     "hint": "range",
-                    "hint_string": "100,10000,10,suffix:m",
-                    "default": 1500.0
+                    "hint_string": "100,10000,10,suffix:m"
                 },
                 {
                     "title": "Vehicle smoke density",
@@ -940,8 +903,7 @@
                     "key": "reloaded/smoke/dynamic/density",
                     "type": "float",
                     "hint": "range",
-                    "hint_string": "0.25,8,0.25",
-                    "default": 1.0
+                    "hint_string": "0.25,8,0.25"
                 },
                 {
                     "title": "Vehicle smoke lifetime",
@@ -950,7 +912,6 @@
                     "type": "float",
                     "hint": "range",
                     "hint_string": "0.1,4,0.05",
-                    "default": 1.0,
                     "advanced": true
                 },
                 {
@@ -960,7 +921,6 @@
                     "type": "int",
                     "hint": "range",
                     "hint_string": "16,8000,1",
-                    "default": 2000,
                     "advanced": true
                 },
                 {
@@ -969,8 +929,7 @@
                     "key": "reloaded/smoke/static/distance",
                     "type": "float",
                     "hint": "range",
-                    "hint_string": "100,10000,10,suffix:m",
-                    "default": 1500.0
+                    "hint_string": "100,10000,10,suffix:m"
                 },
                 {
                     "title": "Scenery smoke density",
@@ -978,8 +937,7 @@
                     "key": "reloaded/smoke/static/density",
                     "type": "float",
                     "hint": "range",
-                    "hint_string": "0.25,8,0.25",
-                    "default": 1.0
+                    "hint_string": "0.25,8,0.25"
                 },
                 {
                     "title": "Scenery smoke lifetime",
@@ -988,7 +946,6 @@
                     "type": "float",
                     "hint": "range",
                     "hint_string": "0.1,4,0.05",
-                    "default": 0.5,
                     "advanced": true
                 },
                 {
@@ -998,7 +955,6 @@
                     "type": "int",
                     "hint": "range",
                     "hint_string": "16,8000,1",
-                    "default": 500,
                     "advanced": true
                 }
             ]
@@ -1012,8 +968,7 @@
                     "key": "reloaded/weather/wind_turbulence",
                     "type": "float",
                     "hint": "range",
-                    "hint_string": "0,4,0.01,or_greater",
-                    "default": 1.0
+                    "hint_string": "0,4,0.01,or_greater"
                 },
                 {
                     "title": "Fog curve",
@@ -1022,7 +977,6 @@
                     "type": "float",
                     "hint": "range",
                     "hint_string": "0.01,8,0.01",
-                    "default": 1.5,
                     "advanced": true
                 },
                 {
@@ -1032,7 +986,6 @@
                     "type": "float",
                     "hint": "range",
                     "hint_string": "10,5000,10,or_greater,suffix:m",
-                    "default": 1000.0,
                     "advanced": true
                 },
                 {
@@ -1042,7 +995,6 @@
                     "type": "float",
                     "hint": "range",
                     "hint_string": "0,1,0.01",
-                    "default": 0.0,
                     "advanced": true
                 },
                 {
@@ -1052,7 +1004,6 @@
                     "type": "float",
                     "hint": "range",
                     "hint_string": "0.1,4,0.01,or_greater",
-                    "default": 1.5,
                     "advanced": true
                 },
                 {
@@ -1062,7 +1013,6 @@
                     "type": "float",
                     "hint": "range",
                     "hint_string": "0.01,4,0.0001,or_greater",
-                    "default": 1.0,
                     "advanced": true
                 },
                 {
@@ -1072,7 +1022,6 @@
                     "type": "float",
                     "hint": "range",
                     "hint_string": "0.01,4,0.0001,or_greater",
-                    "default": 0.4255,
                     "advanced": true
                 },
                 {
@@ -1081,8 +1030,7 @@
                     "key": "reloaded/weather/fog/volumetric_energy",
                     "type": "float",
                     "hint": "range",
-                    "hint_string": "0,16,0.001,or_greater",
-                    "default": 1.0
+                    "hint_string": "0,16,0.001,or_greater"
                 },
                 {
                     "title": "Volumetric fog length scale",
@@ -1091,7 +1039,6 @@
                     "type": "float",
                     "hint": "range",
                     "hint_string": "1,64,0.5",
-                    "default": 24.0,
                     "advanced": true
                 },
                 {
@@ -1101,7 +1048,6 @@
                     "type": "float",
                     "hint": "range",
                     "hint_string": "0,1,0.01",
-                    "default": 0.25,
                     "advanced": true
                 },
                 {
@@ -1111,7 +1057,6 @@
                     "type": "float",
                     "hint": "range",
                     "hint_string": "1,4,0.05",
-                    "default": 2.0,
                     "advanced": true
                 },
                 {
@@ -1121,7 +1066,6 @@
                     "type": "float",
                     "hint": "range",
                     "hint_string": "10,5000,10,or_greater,suffix:m",
-                    "default": 800.0,
                     "advanced": true
                 },
                 {
@@ -1131,17 +1075,15 @@
                     "type": "float",
                     "hint": "range",
                     "hint_string": "0,1,0.01",
-                    "default": 0.6,
                     "advanced": true
                 },
                 {
                     "title": "Rain density",
                     "store": "project",
-                    "key": "gnd_weather/rain_mesh_density",
+                    "key": "gnd_weather/precipitation_mesh_density",
                     "type": "float",
                     "hint": "range",
                     "hint_string": "0.1,8,0.01",
-                    "default": 2.0,
                     "advanced": true
                 },
                 {
@@ -1151,7 +1093,6 @@
                     "type": "float",
                     "hint": "range",
                     "hint_string": "0,1,0.01",
-                    "default": 1.0,
                     "advanced": true
                 },
                 {
@@ -1161,7 +1102,6 @@
                     "type": "float",
                     "hint": "range",
                     "hint_string": "0,20,0.005,suffix:m",
-                    "default": 0.855,
                     "advanced": true
                 },
                 {
@@ -1171,7 +1111,6 @@
                     "type": "float",
                     "hint": "range",
                     "hint_string": "0,16,0.01",
-                    "default": 10.0,
                     "advanced": true
                 },
                 {
@@ -1181,7 +1120,6 @@
                     "type": "float",
                     "hint": "range",
                     "hint_string": "0,1,0.01",
-                    "default": 0.5,
                     "advanced": true
                 },
                 {
@@ -1191,7 +1129,6 @@
                     "type": "float",
                     "hint": "range",
                     "hint_string": "0.1,4,0.01",
-                    "default": 2.0,
                     "advanced": true
                 },
                 {
@@ -1201,7 +1138,6 @@
                     "type": "float",
                     "hint": "range",
                     "hint_string": "0,1,0.01",
-                    "default": 0.7,
                     "advanced": true
                 },
                 {
@@ -1211,7 +1147,6 @@
                     "type": "float",
                     "hint": "range",
                     "hint_string": "0,1,0.01",
-                    "default": 1.0,
                     "advanced": true
                 },
                 {
@@ -1221,7 +1156,6 @@
                     "type": "float",
                     "hint": "range",
                     "hint_string": "0,1,0.01",
-                    "default": 0.38,
                     "advanced": true
                 },
                 {
@@ -1231,7 +1165,6 @@
                     "type": "float",
                     "hint": "range",
                     "hint_string": "0,1,0.01",
-                    "default": 0.5,
                     "advanced": true
                 },
                 {
@@ -1241,7 +1174,6 @@
                     "type": "float",
                     "hint": "range",
                     "hint_string": "0.1,50,0.1,suffix:m",
-                    "default": 0.1,
                     "advanced": true
                 },
                 {
@@ -1251,27 +1183,6 @@
                     "type": "float",
                     "hint": "range",
                     "hint_string": "0.1,100,0.1,suffix:m",
-                    "default": 3.0,
-                    "advanced": true
-                },
-                {
-                    "title": "Rain probe count",
-                    "store": "project",
-                    "key": "gnd_weather/rain_probe_max_count",
-                    "type": "int",
-                    "hint": "range",
-                    "hint_string": "1,256,1",
-                    "default": 64,
-                    "advanced": true
-                },
-                {
-                    "title": "Rain probe distance",
-                    "store": "project",
-                    "key": "gnd_weather/rain_probe_distance",
-                    "type": "float",
-                    "hint": "range",
-                    "hint_string": "0.1,100,0.1,suffix:m",
-                    "default": 4.0,
                     "advanced": true
                 },
                 {
@@ -1281,7 +1192,6 @@
                     "type": "float",
                     "hint": "range",
                     "hint_string": "-18,0,0.5,suffix:°",
-                    "default": -6.0,
                     "advanced": true
                 },
                 {
@@ -1291,7 +1201,6 @@
                     "type": "float",
                     "hint": "range",
                     "hint_string": "0,15,0.5,suffix:°",
-                    "default": 6.0,
                     "advanced": true
                 }
             ]
@@ -1324,8 +1233,7 @@
                     "key": "maszyna/sound/culling_distance",
                     "type": "float",
                     "hint": "range",
-                    "hint_string": "0,5000,10,or_greater,suffix:m",
-                    "default": 1000.0
+                    "hint_string": "0,5000,10,or_greater,suffix:m"
                 }
             ]
         },
@@ -1338,8 +1246,7 @@
                     "key": "reloaded/camera/external_view_min_distance",
                     "type": "float",
                     "hint": "range",
-                    "hint_string": "0.1,20,0.1,suffix:m",
-                    "default": 1.0
+                    "hint_string": "0.1,20,0.1,suffix:m"
                 },
                 {
                     "title": "External view maximum distance",
@@ -1347,8 +1254,7 @@
                     "key": "reloaded/camera/external_view_max_distance",
                     "type": "float",
                     "hint": "range",
-                    "hint_string": "10,2000,10,suffix:m",
-                    "default": 200.0
+                    "hint_string": "10,2000,10,suffix:m"
                 },
                 {
                     "title": "Follow jump distance",
@@ -1356,8 +1262,7 @@
                     "key": "reloaded/camera/follow_jump_distance",
                     "type": "float",
                     "hint": "range",
-                    "hint_string": "100,100000,100,suffix:m",
-                    "default": 10000.0
+                    "hint_string": "100,100000,100,suffix:m"
                 }
             ]
         },
@@ -1370,8 +1275,7 @@
                     "key": "reloaded/simulation/speed_change_time",
                     "type": "float",
                     "hint": "range",
-                    "hint_string": "0,5,0.05,suffix:s",
-                    "default": 0.4
+                    "hint_string": "0,5,0.05,suffix:s"
                 }
             ]
         },
@@ -1396,8 +1300,7 @@
                     "title": "Nick",
                     "store": "project",
                     "key": "reloaded/player/nick",
-                    "type": "String",
-                    "default": ""
+                    "type": "String"
                 }
             ]
         },
@@ -1430,8 +1333,7 @@
                     "store": "project",
                     "key": "debug/file_logging/log_path",
                     "type": "String",
-                    "hint": "folder",
-                    "default": "user://logs/app.log"
+                    "hint": "folder"
                 }
             ]
         }

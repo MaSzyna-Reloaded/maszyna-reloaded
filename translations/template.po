@@ -323,46 +323,7 @@ msgstr ""
 msgid "Settings"
 msgstr ""
 
-msgid "Calendar"
-msgstr ""
-
 msgid "Weather"
-msgstr ""
-
-msgid "Fog"
-msgstr ""
-
-msgid "Wind"
-msgstr ""
-
-msgid "Dir"
-msgstr ""
-
-msgid "Rain"
-msgstr ""
-
-msgid "Clouds"
-msgstr ""
-
-msgid "Fog Distance"
-msgstr ""
-
-msgid "Time"
-msgstr ""
-
-msgid "Day"
-msgstr ""
-
-msgid "Month"
-msgstr ""
-
-msgid "Year"
-msgstr ""
-
-msgid "Time Speed"
-msgstr ""
-
-msgid "Use system time"
 msgstr ""
 
 msgid "Vehicle"

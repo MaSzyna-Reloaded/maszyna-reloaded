@@ -318,6 +318,24 @@
                     "hint": "range",
                     "hint_string": "0.5,2,0.01",
                     "default": 1.0
+                },
+                {
+                    "title": "Shadow texture quality",
+                    "store": "project",
+                    "key": "reloaded/shadows/texture_quality",
+                    "type": "int",
+                    "hint": "enum",
+                    "hint_string": "Low:0,Medium:1,High:2,Maximum:3",
+                    "advanced": true
+                },
+                {
+                    "title": "Shadow softness",
+                    "store": "project",
+                    "key": "rendering/lights_and_shadows/directional_shadow/soft_shadow_filter_quality",
+                    "type": "int",
+                    "hint": "enum",
+                    "hint_string": "Off:0,Very low:1,Low:2,Medium:3,High:4,Ultra:5",
+                    "advanced": true
                 }
             ]
         },
@@ -421,8 +439,7 @@
                     "title": "Shadows",
                     "store": "project",
                     "key": "reloaded/scenery/shadows/enabled",
-                    "type": "bool",
-                    "default": true
+                    "type": "bool"
                 },
                 {
                     "title": "Shadow mode",
@@ -430,8 +447,7 @@
                     "key": "reloaded/scenery/shadows/mode",
                     "type": "int",
                     "hint": "enum",
-                    "hint_string": "Orthogonal:0,PSSM 2 Splits:1,PSSM 4 Splits:2",
-                    "default": 2
+                    "hint_string": "Orthogonal:0,PSSM 2 Splits:1,PSSM 4 Splits:2"
                 },
                 {
                     "title": "Shadow distance",
@@ -440,7 +456,6 @@
                     "type": "float",
                     "hint": "range",
                     "hint_string": "0,10000,1,suffix:m",
-                    "default": 250.0,
                     "advanced": true
                 },
                 {
@@ -450,7 +465,6 @@
                     "type": "float",
                     "hint": "range",
                     "hint_string": "0,10,0.01,or_greater",
-                    "default": 1.0,
                     "advanced": true
                 },
                 {
@@ -460,7 +474,6 @@
                     "type": "float",
                     "hint": "range",
                     "hint_string": "0,1,0.01",
-                    "default": 1.0,
                     "advanced": true
                 },
                 {
@@ -470,7 +483,6 @@
                     "type": "float",
                     "hint": "range",
                     "hint_string": "0,10,0.001,or_greater",
-                    "default": 0.1,
                     "advanced": true
                 },
                 {
@@ -480,7 +492,6 @@
                     "type": "float",
                     "hint": "range",
                     "hint_string": "0,32,0.001,or_greater",
-                    "default": 1.0,
                     "advanced": true
                 },
                 {
@@ -488,7 +499,6 @@
                     "store": "project",
                     "key": "reloaded/scenery/shadows/blend_splits",
                     "type": "bool",
-                    "default": true,
                     "advanced": true
                 },
                 {
@@ -498,7 +508,6 @@
                     "type": "float",
                     "hint": "range",
                     "hint_string": "0,1,0.001",
-                    "default": 0.03125,
                     "advanced": true
                 },
                 {
@@ -508,7 +517,6 @@
                     "type": "float",
                     "hint": "range",
                     "hint_string": "0,1,0.001",
-                    "default": 0.125,
                     "advanced": true
                 },
                 {
@@ -518,7 +526,6 @@
                     "type": "float",
                     "hint": "range",
                     "hint_string": "0,1,0.001",
-                    "default": 0.5,
                     "advanced": true
                 },
                 {
@@ -645,8 +652,7 @@
                     "title": "Improved cabin shadows",
                     "store": "project",
                     "key": "reloaded/cabin/improve_shadows_quality",
-                    "type": "bool",
-                    "default": true
+                    "type": "bool"
                 },
                 {
                     "title": "Indicator glow",
@@ -734,7 +740,6 @@
                     "store": "project",
                     "key": "reloaded/cabin/shadows/enabled",
                     "type": "bool",
-                    "default": true,
                     "depends_on": "reloaded/cabin/improve_shadows_quality"
                 },
                 {
@@ -744,7 +749,6 @@
                     "type": "int",
                     "hint": "enum",
                     "hint_string": "Orthogonal:0,PSSM 2 Splits:1,PSSM 4 Splits:2",
-                    "default": 1,
                     "depends_on": "reloaded/cabin/improve_shadows_quality"
                 },
                 {
@@ -754,7 +758,6 @@
                     "type": "float",
                     "hint": "range",
                     "hint_string": "0,10000,1,suffix:m",
-                    "default": 8.0,
                     "advanced": true
                 },
                 {
@@ -764,7 +767,6 @@
                     "type": "float",
                     "hint": "range",
                     "hint_string": "0,10,0.01,or_greater",
-                    "default": 1.0,
                     "advanced": true
                 },
                 {
@@ -774,7 +776,6 @@
                     "type": "float",
                     "hint": "range",
                     "hint_string": "0,1,0.01",
-                    "default": 1.0,
                     "advanced": true
                 },
                 {
@@ -784,7 +785,6 @@
                     "type": "float",
                     "hint": "range",
                     "hint_string": "0,10,0.001,or_greater",
-                    "default": 0.1,
                     "advanced": true
                 },
                 {
@@ -794,7 +794,6 @@
                     "type": "float",
                     "hint": "range",
                     "hint_string": "0,32,0.001,or_greater",
-                    "default": 5.0,
                     "advanced": true
                 },
                 {
@@ -802,7 +801,6 @@
                     "store": "project",
                     "key": "reloaded/cabin/shadows/blend_splits",
                     "type": "bool",
-                    "default": true,
                     "advanced": true
                 },
                 {
@@ -812,7 +810,6 @@
                     "type": "float",
                     "hint": "range",
                     "hint_string": "0,1,0.001",
-                    "default": 0.25,
                     "advanced": true
                 },
                 {
@@ -822,7 +819,6 @@
                     "type": "float",
                     "hint": "range",
                     "hint_string": "0,1,0.001",
-                    "default": 0.5,
                     "advanced": true
                 },
                 {
@@ -832,7 +828,6 @@
                     "type": "float",
                     "hint": "range",
                     "hint_string": "0,1,0.001",
-                    "default": 0.75,
                     "advanced": true
                 }
             ]
@@ -1137,7 +1132,7 @@
                 {
                     "title": "Rain density",
                     "store": "project",
-                    "key": "gnd_weather/rain_mesh_density",
+                    "key": "gnd_weather/precipitation_mesh_density",
                     "type": "float",
                     "hint": "range",
                     "hint_string": "0.1,8,0.01",
@@ -1252,26 +1247,6 @@
                     "hint": "range",
                     "hint_string": "0.1,100,0.1,suffix:m",
                     "default": 3.0,
-                    "advanced": true
-                },
-                {
-                    "title": "Rain probe count",
-                    "store": "project",
-                    "key": "gnd_weather/rain_probe_max_count",
-                    "type": "int",
-                    "hint": "range",
-                    "hint_string": "1,256,1",
-                    "default": 64,
-                    "advanced": true
-                },
-                {
-                    "title": "Rain probe distance",
-                    "store": "project",
-                    "key": "gnd_weather/rain_probe_distance",
-                    "type": "float",
-                    "hint": "range",
-                    "hint_string": "0.1,100,0.1,suffix:m",
-                    "default": 4.0,
                     "advanced": true
                 },
                 {

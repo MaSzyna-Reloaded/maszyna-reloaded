@@ -316,6 +316,15 @@ func _read() -> Variant:
     return read_setting(store, section, key, default_value)
 
 
+## A setting's default value (settings.json): its "default", or, of a PROJECT setting declared
+## without one, the value its library registers it with (ProjectSettings.property_get_revert() -
+## libreloaded's ReloadedProjectSettings), so the default is written down in one place
+static func get_default_value(setting: Dictionary) -> Variant:
+    if setting.has("default"):
+        return setting["default"]
+    return ProjectSettings.property_get_revert(setting["key"])
+
+
 ## The value a setting has now - setting_default when it was never set; a PROJECT setting has no
 ## section of its own
 static func read_setting(

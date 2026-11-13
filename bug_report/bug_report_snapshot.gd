@@ -117,7 +117,7 @@ static func settings(definition: JSON) -> Dictionary:
             var store: SettingRow.Store = SettingRow.STORES[setting["store"]]
             var setting_section: String = setting.get("section", "")
             var key: String = setting["key"]
-            var value: Variant = SettingRow.read_setting(store, setting_section, key, setting["default"])
+            var value: Variant = SettingRow.read_setting(store, setting_section, key, SettingRow.get_default_value(setting))
             result[key if store == SettingRow.Store.PROJECT else setting_section.path_join(key)] = value
     return result
 

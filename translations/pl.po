@@ -1289,6 +1289,30 @@ msgstr "Cienie"
 msgid "Shadow mode"
 msgstr "Tryb cieni"
 
+msgid "Shadow texture quality"
+msgstr "Jakość tekstury cieni"
+
+msgid "Low"
+msgstr "Niska"
+
+msgid "Medium"
+msgstr "Średnia"
+
+msgid "High"
+msgstr "Wysoka"
+
+msgid "Maximum"
+msgstr "Maksymalna"
+
+msgid "Shadow softness"
+msgstr "Miękkość cieni"
+
+msgid "Very low"
+msgstr "Bardzo niska"
+
+msgid "Ultra"
+msgstr "Ultra"
+
 msgid "Orthogonal"
 msgstr "Ortogonalne"
 

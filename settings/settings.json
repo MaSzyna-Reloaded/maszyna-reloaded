@@ -980,15 +980,6 @@
                     "advanced": true
                 },
                 {
-                    "title": "Fog sky height",
-                    "store": "project",
-                    "key": "reloaded/weather/fog/sky_height",
-                    "type": "float",
-                    "hint": "range",
-                    "hint_string": "10,5000,10,or_greater,suffix:m",
-                    "advanced": true
-                },
-                {
                     "title": "Aerial perspective",
                     "store": "project",
                     "key": "reloaded/weather/fog/aerial_perspective",

@@ -430,6 +430,10 @@ func process_time(delta: float) -> void:
     _time_update_elapsed = 0.0
     _push_time(false)
     _apply_sun_glint()
+    # the sun's size as the sky draws it, for what mirrors it (the shader global the projects
+    # declare, as the core's reloaded_wind_*)
+    RenderingServer.global_shader_parameter_set(
+        &"reloaded_sun_angular_radius", SkydomeServer.skydome_get_param(skydome.get_rid(), &"sun_angular_radius"))
 
 
 func _apply_sun_glint() -> void:

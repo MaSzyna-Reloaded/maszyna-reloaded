@@ -1589,6 +1589,9 @@ msgstr "Nepřímé osvětlení (SSIL)"
 msgid "Reflections (SSR)"
 msgstr "Odrazy (SSR)"
 
+msgid "Water reflections (SSR)"
+msgstr "Odrazy na vodě (SSR)"
+
 msgid "Global illumination (SDFGI)"
 msgstr "Globální osvětlení (SDFGI)"
 

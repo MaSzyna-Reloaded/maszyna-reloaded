@@ -1589,6 +1589,9 @@ msgstr "Közvetett megvilágítás (SSIL)"
 msgid "Reflections (SSR)"
 msgstr "Tükröződések (SSR)"
 
+msgid "Water reflections (SSR)"
+msgstr "Tükröződések a vízen (SSR)"
+
 msgid "Global illumination (SDFGI)"
 msgstr "Globális megvilágítás (SDFGI)"
 

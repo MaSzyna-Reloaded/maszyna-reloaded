@@ -1604,6 +1604,9 @@ msgstr ""
 msgid "Reflections (SSR)"
 msgstr ""
 
+msgid "Water reflections (SSR)"
+msgstr ""
+
 msgid "Global illumination (SDFGI)"
 msgstr ""
 

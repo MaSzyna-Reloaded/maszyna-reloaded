@@ -1604,6 +1604,9 @@ msgstr "Oświetlenie pośrednie (SSIL)"
 msgid "Reflections (SSR)"
 msgstr "Odbicia (SSR)"
 
+msgid "Water reflections (SSR)"
+msgstr "Odbicia w wodzie (SSR)"
+
 msgid "Global illumination (SDFGI)"
 msgstr "Oświetlenie globalne (SDFGI)"
 

@@ -74,6 +74,7 @@ file_logging/log_path="user://logs/app.log"
 
 [display]
 
+display_server/driver.linuxbsd="wayland"
 window/size/mode=3
 
 [editor_overrides]

@@ -1607,6 +1607,12 @@ msgstr "Odbicia (SSR)"
 msgid "Water reflections (SSR)"
 msgstr "Odbicia w wodzie (SSR)"
 
+msgid "Water reflections fade start (m)"
+msgstr "Początek zanikania odbić wody (m)"
+
+msgid "Water reflections fade end (m)"
+msgstr "Koniec zanikania odbić wody (m)"
+
 msgid "Global illumination (SDFGI)"
 msgstr "Oświetlenie globalne (SDFGI)"
 
@@ -1723,6 +1729,9 @@ msgstr "Uruchom grę ponownie, aby zastosować zmiany."
 
 msgid "Sunshafts"
 msgstr "Promienie słońca"
+
+msgid "Shelter from rain and snow (depth map)"
+msgstr "Osłona przed deszczem i śniegiem (mapa głębi)"
 
 msgid "Sunshaft intensity"
 msgstr "Intensywność promieni słońca"

@@ -1607,6 +1607,12 @@ msgstr ""
 msgid "Water reflections (SSR)"
 msgstr ""
 
+msgid "Water reflections fade start (m)"
+msgstr ""
+
+msgid "Water reflections fade end (m)"
+msgstr ""
+
 msgid "Global illumination (SDFGI)"
 msgstr ""
 
@@ -1722,6 +1728,9 @@ msgid "Restart the game to apply the changes."
 msgstr ""
 
 msgid "Sunshafts"
+msgstr ""
+
+msgid "Shelter from rain and snow (depth map)"
 msgstr ""
 
 msgid "Sunshaft intensity"

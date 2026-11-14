@@ -161,6 +161,22 @@
                     "type": "bool"
                 },
                 {
+                    "title": "Water reflections fade start (m)",
+                    "store": "project",
+                    "key": "gnd_weather/water_reflections_fade_start",
+                    "type": "float",
+                    "hint": "range",
+                    "hint_string": "0,1000,1"
+                },
+                {
+                    "title": "Water reflections fade end (m)",
+                    "store": "project",
+                    "key": "gnd_weather/water_reflections_fade_end",
+                    "type": "float",
+                    "hint": "range",
+                    "hint_string": "1,1000,1"
+                },
+                {
                     "title": "Volumetric fog",
                     "store": "user",
                     "section": "render",
@@ -172,6 +188,12 @@
                     "title": "Sunshafts",
                     "store": "project",
                     "key": "gnd_skydome/sunshafts_enabled",
+                    "type": "bool"
+                },
+                {
+                    "title": "Shelter from rain and snow (depth map)",
+                    "store": "project",
+                    "key": "gnd_weather/shelter_map_enabled",
                     "type": "bool"
                 },
                 {

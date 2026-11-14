@@ -7,8 +7,8 @@ extends Node
 ## project.godot gives one is kept, and the settings screen offers the project's own value as the
 ## default (SettingRow.get_default_value()).
 
-## The world scene, whose Skydome node has the game's look of the sky
-const GAME: GDScript = preload("res://game.gd")
+## The startup, which names the world scene whose Skydome node has the game's look of the sky
+const STARTUP: GDScript = preload("res://startup/startup.gd")
 
 
 func _ready() -> void:
@@ -40,7 +40,7 @@ static func _add_plugin_setting(name: String, default_value: Variant) -> void:
 ## made only when a scenery is chosen
 static func _get_world_skydome_values() -> Dictionary:
     var values: Dictionary = {}
-    var state: SceneState = (GAME.WORLD_SCENE as PackedScene).get_state()
+    var state: SceneState = (load(STARTUP.WORLD_SCENE) as PackedScene).get_state()
     for node: int in state.get_node_count():
         var properties: Dictionary = {}
         for property: int in state.get_node_property_count(node):

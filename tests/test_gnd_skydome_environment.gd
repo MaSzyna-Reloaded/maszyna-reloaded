@@ -52,6 +52,16 @@ func test_applies_rendering_light_settings_on_ready() -> void:
     assert_almost_eq(sun_light.directional_shadow_max_distance, 250.0, 0.000001)
     assert_almost_eq(sun_light.light_volumetric_fog_energy, 12.5, 0.000001)
 
+func test_a_sun_softened_by_an_overcast_has_no_glint() -> void:
+    var sky: GndSkydomeMaszynaEnvironment = _create_sky(_create_environment_node())
+    sky.sun_light.light_angular_distance = GndSkydomeMaszynaEnvironment.SUN_GLINT_SHARP_ANGLE
+    sky._apply_sun_glint()
+    assert_eq(sky.sun_light.light_specular, 1.0, "a clear sky's sun glints")
+    sky.sun_light.light_angular_distance = 15.0
+    sky._apply_sun_glint()
+    assert_eq(sky.sun_light.light_specular, 0.0, "a rain's does not")
+
+
 func test_maps_rain_intensity_to_storm_overcast_and_rainbow() -> void:
     var environment_node: EnvironmentNode = _create_environment_node()
     var sky: GndSkydomeMaszynaEnvironment = _create_sky(environment_node)
@@ -135,6 +145,21 @@ func test_maps_fog_controls_to_skydome_and_weather() -> void:
     assert_almost_eq(skydome.night_fog_sky_affect, 0.3, 0.000001)
     assert_eq(skydome.fog_mode, SkydomeSky.FogModeOverride.DEPTH)
     assert_eq(sky._environment.fog_mode, Environment.FOG_MODE_DEPTH)
+
+
+func test_far_fog_leaves_the_sky() -> void:
+    var environment_node: EnvironmentNode = _create_environment_node()
+    var sky: GndSkydomeMaszynaEnvironment = _create_sky(environment_node)
+    var skydome: SkydomeSky = _drawn(sky)
+
+    environment_node.fog_density = 1.0
+    environment_node.fog_distance = 5000.0
+    environment_node._process(0.0)
+    sky._process(0.0)
+
+    # a fog of kilometres hides none of the sky
+    assert_almost_eq(skydome.day_fog_sky_affect, 0.0, 0.000001)
+    assert_almost_eq(skydome.night_fog_sky_affect, 0.0, 0.000001)
 
 
 func test_fog_switch_disables_all_fog_layers() -> void:

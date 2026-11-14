@@ -72,6 +72,7 @@ func _ready() -> void:
         var extension: GameHudExtension = scene.instantiate() as GameHudExtension
         %Content.add_child(extension)
         _extensions.append(extension)
+        extension.attach_debug_hud(%DebugHud)
         extension.fill_menu(%Diagnostics)
         %DebugHud.windows_visibility_changed.connect(extension.set_windows_shown)
     # the menus show their keys and handle them: a key picks its entry as a click would

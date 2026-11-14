@@ -36,6 +36,15 @@ extends Control
 ## of that group (InputBindings.GROUPS), a row each (setting_input.gd): the player's binding of an
 ## action is in effect at once, saved and discarded as any setting. A keyboard preset chosen above
 ## any key section sets the keys of every key section at once.
+##
+## A section with a "repeat_group" in place of its "settings" repeats that group's own "settings"
+## template once per instance - as many as the player's own "count_key" of "count_section" is,
+## read fresh whenever the screen opens. Each instance's "section" is built from "section_template"
+## (its "%d" the instance's index, from 0) instead of the template's own "section" (it has none),
+## and each row's title is the template's own before "instance_title" (its "%d" the instance's
+## number, from 1). A plugin whose own count setting controls how many of its own sections exist
+## (UserSettings "multimonitor_<n>", one per configured monitor) declares its rows this way once,
+## rather than one entry per instance it cannot know the count of.
 
 const DEFINITION: JSON = preload("settings.json")
 const PAGE: PackedScene = preload("settings_page.tscn")
@@ -113,6 +122,18 @@ func _ready() -> void:
                     "type": "input",
                     "default": InputBindings.get_default_events(action),
                 })
+        # a repeated group: the template's own rows, once per instance of the player's own count
+        if section.has("repeat_group"):
+            var group: Dictionary = section["repeat_group"]
+            var count: int = int(UserSettings.get_setting(group["count_section"], group["count_key"], 1))
+            for index: int in count:
+                var instance_section: String = group["section_template"] % index
+                for template: Dictionary in group.get("settings", []):
+                    var row: Dictionary = template.duplicate()
+                    row["store"] = "user"
+                    row["section"] = instance_section
+                    row["title"] = "%s — %s" % [template["title"], group["instance_title"] % (index + 1)]
+                    settings.append(row)
         var page: SettingsPage = PAGE.instantiate()
         page.sounds = sounds
         page.visible = false

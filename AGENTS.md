@@ -66,3 +66,12 @@ Where the game is not libmaszyna:
   libmaszyna documents itself
 * `make install-git-hooks` once per clone: the pre-commit hook runs libmaszyna's
   `scripts/check-staged-uids` on this repository
+* REQUIRED: **an unclear rebase conflict is decided by the operator, not on a guess.** Where both
+  sides changed the same lines and it is not certain which change stands - or how the branch's
+  change is carried onto what the other side did since - compare the two exactly: the branch's
+  change against its base, the other side's against the same base. Lay the situation out to the
+  operator - each side's change, and what each resolution would keep and drop - and ask; neither
+  side is taken by default. After every rebase, before the push, every line the branch added is
+  checked against the rebased head, and each one missing is named to the operator with its
+  reason: this game's PR rebased onto main took main's side of its sky settings
+  (`world/world.tscn`) and HUD scene (`hud/game_hud.tscn`) and lost them unnoticed (2026-11-14)

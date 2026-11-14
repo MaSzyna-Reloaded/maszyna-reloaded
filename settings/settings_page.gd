@@ -1,20 +1,25 @@
 class_name SettingsPage
 extends FocusSection
 
-## The settings of one section of the settings screen, one row each, and under them the advanced
-## ones folded away under "Advanced" (UIFoldable), shown only when there are any. Up and down walk
-## the rows - the advanced title among them, and the advanced rows while it is unfolded - and left
-## leaves as navigate_left, to the sections; Enter on the title folds or unfolds it, switches a
-## switch, and puts any other row into editing, where left and right change its value until Enter
-## or Escape ends it; Tab and Shift+Tab go from a slider to its value field to type it and back.
-## Down from the last item leaves as navigate_down, Escape (not editing) as cancelled.
+## The settings of one section of the settings screen, one row each, and under them a named group's
+## rows folded away under its own title (UIFoldable, add_group_row()) - the settings' "Advanced",
+## a plugin's own repeated instances (settings_screen.gd, "repeat_group") - shown only once it has
+## a row. Up and down walk the rows - a group's title among them, and its rows while it is unfolded
+## - and left leaves as navigate_left, to the sections; Enter on a group's title folds or unfolds
+## it, switches a switch, and puts any other row into editing, where left and right change its
+## value until Enter or Escape ends it; Tab and Shift+Tab go from a slider to its value field to
+## type it and back. Down from the last item leaves as navigate_down, Escape (not editing) as
+## cancelled.
 
 ## The bank this page plays from - it has to name "keystroke" and "change_focus"
 @export var sounds: SfxBank = null
 
 var _rows: Array[SettingRow] = []
-var _advanced_rows: Array[SettingRow] = []
-## The item the keyboard is on - a row or the advanced title
+## Every group's own rows, by its UIFoldable - in the order the groups were made
+var _groups: Array[UIFoldable] = []
+var _group_rows: Dictionary[UIFoldable, Array] = {}
+var _group_by_title: Dictionary[String, UIFoldable] = {}
+## The item the keyboard is on - a row or a group's title
 var _selected: Control = null
 ## Left and right change the selected row's value instead of leaving the page
 var _editing: bool = false
@@ -33,8 +38,8 @@ func _ready() -> void:
 func add_row(row: SettingRow) -> void:
     %Rows.add_child(row)
     _rows.append(row)
-    # the first row the keyboard is on is the first one shown, even after advanced rows came
-    if not _selected or _selected == %Advanced:
+    # the first row the keyboard is on is the first one shown, even after a group came first
+    if not _selected or _selected is UIFoldable:
         _selected = row
 
 
@@ -45,46 +50,73 @@ func add_header(header: Control) -> void:
     %Content.move_child(header, 0)
 
 
-## Only the rows whose name holds `text` in any language (SettingRow.matches()) are shown, and
-## "Advanced" only with one of its own; the keyboard goes to the first one shown when its row went
+## Only the rows whose name holds `text` in any language (SettingRow.matches()) are shown, and a
+## group only with one of its own; the keyboard goes to the first one shown when its row went
 func filter_rows(text: String) -> void:
-    for row: SettingRow in _rows + _advanced_rows:
+    for row: SettingRow in _rows:
         row.visible = row.matches(text)
-    if _advanced_rows:
-        %Advanced.visible = _advanced_rows.any(func(row: SettingRow) -> bool: return row.visible)
+    for group: UIFoldable in _groups:
+        var rows: Array = _group_rows[group]
+        for row: SettingRow in rows:
+            row.visible = row.matches(text)
+        group.visible = rows.any(func(row: SettingRow) -> bool: return row.visible)
     var items: Array[Control] = _items()
     if items and not _selected in items:
         _select(items[0])
 
 
-## A row under "Advanced", which shows from the first one on
-func add_advanced_row(row: SettingRow) -> void:
+## A row under the named group - "Advanced", or one of a plugin's own instances
+## (settings_screen.gd, "repeat_group") - made the first time its title is asked for, which shows
+## from its first row on
+func add_group_row(title: String, row: SettingRow) -> void:
+    var group: UIFoldable = _group_by_title.get(title)
+    if not group:
+        group = UIFoldable.new()
+        group.title = title
+        group.folded = true
+        group.visible = false
+        var rows_box: VBoxContainer = VBoxContainer.new()
+        rows_box.add_theme_constant_override("separation", 6)
+        group.add_child(rows_box)
+        group.folding_changed.connect(_on_group_folding_changed.bind(group))
+        %Content.add_child(group)
+        _groups.append(group)
+        _group_rows[group] = []
+        _group_by_title[title] = group
+        if not _selected:
+            _selected = group
     row.advanced = true
-    %AdvancedRows.add_child(row)
-    _advanced_rows.append(row)
-    %Advanced.visible = true
-    if not _selected:
-        _selected = %Advanced
+    group.get_child(0).add_child(row)
+    _group_rows[group].append(row)
+    group.visible = true
 
 
 func restore_defaults() -> void:
-    for row: SettingRow in _rows + _advanced_rows:
+    for row: SettingRow in _all_rows():
         row.restore_default()
 
 
 func revert() -> void:
-    for row: SettingRow in _rows + _advanced_rows:
+    for row: SettingRow in _all_rows():
         row.revert()
 
 
 ## What the settings are opened with, for needs_restart()
 func remember_values() -> void:
-    for row: SettingRow in _rows + _advanced_rows:
+    for row: SettingRow in _all_rows():
         row.remember_value()
 
 
 func needs_restart() -> bool:
-    return (_rows + _advanced_rows).any(func(row: SettingRow) -> bool: return row.needs_restart())
+    return _all_rows().any(func(row: SettingRow) -> bool: return row.needs_restart())
+
+
+## Every row of the page, top-level and every group's
+func _all_rows() -> Array[SettingRow]:
+    var rows: Array[SettingRow] = _rows.duplicate()
+    for group: UIFoldable in _groups:
+        rows.append_array(_group_rows[group])
+    return rows
 
 
 ## The selected item is lit only while the page has the focus, and nothing is edited without it
@@ -113,7 +145,8 @@ func _input(event: InputEvent) -> void:
     if click and click.pressed:
         if not %Scroll.get_global_rect().has_point(click.position):
             return
-        # bottom up: "Advanced" spans its own rows, which come after it, so a row is found first
+        # bottom up: a group's title spans its own rows, which come after it, so a row is found
+        # first
         var items: Array[Control] = _items()
         items.reverse()
         for item: Control in items:
@@ -181,10 +214,11 @@ func _input(event: InputEvent) -> void:
     elif event.is_action_pressed("menu_activate", false, true):
         # a row that is not available takes nothing, editing included
         if not row:
-            if %Advanced.folded:
-                %Advanced.expand()
+            var group: UIFoldable = _selected as UIFoldable
+            if group.folded:
+                group.expand()
             else:
-                %Advanced.fold()
+                group.fold()
         elif not row.available:
             pass
         elif row.is_edited_by_steps():
@@ -203,19 +237,20 @@ func _gui_input(event: InputEvent) -> void:
         focus_requested.emit()
 
 
-## What the keyboard walks, top to bottom: the rows, the advanced title, the advanced rows unfolded
-## - those the search shows (filter_rows())
+## What the keyboard walks, top to bottom: the rows, every group's title, its rows while unfolded -
+## those the search shows (filter_rows())
 func _items() -> Array[Control]:
     var items: Array[Control] = []
     for row: SettingRow in _rows:
         if row.visible:
             items.append(row)
-    if %Advanced.visible:
-        items.append(%Advanced)
-        if not %Advanced.folded:
-            for row: SettingRow in _advanced_rows:
-                if row.visible:
-                    items.append(row)
+    for group: UIFoldable in _groups:
+        if group.visible:
+            items.append(group)
+            if not group.folded:
+                for row: SettingRow in _group_rows[group]:
+                    if row.visible:
+                        items.append(row)
     return items
 
 
@@ -245,19 +280,19 @@ func _select(item: Control) -> void:
 func _light(item: Control, lit: bool) -> void:
     if item is SettingRow:
         (item as SettingRow).set_selected(lit)
-    else:
-        %Advanced.set_selected(lit)
+    elif item is UIFoldable:
+        (item as UIFoldable).set_selected(lit)
 
 
-## "Advanced" opens folded every time the page is shown again - after another section, after the
+## Every group opens folded every time the page is shown again - after another section, after the
 ## settings were closed
 func _notification(what: int) -> void:
-    if what == NOTIFICATION_VISIBILITY_CHANGED and not is_visible_in_tree() and _advanced_rows:
-        %Advanced.fold()
+    if what == NOTIFICATION_VISIBILITY_CHANGED and not is_visible_in_tree():
+        for group: UIFoldable in _groups:
+            group.fold()
 
 
-## Folded under a chosen advanced row - a click on the title, the page hidden: the keyboard goes up
-## to the title
-func _on_advanced_folding_changed(is_folded: bool) -> void:
-    if is_folded and _selected in _advanced_rows:
-        _select(%Advanced)
+## Folded under its own chosen row, the page hidden: the keyboard goes up to the title
+func _on_group_folding_changed(is_folded: bool, group: UIFoldable) -> void:
+    if is_folded and _selected in _group_rows[group]:
+        _select(group)

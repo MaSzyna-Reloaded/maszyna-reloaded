@@ -23,14 +23,15 @@ extends Control
 ## "enum" "Name:value,Name:value"; "hint": "resolution" is the window's size, its choices made from
 ## the screen, and "folder" a project setting naming a file, shown as its folder with a button that
 ## opens it in the file manager, and "game_dir" the game directory (a "user" String), changed in the
-## GameDirWindow. Titles and choice names are msgids. "advanced": true puts a setting
-## under the section's folded "Advanced". "excludes" names the keys of the section's settings that
-## cannot be switched on while this one is on (TAA or MSAA and FXAA); "depends_on" the key of the
-## one that has to be on for this one to be changed; "disabled_by" the key of the one that keeps it
-## from being changed while it is on - or, with "disabled_by_values", while it has one of them
-## (TAA while the upscaling is FSR 2.2). "restart_required": true marks one that takes effect only after
-## the game restarts - a change of it lights the note above the buttons, and Save asks whether to
-## restart.
+## GameDirWindow. Titles and choice names are msgids. "advanced": true puts a setting under the
+## section's folded "Advanced"; "group": "<title>" puts it instead under a folded group of that
+## title, made the first time it is asked for (SettingsPage.add_group_row()). "excludes" names the
+## keys of the section's settings that cannot be switched on while this one is on (TAA or MSAA and
+## FXAA); "depends_on" the key of the one that has to be on for this one to be changed;
+## "disabled_by" the key of the one that keeps it from being changed while it is on - or, with
+## "disabled_by_values", while it has one of them (TAA while the upscaling is FSR 2.2).
+## "restart_required": true marks one that takes effect only after the game restarts - a change of
+## it lights the note above the buttons, and Save asks whether to restart.
 ##
 ## A section with an "input_group" in place of its "settings" holds the keys of the input actions
 ## of that group (InputBindings.GROUPS), a row each (setting_input.gd): the player's binding of an
@@ -38,13 +39,13 @@ extends Control
 ## any key section sets the keys of every key section at once.
 ##
 ## A section with a "repeat_group" in place of its "settings" repeats that group's own "settings"
-## template once per instance - as many as the player's own "count_key" of "count_section" is,
-## read fresh whenever the screen opens. Each instance's "section" is built from "section_template"
-## (its "%d" the instance's index, from 0) instead of the template's own "section" (it has none),
-## and each row's title is the template's own before "instance_title" (its "%d" the instance's
-## number, from 1). A plugin whose own count setting controls how many of its own sections exist
-## (UserSettings "multimonitor_<n>", one per configured monitor) declares its rows this way once,
-## rather than one entry per instance it cannot know the count of.
+## template once per instance - as many as the player's own "count_key" of "count_section" is, read
+## fresh whenever the screen opens - each instance's own rows folded under "instance_title" (its
+## "%d" the instance's number, from 1). Each instance's "section" is built from "section_template"
+## (its "%d" the instance's index, from 0) instead of the template's own "section" (it has none). A
+## plugin whose own count setting controls how many of its own sections exist (UserSettings
+## "multimonitor_<n>", one per configured monitor) declares its rows this way once, rather than one
+## entry per instance it cannot know the count of.
 
 const DEFINITION: JSON = preload("settings.json")
 const PAGE: PackedScene = preload("settings_page.tscn")
@@ -122,17 +123,19 @@ func _ready() -> void:
                     "type": "input",
                     "default": InputBindings.get_default_events(action),
                 })
-        # a repeated group: the template's own rows, once per instance of the player's own count
+        # a repeated group: the template's own rows, once per instance of the player's own count,
+        # each instance folded away under its own title
         if section.has("repeat_group"):
             var group: Dictionary = section["repeat_group"]
             var count: int = int(UserSettings.get_setting(group["count_section"], group["count_key"], 1))
             for index: int in count:
                 var instance_section: String = group["section_template"] % index
+                var instance_title: String = group["instance_title"] % (index + 1)
                 for template: Dictionary in group.get("settings", []):
                     var row: Dictionary = template.duplicate()
                     row["store"] = "user"
                     row["section"] = instance_section
-                    row["title"] = "%s — %s" % [template["title"], group["instance_title"] % (index + 1)]
+                    row["group"] = instance_title
                     settings.append(row)
         var page: SettingsPage = PAGE.instantiate()
         page.sounds = sounds
@@ -163,8 +166,10 @@ func _ready() -> void:
             row.default_value = SettingRow.get_default_value(setting)
             row.hint_string = setting.get("hint_string", "")
             row.restart_required = setting.get("restart_required", false)
-            if setting.get("advanced", false):
-                page.add_advanced_row(row)
+            if setting.has("group"):
+                page.add_group_row(setting["group"], row)
+            elif setting.get("advanced", false):
+                page.add_group_row("Advanced", row)
             else:
                 page.add_row(row)
             rows[row.key] = row

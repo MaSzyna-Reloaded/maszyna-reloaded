@@ -438,8 +438,11 @@ func process_time(delta: float) -> void:
 
 func _apply_sun_glint() -> void:
     if sun_light:
-        sun_light.light_specular = 1.0 - smoothstep(
-                SUN_GLINT_SHARP_ANGLE, SUN_GLINT_GONE_ANGLE, sun_light.light_angular_distance)
+        # and as much as the fog lets the sun through on the sky (SkydomeSky.sun_fog_visibility): a
+        # sun the fog hides glints off no water
+        sun_light.light_specular = (1.0 - smoothstep(
+                SUN_GLINT_SHARP_ANGLE, SUN_GLINT_GONE_ANGLE, sun_light.light_angular_distance)) * float(
+                SkydomeServer.skydome_get_param(skydome.get_rid(), &"sun_fog_visibility"))
 
 
 # Configuration changes snap immediately; only running time uses Skydome's transition.

@@ -50,7 +50,7 @@ const FOG_VOLUMETRIC_LENGTH_PROPERTIES: Array[StringName] = [&"day_vol_fog_lengt
 const SKYDOME_VOL_FOG_LENGTH_SHRINK: float = 0.8
 const SKYDOME_VOL_FOG_LENGTH_SHRINK_MIN: float = 0.05
 const FOG_RANGE_PROPERTIES: Array[StringName] = [&"day_fog_distance_begin", &"night_fog_distance_begin"]
-# How much of the depth fog reaches the sky follows the fog distance (FOG_SKY_HEIGHT_SETTING);
+# How much of the depth fog reaches the sky follows the fog distance (get_fog_sky_share());
 # Skydome's own pull of it towards 1.0 with a growing fog is switched off.
 const FOG_SKY_AFFECT_PROPERTIES: Array[StringName] = [&"day_fog_sky_affect", &"night_fog_sky_affect"]
 # The volumetric fog is a volume right in front of the camera, so it stands in front of the sky as

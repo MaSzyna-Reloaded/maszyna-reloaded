@@ -1,16 +1,15 @@
 class_name VehicleBrowserWindow
 extends Control
 
-## Every vehicle of the game (MaszynaVehiclesBank) in a window of the game (UIWindow) over the
-## screen that opened it: a search field over the side views of the vehicles found, PAGE_SIZE of
-## them at a time, of the category chosen in the sidebar (MaszynaVehiclesBank.Category). Enter or
-## "Select vehicle" chooses the selected one, Escape or the close button leaves without; what the
-## choice means is its owner's. The categories, the grid and the buttons are its three sections,
-## Tab goes round them.
+## Every vehicle of the catalogue (VehicleCatalogServer), any provider's, in a window of the game
+## (UIWindow) over the screen that opened it: a search field over the side views of the vehicles
+## found, PAGE_SIZE of them at a time, of the category chosen in the sidebar
+## (VehicleInfo.VehicleCategory). Enter or "Select vehicle" chooses the selected one, Escape or the
+## close button leaves without; what the choice means is its owner's. The categories, the grid and
+## the buttons are its three sections, Tab goes round them.
 
-## A vehicle was chosen - its directory as a scenery names it ("dynamic/pkp/en57_v1"), its file
-## name and its first skin
-signal vehicle_chosen(data_path: String, file_name: String, skin: String)
+## A vehicle was chosen, in its first livery
+signal vehicle_chosen(vehicle: VehicleData)
 ## The window went, with a vehicle chosen or without
 signal closed
 
@@ -20,31 +19,31 @@ const WINDOW_RATIO: float = 0.8
 const PAGE_SIZE: int = 50
 ## The sidebar's first row, every category together
 const ALL_CATEGORIES: int = -1
-## The categories' names on the sidebar, as msgids
-const CATEGORY_NAMES: Dictionary[MaszynaVehiclesBank.Category, String] = {
-    MaszynaVehiclesBank.Category.ELECTRIC_LOCOS: "Electric locos",
-    MaszynaVehiclesBank.Category.DIESEL_LOCOS: "Diesel locos",
-    MaszynaVehiclesBank.Category.STEAM_LOCOS: "Steam locos",
-    MaszynaVehiclesBank.Category.RAILCARS: "Railcars",
-    MaszynaVehiclesBank.Category.EMU: "EMU",
-    MaszynaVehiclesBank.Category.UTILITY: "Utility",
-    MaszynaVehiclesBank.Category.DRAISINES: "Draisines",
-    MaszynaVehiclesBank.Category.TRAMS: "Trams",
-    MaszynaVehiclesBank.Category.TRUCKS: "Trucks",
-    MaszynaVehiclesBank.Category.BUSES: "Buses",
-    MaszynaVehiclesBank.Category.CARS: "Cars",
-    MaszynaVehiclesBank.Category.PEOPLE: "People",
-    MaszynaVehiclesBank.Category.ANIMALS: "Animals",
-    MaszynaVehiclesBank.Category.CARRIAGES: "Carriages",
-    MaszynaVehiclesBank.Category.UNKNOWN: "Unknown",
+## The categories' names on the sidebar, as msgids, in the sidebar's order
+const CATEGORY_NAMES: Dictionary[VehicleInfo.VehicleCategory, String] = {
+    VehicleInfo.VehicleCategory.ELECTRIC_LOCOMOTIVE: "Electric locos",
+    VehicleInfo.VehicleCategory.DIESEL_LOCOMOTIVE: "Diesel locos",
+    VehicleInfo.VehicleCategory.STEAM_LOCOMOTIVE: "Steam locos",
+    VehicleInfo.VehicleCategory.RAILCAR: "Railcars",
+    VehicleInfo.VehicleCategory.MULTIPLE_UNIT: "EMU",
+    VehicleInfo.VehicleCategory.UTILITY_VEHICLE: "Utility",
+    VehicleInfo.VehicleCategory.DRAISINE: "Draisines",
+    VehicleInfo.VehicleCategory.TRAM: "Trams",
+    VehicleInfo.VehicleCategory.PASSENGER_CAR: "Passenger cars",
+    VehicleInfo.VehicleCategory.FREIGHT_CAR: "Freight cars",
+    VehicleInfo.VehicleCategory.SPECIAL: "Special",
+    VehicleInfo.VehicleCategory.ROAD_TRUCK: "Trucks",
+    VehicleInfo.VehicleCategory.ROAD_BUS: "Buses",
+    VehicleInfo.VehicleCategory.ROAD_CAR: "Cars",
+    VehicleInfo.VehicleCategory.OTHER: "Other",
 }
 
-## Every vehicle of the game directory they were read from - read once per directory, a scan of
-## the whole dynamic/ is no work for every opening
-var _vehicles: Array[MaszynaVehiclesBank.Vehicle] = []
-var _vehicles_game_dir: String = ""
+## Every vehicle of the catalogue, by its name, as the window was last opened
+var _vehicles: Array[VehicleInfo] = []
+## The names of the liveries of each of them - its provider's, not the player's
+var _liveries: Dictionary[VehicleInfo, PackedStringArray] = {}
 ## The vehicles the search found, and the page of them the grid shows
-var _found: Array[MaszynaVehiclesBank.Vehicle] = []
+var _found: Array[VehicleInfo] = []
 var _page: int = 0
 ## The category of each sidebar row - ALL_CATEGORIES first, then those the vehicles have - and the
 ## one chosen
@@ -52,14 +51,10 @@ var _listed_categories: Array[int] = []
 var _category: int = ALL_CATEGORIES
 
 
-## Shown as it was left - the search, the page, the selected vehicle and the scroll stay; only
-## another game directory has other vehicles to read and search anew
+## Shown as it was left - the search, the page, the selected vehicle and the scroll stay; only a
+## catalogue of other vehicles (another game directory) is listed and searched anew
 func open() -> void:
-    var game_dir: String = MaszynaGameDirectory.get_game_dir()
-    if not game_dir == _vehicles_game_dir:
-        _vehicles = MaszynaVehiclesBank.scan(game_dir)
-        _vehicles_game_dir = game_dir
-        _list_categories()
+    _read_vehicles()
     visible = true
     %Window.show_part(WINDOW_RATIO)
     %SearchInput.grab_typing_focus()
@@ -76,15 +71,36 @@ func close() -> void:
     closed.emit()
 
 
+## The catalogue's vehicles; their categories listed again when they are not the ones listed
+func _read_vehicles() -> void:
+    var vehicles: Array[VehicleInfo] = []
+    for category: VehicleInfo.VehicleCategory in CATEGORY_NAMES:
+        vehicles.append_array(VehicleCatalogServer.vehicle_list(category))
+    vehicles.sort_custom(func(a: VehicleInfo, b: VehicleInfo) -> bool: return a.vehicle < b.vehicle)
+    if _vehicles.size() == vehicles.size() and range(vehicles.size()).all(
+            func(index: int) -> bool: return _vehicles[index].vehicle == vehicles[index].vehicle):
+        return
+    _vehicles = vehicles
+    _liveries.clear()
+    for vehicle: VehicleInfo in _vehicles:
+        var names: PackedStringArray = []
+        for livery: VehicleLivery in VehicleCatalogServer.livery_list(vehicle):
+            # a player's livery is not drawn yet
+            if not livery.base:
+                names.append(livery.name)
+        _liveries[vehicle] = names
+    _list_categories()
+
+
 ## The categories the vehicles have, in their order; the list selects the first row - every
 ## vehicle - and reports it back, so the search follows from there and counts them
 func _list_categories() -> void:
     var categories: Dictionary[int, bool] = {}
-    for vehicle: MaszynaVehiclesBank.Vehicle in _vehicles:
+    for vehicle: VehicleInfo in _vehicles:
         categories[vehicle.category] = true
     _listed_categories.assign([ALL_CATEGORIES])
     var names: PackedStringArray = [tr("All vehicles")]
-    for category: MaszynaVehiclesBank.Category in CATEGORY_NAMES:
+    for category: VehicleInfo.VehicleCategory in CATEGORY_NAMES:
         if categories.has(category):
             _listed_categories.append(category)
             names.append(tr(CATEGORY_NAMES[category]))
@@ -98,21 +114,22 @@ func _on_category_list_item_selected(index: int) -> void:
     search_vehicles()
 
 
-## The vehicles of the chosen category whose name, directory or a skin holds the search text, from
+## The vehicles of the chosen category whose name or a livery holds the search text (any case), from
 ## their first page. Every category counts what the search found in it, so the sidebar tells where
 ## else the text is.
 func search_vehicles() -> void:
-    var matching: Array[MaszynaVehiclesBank.Vehicle] = MaszynaVehiclesBank.filter(_vehicles, %SearchInput.get_text())
+    var text: String = %SearchInput.get_text().strip_edges().to_lower()
+    var matching: Array[VehicleInfo] = _vehicles.filter(func(vehicle: VehicleInfo) -> bool:
+        return (not text or vehicle.vehicle.to_lower().contains(text) or vehicle.title.to_lower().contains(text)
+                or " ".join(_liveries[vehicle]).to_lower().contains(text)))
     var counts: Dictionary[int, int] = {ALL_CATEGORIES: matching.size()}
-    for vehicle: MaszynaVehiclesBank.Vehicle in matching:
+    for vehicle: VehicleInfo in matching:
         counts[vehicle.category] = counts.get(vehicle.category, 0) + 1
     for row: int in _listed_categories.size():
         %CategoryList.set_row_note(row, str(counts.get(_listed_categories[row], 0)))
     _found = matching
     if not _category == ALL_CATEGORIES:
-        _found = matching.filter(
-            func(vehicle: MaszynaVehiclesBank.Vehicle) -> bool: return vehicle.category == _category
-        )
+        _found = matching.filter(func(vehicle: VehicleInfo) -> bool: return vehicle.category == _category)
     show_page(0)
 
 
@@ -124,11 +141,9 @@ func show_page(page: int) -> void:
     %NextPageButton.disabled = _page >= page_count - 1
     %SelectButton.disabled = not _found
     var tiles: Array[TileGrid.Tile] = []
-    for vehicle: MaszynaVehiclesBank.Vehicle in _found.slice(_page * PAGE_SIZE, (_page + 1) * PAGE_SIZE):
-        tiles.append(TileGrid.Tile.new(
-            SelectorVehicle.of(vehicle.data_path, vehicle.file_name, vehicle.skins[0] if vehicle.skins else "", ""),
-            vehicle.data_path.path_join(vehicle.file_name), vehicle.file_name
-        ))
+    for vehicle: VehicleInfo in _found.slice(_page * PAGE_SIZE, (_page + 1) * PAGE_SIZE):
+        var caption: String = vehicle.title if vehicle.title else vehicle.vehicle
+        tiles.append(TileGrid.Tile.new(_of(vehicle), vehicle.vehicle, caption))
     # an empty grid hides itself; the column keeps its room and says so, with the way back from a
     # search that found nothing
     %VehicleGrid.set_tiles(tiles)
@@ -162,12 +177,18 @@ func choose_selected_vehicle() -> void:
     var index: int = %VehicleGrid.get_selected()
     if index < 0:
         return
-    var vehicle: MaszynaVehiclesBank.Vehicle = _found[_page * PAGE_SIZE + index]
-    # the bank names the directory as a "dynamic" line does, with a slash first; a scenery does not
-    vehicle_chosen.emit(
-        vehicle.data_path.trim_prefix("/"), vehicle.file_name, vehicle.skins[0] if vehicle.skins else ""
-    )
+    vehicle_chosen.emit(_of(_found[_page * PAGE_SIZE + index]))
     close()
+
+
+## The VehicleData of the catalogue's [param vehicle], in its first livery
+func _of(vehicle: VehicleInfo) -> VehicleData:
+    var data: VehicleData = VehicleData.new()
+    data.vehicle_provider = vehicle.vehicle_provider
+    data.vehicle = vehicle.vehicle
+    var liveries: PackedStringArray = _liveries[vehicle]
+    data.livery = liveries[0] if liveries else ""
+    return data
 
 
 ## The categories, the grid and the buttons are exclusive; every way between them ends in one of

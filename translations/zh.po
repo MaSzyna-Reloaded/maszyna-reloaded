@@ -323,47 +323,8 @@ msgstr "SHP"
 msgid "Settings"
 msgstr "设置"
 
-msgid "Calendar"
-msgstr "日历"
-
 msgid "Weather"
 msgstr "天气"
-
-msgid "Fog"
-msgstr "雾"
-
-msgid "Wind"
-msgstr "风"
-
-msgid "Dir"
-msgstr "方向"
-
-msgid "Rain"
-msgstr "雨"
-
-msgid "Clouds"
-msgstr "云"
-
-msgid "Fog Distance"
-msgstr "雾距离"
-
-msgid "Time"
-msgstr "时间"
-
-msgid "Day"
-msgstr "日"
-
-msgid "Month"
-msgstr "月"
-
-msgid "Year"
-msgstr "年"
-
-msgid "Time Speed"
-msgstr "时间流速"
-
-msgid "Use system time"
-msgstr "使用系统时间"
 
 msgid "Vehicle"
 msgstr "车辆"
@@ -1628,6 +1589,15 @@ msgstr "间接光照 (SSIL)"
 msgid "Reflections (SSR)"
 msgstr "反射 (SSR)"
 
+msgid "Water reflections (SSR)"
+msgstr "水面反射 (SSR)"
+
+msgid "Water reflections fade start (m)"
+msgstr "水面反射淡出起点（米）"
+
+msgid "Water reflections fade end (m)"
+msgstr "水面反射淡出终点（米）"
+
 msgid "Global illumination (SDFGI)"
 msgstr "全局光照 (SDFGI)"
 
@@ -1744,6 +1714,9 @@ msgstr "重启游戏以应用更改。"
 
 msgid "Sunshafts"
 msgstr "太阳光束"
+
+msgid "Shelter from rain and snow (depth map)"
+msgstr "遮挡雨雪（深度图）"
 
 msgid "Sunshaft intensity"
 msgstr "太阳光束强度"

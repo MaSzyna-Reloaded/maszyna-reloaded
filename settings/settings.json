@@ -155,6 +155,28 @@
                     "default": true
                 },
                 {
+                    "title": "Water reflections (SSR)",
+                    "store": "project",
+                    "key": "maszyna/rendering/water_screen_reflections",
+                    "type": "bool"
+                },
+                {
+                    "title": "Water reflections fade start (m)",
+                    "store": "project",
+                    "key": "gnd_weather/water_reflections_fade_start",
+                    "type": "float",
+                    "hint": "range",
+                    "hint_string": "0,1000,1"
+                },
+                {
+                    "title": "Water reflections fade end (m)",
+                    "store": "project",
+                    "key": "gnd_weather/water_reflections_fade_end",
+                    "type": "float",
+                    "hint": "range",
+                    "hint_string": "1,1000,1"
+                },
+                {
                     "title": "Volumetric fog",
                     "store": "user",
                     "section": "render",
@@ -166,6 +188,12 @@
                     "title": "Sunshafts",
                     "store": "project",
                     "key": "gnd_skydome/sunshafts_enabled",
+                    "type": "bool"
+                },
+                {
+                    "title": "Shelter from rain and snow (depth map)",
+                    "store": "project",
+                    "key": "gnd_weather/shelter_map_enabled",
                     "type": "bool"
                 },
                 {
@@ -364,7 +392,8 @@
                     "store": "project",
                     "key": "reloaded/resources/lazy_loading",
                     "type": "bool",
-                    "restart_required": true
+                    "restart_required": true,
+                    "advanced": true
                 },
                 {
                     "title": "Self-illumination energy",
@@ -977,15 +1006,6 @@
                     "type": "float",
                     "hint": "range",
                     "hint_string": "0.01,8,0.01",
-                    "advanced": true
-                },
-                {
-                    "title": "Fog sky height",
-                    "store": "project",
-                    "key": "reloaded/weather/fog/sky_height",
-                    "type": "float",
-                    "hint": "range",
-                    "hint_string": "10,5000,10,or_greater,suffix:m",
                     "advanced": true
                 },
                 {

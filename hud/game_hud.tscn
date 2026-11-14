@@ -169,6 +169,7 @@ visible = false
 layout_mode = 1
 
 [node name="FloatingCorner" type="VBoxContainer" parent="Content"]
+visible = false
 layout_mode = 1
 anchors_preset = 3
 anchor_left = 1.0

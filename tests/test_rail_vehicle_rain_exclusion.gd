@@ -57,6 +57,32 @@ func test_shown_cab_excludes_rain_over_the_vehicle_body() -> void:
     )
     assert_almost_eq(volumes[0].position.y, controller.dimensions_height * 0.5, 0.000001)
     assert_almost_eq(volumes[0].precipitation_delta, -1.0, 0.000001)
+    assert_true(volumes[0].enclosed)
+
+
+## The cab's box its models' bounds in its frame, not the vehicle's whole body: sized to the body it
+## hid the snow about the vehicle and over its bonnet
+func test_the_cabs_box_its_models_bounds() -> void:
+    var sky: GndSkydomeMaszynaEnvironment = autofree(GndSkydomeMaszynaEnvironment.new())
+    var mount: Node3D = add_child_autofree(Node3D.new())
+    mount.rotation.y = 0.7
+    mount.position = Vector3(100.0, 2.0, -40.0)
+    var cabin: Node3D = Node3D.new()
+    mount.add_child(cabin)
+    var shell: MeshInstance3D = MeshInstance3D.new()
+    var box: BoxMesh = BoxMesh.new()
+    box.size = Vector3(2.8, 2.2, 2.5)
+    shell.mesh = box
+    shell.position = Vector3(0.0, 2.6, 4.0)
+    # internal, as a generated interior is
+    cabin.add_child(shell, false, Node.INTERNAL_MODE_BACK)
+    var volume: PrecipitationVolume = PrecipitationVolume.new()
+    cabin.add_child(volume)
+
+    sky._fit_rain_exclusion(volume, RID())
+
+    assert_true(volume.size.is_equal_approx(Vector3(2.8, 2.2, 2.5)), str(volume.size))
+    assert_true(volume.position.is_equal_approx(Vector3(0.0, 2.6, 4.0)), str(volume.position))
 
 
 ## Internal children too: the vehicle's parts and the cab's generated interior are internal

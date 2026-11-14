@@ -15,6 +15,12 @@ signal scenery_loaded(first_vehicle_id: String)
 ## (SceneryProvider.scenario_start())
 signal scenario_progress(progress: float)
 
+## What the scenery's tracks are drawn with, by the name of the backend drawing them, and the snow
+## on its vehicles - this world's, handed to the scenery it opens (SceneryContentNode.track_looks,
+## vehicle_snow_material)
+@export var track_looks: Dictionary[StringName, Resource] = {}
+@export var vehicle_snow_material: ShaderMaterial = null
+
 ## The scenery's node its provider made (SceneryProvider.create_scenery()); null while there is none
 var _scenery: SceneryContentNode = null
 ## The provider of the scenery, which runs its scenario from its load until it unloads
@@ -47,6 +53,8 @@ func unload_scenery() -> void:
 func _open_scenery(info: SceneryInfo) -> SceneryContentNode:
     _provider = instance_from_id(SceneryServer.provider_get(info.provider)) as SceneryProvider
     _scenery = _provider.create_scenery(info)
+    _scenery.track_looks = track_looks
+    _scenery.vehicle_snow_material = vehicle_snow_material
     add_child(_scenery)
     _scenery.environment_node_path = _scenery.get_path_to(%EnvironmentNode)
     _scenery.load_files_parsed.connect(_on_scenery_load_files_parsed)

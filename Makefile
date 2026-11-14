@@ -1,4 +1,4 @@
-.PHONY: terrain3d links libreloaded-local libreloaded-submodule plugin-local plugin-submodule compile-debug compile-release compile-profiling compile-release-symbols compile-release-linux compile-windows-release compile-android-release build-number release release-linux release-linux-nopython release-linux-symbols release-windows release-windows-nopython release-android release-clear-godot-cache windows-installer-image windows-installer-image-push run-tests check-staged-uids install-git-hooks
+.PHONY: terrain3d links libreloaded-local libreloaded-submodule plugin-local plugin-submodule compile-debug compile-release compile-profiling compile-release-symbols compile-release-linux compile-windows-release compile-android-release build-number release release-linux release-linux-nopython release-linux-symbols release-windows release-windows-nopython release-android release-clear-godot-cache export-template-linux export-template-windows windows-installer-image windows-installer-image-push run-tests check-staged-uids install-git-hooks FORCE
 .DEFAULT_GOAL = compile-debug
 
 # libreloaded is the vendor/libreloaded submodule, built with its plugin libmaszyna - MaSzyna's
@@ -61,13 +61,19 @@ export BUILD_TAG BUILD_BRANCH
 # differently: make release-linux GODOT=godot-double
 GODOT?=godot-double
 # The engine the release is exported with - libreloaded's; the export looks its template up by its
-# version, and libreloaded builds it once per machine, outside its checkout, and says where
+# version, and libreloaded builds it under the name of its build: the version and its godot-patches,
+# in the engines' directory of the machine (its make godot-bin)
 GODOT_VERSION:=$(shell sed -n 's/^GODOT_VERSION:=//p' $(LIBRELOADED)/Makefile)
 GODOT_BIN:=$(shell MAKEFLAGS= $(MAKE) -s --no-print-directory -C $(LIBRELOADED) godot-bin)
 LINUX_TEMPLATE:=$(GODOT_BIN)/godot.linuxbsd.template_release.double.x86_64
 LINUX_TEMPLATE_INSTALLED:=$(HOME)/.local/share/godot/export_templates/$(GODOT_VERSION).stable.double/linux_release.x86_64
 WINDOWS_TEMPLATE:=$(GODOT_BIN)/godot.windows.template_release.double.x86_64.exe
 WINDOWS_TEMPLATE_INSTALLED:=$(HOME)/.local/share/godot/export_templates/$(GODOT_VERSION).stable.double/windows_release_x86_64.exe
+# The engine's editor as well, built beside the templates when GODOT_EDITOR is set - the
+# upgrade-*.sh scripts set it; make alone does not, the editor takes as long again (the environment
+# reaches make, a game built on this one's included)
+GODOT_EDITOR?=
+LINUX_EDITOR:=$(GODOT_BIN)/godot.linuxbsd.editor.double.x86_64
 # The Windows installer is made by NSIS in ci/docker/windows-installer; the checkout is mounted at
 # its own path and the build runs as the host user
 # Published on ghcr.io and tagged by its Dockerfile: the CI pulls it, and a changed Dockerfile is a
@@ -174,18 +180,31 @@ release-clear-godot-cache:
 
 # The templates of the engine's build - its version and its godot-patches: libreloaded builds the
 # one missing (its Makefile), which takes hours and is done once per build (vendor/libreloaded/
-# ci/fetch-godot.sh fetches CI's instead), and the one newer than the installed one is installed -
-# a patch added is a new template, which upgrade-linux.sh and upgrade-windows.sh export with
-$(LINUX_TEMPLATE) $(WINDOWS_TEMPLATE):
-	$(MAKE) -C $(LIBRELOADED) $(patsubst $(LIBRELOADED)/%,%,$@)
+# ci/fetch-godot.sh fetches CI's instead), and installed whenever it is not the one installed - a
+# patch added is a new template, which upgrade-linux.sh and upgrade-windows.sh export with. By its
+# content, not its date: every build is kept (libreloaded's make godot-bin), so the template of a
+# build made before - another branch's patches - is older than the one installed
+$(LINUX_TEMPLATE) $(WINDOWS_TEMPLATE) $(LINUX_EDITOR):
+	$(MAKE) -C $(LIBRELOADED) $@
 
 
-$(LINUX_TEMPLATE_INSTALLED): $(LINUX_TEMPLATE)
-	install -D $< $@
+$(LINUX_TEMPLATE_INSTALLED): $(LINUX_TEMPLATE) FORCE
+	cmp -s $< $@ || install -D $< $@
 
 
-$(WINDOWS_TEMPLATE_INSTALLED): $(WINDOWS_TEMPLATE)
-	install -D $< $@
+$(WINDOWS_TEMPLATE_INSTALLED): $(WINDOWS_TEMPLATE) FORCE
+	cmp -s $< $@ || install -D $< $@
+
+
+FORCE:
+
+
+# The installed template of a platform by name: what a release exports with, a game built on this
+# one (PROJECT_DIR) included
+export-template-linux: $(LINUX_TEMPLATE_INSTALLED) $(if $(GODOT_EDITOR),$(LINUX_EDITOR))
+
+
+export-template-windows: $(WINDOWS_TEMPLATE_INSTALLED) $(if $(GODOT_EDITOR),$(LINUX_EDITOR))
 
 
 windows-installer-image:
@@ -203,7 +222,7 @@ windows-installer-image-push: windows-installer-image
 # the Linux SDK container: no Docker, no ghcr.io and no network, but the release starts only on a
 # glibc as new as the host's - a build for this machine, never one to ship
 RELEASE_LINUX_LIBRARY=$(if $(LINUX_HOST),compile-release,compile-release-linux)
-release-linux-nopython: release-clear-godot-cache compile-debug $(RELEASE_LINUX_LIBRARY) $(LINUX_TEMPLATE_INSTALLED)
+release-linux-nopython: release-clear-godot-cache compile-debug $(RELEASE_LINUX_LIBRARY) export-template-linux
 	mkdir -p bin/linux
 	$(GODOT) --headless --path . --export-release "linux_x86_64" bin/linux/reloaded.zip
 	mv bin/linux/reloaded.zip $(LINUX_NOPYTHON_ZIP)
@@ -222,7 +241,7 @@ release-linux-symbols: release-clear-godot-cache compile-debug compile-release-s
 	@echo "Exported with symbols: $(LINUX_NOPYTHON_ZIP)"
 
 
-release-windows-nopython: release-clear-godot-cache compile-debug compile-windows-release $(WINDOWS_TEMPLATE_INSTALLED) windows-installer-image
+release-windows-nopython: release-clear-godot-cache compile-debug compile-windows-release export-template-windows windows-installer-image
 	mkdir -p bin/windows
 	$(GODOT) --headless --path . --export-release "windows_x86_64" bin/windows/reloaded.zip
 	mv bin/windows/reloaded.zip $(WINDOWS_NOPYTHON_ZIP)

@@ -10,6 +10,10 @@ extends Control
 ## reads at its init take effect on the next start (setting_row.gd). The window (UIWindow) keeps
 ## the keys and the mouse to itself.
 ##
+## A plugin's own sections, shaped the same way and registered once at its own init
+## (UserSettings.register_declarations()), stand after settings.json's own - a plugin needs no
+## entry here to show its settings.
+##
 ## settings.json lists "sections", each with a "title" and its "settings". A setting has a "title",
 ## a "store" ("project": "key" is the full name of a project setting; "user": "section" and "key"
 ## of UserSettings), a "type" ("bool", "int", "float", "String" - a text typed into a field), a
@@ -89,12 +93,14 @@ func _ready() -> void:
     UserSettings.config_changed.connect(_update_restart_note)
     _apply_graphics()
     var notes: PackedStringArray = []
+    # a plugin's own sections (UserSettings.register_declarations()), after the game's own
+    var sections: Array = DEFINITION.data["sections"] + UserSettings.get_registered_declarations()
     # a key row names the section of an action in conflict with its own, any section's
     var group_titles: Dictionary[String, String] = {}
-    for section: Dictionary in DEFINITION.data["sections"]:
+    for section: Dictionary in sections:
         if section.has("input_group"):
             group_titles[section["input_group"]] = section["title"]
-    for section: Dictionary in DEFINITION.data["sections"]:
+    for section: Dictionary in sections:
         var settings: Array = section.get("settings", [])
         # a key section: a row per action of the group, its value the action's events
         if section.has("input_group"):

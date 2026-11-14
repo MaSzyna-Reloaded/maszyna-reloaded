@@ -1589,6 +1589,9 @@ msgstr "间接光照 (SSIL)"
 msgid "Reflections (SSR)"
 msgstr "反射 (SSR)"
 
+msgid "Water reflections (SSR)"
+msgstr "水面反射 (SSR)"
+
 msgid "Global illumination (SDFGI)"
 msgstr "全局光照 (SDFGI)"
 

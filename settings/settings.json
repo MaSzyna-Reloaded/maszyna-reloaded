@@ -155,6 +155,12 @@
                     "default": true
                 },
                 {
+                    "title": "Water reflections (SSR)",
+                    "store": "project",
+                    "key": "maszyna/rendering/water_screen_reflections",
+                    "type": "bool"
+                },
+                {
                     "title": "Volumetric fog",
                     "store": "user",
                     "section": "render",

@@ -127,6 +127,9 @@ func create_nodes(world_environment: WorldEnvironment, _sky_environment: Environ
     weather.world_environment_path = NodePath("..")
     # Rain look comes from the gnd_weather/* project settings (WeatherSettings).
     weather.apply_project_settings = true
+    # the shelter map's camera draws the scene but not the sun: seeing the sun's layer, it had the
+    # engine render the sun's shadows for it a second time
+    weather.shelter_map_cull_mask = WeatherNode.ALL_RENDER_LAYERS & ~EnvironmentNode.SUN_RENDER_LAYER
     weather.weather_time_scale = SimulationServer.simulation_get_current_speed()
     # the season is the weather's, by the place and the date: the scenery's materials take it from
     # SimulationServer

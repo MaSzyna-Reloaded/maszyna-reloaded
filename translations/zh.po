@@ -1592,6 +1592,12 @@ msgstr "反射 (SSR)"
 msgid "Water reflections (SSR)"
 msgstr "水面反射 (SSR)"
 
+msgid "Water reflections fade start (m)"
+msgstr "水面反射淡出起点（米）"
+
+msgid "Water reflections fade end (m)"
+msgstr "水面反射淡出终点（米）"
+
 msgid "Global illumination (SDFGI)"
 msgstr "全局光照 (SDFGI)"
 
@@ -1708,6 +1714,9 @@ msgstr "重启游戏以应用更改。"
 
 msgid "Sunshafts"
 msgstr "太阳光束"
+
+msgid "Shelter from rain and snow (depth map)"
+msgstr "遮挡雨雪（深度图）"
 
 msgid "Sunshaft intensity"
 msgstr "太阳光束强度"

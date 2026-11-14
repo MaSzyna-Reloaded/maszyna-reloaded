@@ -1592,6 +1592,12 @@ msgstr "Tükröződések (SSR)"
 msgid "Water reflections (SSR)"
 msgstr "Tükröződések a vízen (SSR)"
 
+msgid "Water reflections fade start (m)"
+msgstr "Vízvisszaverődés halványulásának kezdete (m)"
+
+msgid "Water reflections fade end (m)"
+msgstr "Vízvisszaverődés halványulásának vége (m)"
+
 msgid "Global illumination (SDFGI)"
 msgstr "Globális megvilágítás (SDFGI)"
 
@@ -1708,6 +1714,9 @@ msgstr "Indítsa újra a játékot a változások alkalmazásához."
 
 msgid "Sunshafts"
 msgstr "Napsugarak"
+
+msgid "Shelter from rain and snow (depth map)"
+msgstr "Védelem eső és hó ellen (mélységtérkép)"
 
 msgid "Sunshaft intensity"
 msgstr "Napsugarak erőssége"

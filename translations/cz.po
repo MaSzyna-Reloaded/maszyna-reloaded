@@ -1592,6 +1592,12 @@ msgstr "Odrazy (SSR)"
 msgid "Water reflections (SSR)"
 msgstr "Odrazy na vodě (SSR)"
 
+msgid "Water reflections fade start (m)"
+msgstr "Začátek mizení odrazů vody (m)"
+
+msgid "Water reflections fade end (m)"
+msgstr "Konec mizení odrazů vody (m)"
+
 msgid "Global illumination (SDFGI)"
 msgstr "Globální osvětlení (SDFGI)"
 
@@ -1708,6 +1714,9 @@ msgstr "Restartujte hru, aby se změny projevily."
 
 msgid "Sunshafts"
 msgstr "Sluneční paprsky"
+
+msgid "Shelter from rain and snow (depth map)"
+msgstr "Ochrana před deštěm a sněhem (hloubková mapa)"
 
 msgid "Sunshaft intensity"
 msgstr "Intenzita slunečních paprsků"

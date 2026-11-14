@@ -988,6 +988,26 @@ reloaded_weather_probes_enabled={
 "type": "float",
 "value": 0.0
 }
+reloaded_weather_shelter_map={
+"type": "sampler2D",
+"value": ""
+}
+reloaded_weather_shelter_transform={
+"type": "mat4",
+"value": Projection(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1)
+}
+reloaded_weather_shelter_enabled={
+"type": "float",
+"value": 0.0
+}
+reloaded_weather_reflections_fade={
+"type": "vec2",
+"value": Vector2(30, 55)
+}
+reloaded_weather_camera_position={
+"type": "vec3",
+"value": Vector3(0, 0, 0)
+}
 reloaded_weather_wet_exists={
 "type": "bool",
 "value": false
@@ -1015,6 +1035,14 @@ reloaded_snow_wetness={
 reloaded_wetness={
 "type": "float",
 "value": 0.0
+}
+reloaded_snowfall={
+"type": "float",
+"value": 0.0
+}
+reloaded_ground_temperature={
+"type": "float",
+"value": 10.0
 }
 reloaded_air_temperature={
 "type": "float",
@@ -1120,6 +1148,14 @@ gnd_wetness={
 "type": "float",
 "value": 0.0
 }
+gnd_snowfall={
+"type": "float",
+"value": 0.0
+}
+gnd_ground_temperature={
+"type": "float",
+"value": 10.0
+}
 gnd_air_temperature={
 "type": "float",
 "value": 10.0
@@ -1151,6 +1187,26 @@ gnd_weather_probe_size={
 gnd_weather_probes_enabled={
 "type": "float",
 "value": 0.0
+}
+gnd_weather_shelter_map={
+"type": "sampler2D",
+"value": ""
+}
+gnd_weather_shelter_transform={
+"type": "mat4",
+"value": Projection(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1)
+}
+gnd_weather_shelter_enabled={
+"type": "float",
+"value": 0.0
+}
+gnd_weather_reflections_fade={
+"type": "vec2",
+"value": Vector2(30, 55)
+}
+gnd_weather_camera_position={
+"type": "vec3",
+"value": Vector3(0, 0, 0)
 }
 gnd_weather_wet_exists={
 "type": "bool",

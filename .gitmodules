@@ -24,6 +24,3 @@
 	path = vendor/multimonitor
 	url = git@github.com:MaSzyna-Reloaded/multimonitor-addon.git
 	branch = dev/gdextension
-	# private: a plain `submodule update --init --recursive` skips it: ci/fetch-multimonitor.sh (and
-	# the CI steps that call it) give it its own read-only, scoped credential first
-	update = none

@@ -47,25 +47,15 @@ jobs:
       prefix: ${{ steps.prefix.outputs.value }}
       release_candidate_tag: ${{ steps.prefix.outputs.release_candidate_tag }}
     steps:
+      # vendor/multimonitor is private: actions/checkout rewrites its SSH URL to HTTPS and fetches
+      # it with this same token, so MULTIMONITOR_TOKEN needs read access to this repository too -
+      # persist-credentials: false keeps it off this run's own .git/config (the security review's
+      # finding), where a pull request's build steps run next
       - name: Checkout
         uses: actions/checkout@v7
         with:
           submodules: recursive
-          # the run's own token never lands in .git/config, where a pull request's build steps run
-          # next (the security review that flagged it)
-          persist-credentials: false
-
-      # vendor/multimonitor is private and .gitmodules gives it `update = none`, so the checkout
-      # above skipped it: its own read-only token, scoped to that one repository alone, fetches it
-      # into the same path instead - never the run's own token, which never sees that repository
-      - name: Fetch the multimonitor submodule
-        uses: actions/checkout@v7
-        with:
-          repository: MaSzyna-Reloaded/multimonitor-addon
-          ref: dev/gdextension
           token: ${{ secrets.MULTIMONITOR_TOKEN }}
-          path: vendor/multimonitor
-          submodules: recursive
           persist-credentials: false
 
       # cmake/write_build_number.cmake, and what a problem report names the build by: a tag's
@@ -140,16 +130,7 @@ jobs:
         uses: actions/checkout@v7
         with:
           submodules: recursive
-          persist-credentials: false
-
-      - name: Fetch the multimonitor submodule
-        uses: actions/checkout@v7
-        with:
-          repository: MaSzyna-Reloaded/multimonitor-addon
-          ref: dev/gdextension
           token: ${{ secrets.MULTIMONITOR_TOKEN }}
-          path: vendor/multimonitor
-          submodules: recursive
           persist-credentials: false
 
       - name: Fetch the double precision Godot
@@ -230,6 +211,7 @@ jobs:
         with:
           ref: ${{ github.event.pull_request.head.sha || github.sha }}
           submodules: recursive
+          token: ${{ secrets.MULTIMONITOR_TOKEN }}
           persist-credentials: false
 
       # the multimonitor addon is not in a release's own packaging yet (a later PR): without

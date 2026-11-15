@@ -1,4 +1,4 @@
-.PHONY: terrain3d links libreloaded-local libreloaded-submodule plugin-local plugin-submodule compile-debug compile-release compile-profiling compile-release-symbols compile-release-linux compile-windows-release compile-android-release compile-multimonitor build-number release release-linux release-linux-nopython release-linux-symbols release-windows release-windows-nopython release-android release-clear-godot-cache windows-installer-image windows-installer-image-push run-tests check-staged-uids install-git-hooks
+.PHONY: terrain3d links libreloaded-local libreloaded-submodule plugin-local plugin-submodule compile-debug compile-release compile-profiling compile-release-symbols compile-release-linux compile-windows-release compile-android-release compile-multimonitor-compile-debug compile-multimonitor-compile-release-linux compile-multimonitor-compile-windows-release compile-multimonitor-compile-android-release build-number release release-linux release-linux-nopython release-linux-symbols release-windows release-windows-nopython release-android release-clear-godot-cache windows-installer-image windows-installer-image-push run-tests check-staged-uids install-git-hooks
 .DEFAULT_GOAL = compile-debug
 
 # libreloaded is the vendor/libreloaded submodule, built with its plugin libmaszyna - MaSzyna's
@@ -30,10 +30,11 @@ LIBRELOADED_ADDON:=addons/libreloaded
 # The sound addon the game uses, libreloaded's own (its build makes its library)
 GND_SFX_ADDON:=vendor/gnd-sfx/addons/gnd_sfx
 
-# The multimonitor rig, a closed-source GDExtension of its own (vendor/multimonitor, private: .gitmodules
-# gives it `update = none`, ci/fetch-multimonitor.sh fetches it); make compile-multimonitor builds its
-# debug library the way its own README does, into $(MULTIMONITOR_ADDON) - links copies that addon in
-# only when the submodule is there, so a checkout without access to it builds and runs as before
+# The multimonitor rig, a closed-source GDExtension of its own (vendor/multimonitor, private: its
+# checkout needs its own read-only credential - CI's own token, scoped to it too); compile-debug and
+# every compile-*-release build its library beside the one they already build, into
+# $(MULTIMONITOR_ADDON) - links copies that addon in only when the submodule is there, so a checkout
+# without access to it builds and runs as before
 MULTIMONITOR:=vendor/multimonitor
 MULTIMONITOR_ADDON:=$(MULTIMONITOR)/addons/multimonitor
 
@@ -135,23 +136,48 @@ plugin-submodule:
 	$(MAKE) links
 
 
-compile-release compile-profiling compile-release-symbols compile-release-linux compile-windows-release compile-android-release: $(BUILD_NUMBER_FILE) $(BUILD_TAG_FILE) $(BUILD_BRANCH_FILE) links
+compile-release compile-profiling compile-release-symbols: $(BUILD_NUMBER_FILE) $(BUILD_TAG_FILE) $(BUILD_BRANCH_FILE) links
 	$(LIBRELOADED_MAKE) $@
 
 
-# the host library and the multimonitor rig's own, side by side (they touch none of each other's
-# files) - the way libreloaded's own make already builds gnd-sfx's beside its own; only once the
-# submodule is there, so a checkout without access to the private repository builds as before
-compile-debug: $(BUILD_NUMBER_FILE) $(BUILD_TAG_FILE) $(BUILD_BRANCH_FILE) links
+# the host library (or a release's own) and the multimonitor rig's, side by side - they touch none
+# of each other's files - the way libreloaded's own make already builds gnd-sfx's beside its own;
+# only once the submodule is there, so a checkout without access to the private repository builds
+# exactly as before
+compile-debug compile-release-linux compile-windows-release compile-android-release: $(BUILD_NUMBER_FILE) $(BUILD_TAG_FILE) $(BUILD_BRANCH_FILE) links
 	$(LIBRELOADED_MAKE) $@ & libreloaded=$$!; \
-	if [ -d $(MULTIMONITOR) ]; then $(MAKE) compile-multimonitor & multimonitor=$$!; fi; \
+	if [ -d $(MULTIMONITOR) ]; then $(MAKE) compile-multimonitor-$@ & multimonitor=$$!; fi; \
 	wait $$libreloaded; \
 	if [ -n "$$multimonitor" ]; then wait $$multimonitor; fi
 
 
-compile-multimonitor:
+compile-multimonitor-compile-debug:
 	cmake -S $(MULTIMONITOR) -B $(MULTIMONITOR)/build -DGODOTCPP_TARGET=template_debug
 	cmake --build $(MULTIMONITOR)/build -j$(shell nproc)
+
+
+# the same old-glibc SDK container compile-release-linux itself builds in (linux-sdk-run,
+# libreloaded's Makefile), over the same checkout it already mounts - so the rig's release library
+# runs on whatever the game's own does
+compile-multimonitor-compile-release-linux:
+	$(LIBRELOADED_MAKE) linux-sdk-run LINUX_SDK_COMMAND='cmake -S $(MULTIMONITOR) -B $(MULTIMONITOR)/build-release-linux -DCMAKE_BUILD_TYPE=Release -DGODOTCPP_TARGET=template_release && cmake --build $(MULTIMONITOR)/build-release-linux --parallel $$(nproc)'
+
+
+# Any NDK will do for a GDExtension; GitHub's runners carry one in ANDROID_NDK_LATEST_HOME
+ANDROID_NDK_ROOT?=$(ANDROID_NDK_LATEST_HOME)
+
+compile-multimonitor-compile-android-release:
+	cmake -S $(MULTIMONITOR) -B $(MULTIMONITOR)/build-release-android -DCMAKE_BUILD_TYPE=Release \
+	    -DGODOTCPP_TARGET=template_release -DGODOTCPP_PLATFORM=android -DANDROID_NDK_ROOT=$(ANDROID_NDK_ROOT)
+	cmake --build $(MULTIMONITOR)/build-release-android -j$(shell nproc)
+
+
+compile-multimonitor-compile-windows-release:
+	cmake -S $(MULTIMONITOR) -B $(MULTIMONITOR)/build-release-windows -DCMAKE_BUILD_TYPE=Release \
+	    -DGODOTCPP_TARGET=template_release -DGODOTCPP_PLATFORM=windows -DCMAKE_SYSTEM_NAME=Windows \
+	    -DCMAKE_C_COMPILER=x86_64-w64-mingw32-gcc -DCMAKE_CXX_COMPILER=x86_64-w64-mingw32-g++ \
+	    -DCMAKE_SIZEOF_VOID_P=8
+	cmake --build $(MULTIMONITOR)/build-release-windows -j$(shell nproc)
 
 
 # Terrain3D (the ground the biomes grow on) patched and built double precision: the release

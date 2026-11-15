@@ -135,8 +135,18 @@ plugin-submodule:
 	$(MAKE) links
 
 
-compile-debug compile-release compile-profiling compile-release-symbols compile-release-linux compile-windows-release compile-android-release: $(BUILD_NUMBER_FILE) $(BUILD_TAG_FILE) $(BUILD_BRANCH_FILE) links
+compile-release compile-profiling compile-release-symbols compile-release-linux compile-windows-release compile-android-release: $(BUILD_NUMBER_FILE) $(BUILD_TAG_FILE) $(BUILD_BRANCH_FILE) links
 	$(LIBRELOADED_MAKE) $@
+
+
+# the host library and the multimonitor rig's own, side by side (they touch none of each other's
+# files) - the way libreloaded's own make already builds gnd-sfx's beside its own; only once the
+# submodule is there, so a checkout without access to the private repository builds as before
+compile-debug: $(BUILD_NUMBER_FILE) $(BUILD_TAG_FILE) $(BUILD_BRANCH_FILE) links
+	$(LIBRELOADED_MAKE) $@ & libreloaded=$$!; \
+	if [ -d $(MULTIMONITOR) ]; then $(MAKE) compile-multimonitor & multimonitor=$$!; fi; \
+	wait $$libreloaded; \
+	if [ -n "$$multimonitor" ]; then wait $$multimonitor; fi
 
 
 compile-multimonitor:

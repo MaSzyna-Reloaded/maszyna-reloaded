@@ -111,14 +111,11 @@ jobs:
         with:
           key: host
 
-      # the empty overrides leave out the clang-tidy database compile-debug prepares for the IDE
+      # the empty overrides leave out the clang-tidy database compile-debug prepares for the IDE;
+      # compile-debug builds the multimonitor rig's own library too, the way libreloaded's own make
+      # already builds gnd-sfx's beside its own (the Makefile, not this step)
       - name: Build the host library
         run: make compile-debug CLANG_TIDY_COMPILE_COMMANDS_FILE= CLANG_TIDY_BINDINGS_FILE=
-
-      # after ccache-action: CMAKE_CXX_COMPILER_LAUNCHER (env, above) is ccache for every build in
-      # this job, and compile-multimonitor's own cmake configure fails without it on PATH yet
-      - name: Build the multimonitor library
-        run: make compile-multimonitor
 
       # and maszyna-python-host, the process PythonScreenServer runs CPython in, the
       # libreloaded.gdextension CMake generates into libreloaded's addon - not versioned, and without

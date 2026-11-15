@@ -47,10 +47,16 @@ jobs:
       prefix: ${{ steps.prefix.outputs.value }}
       release_candidate_tag: ${{ steps.prefix.outputs.release_candidate_tag }}
     steps:
+      # vendor/multimonitor is private: actions/checkout rewrites its SSH URL to HTTPS and fetches
+      # it with this same token, so MULTIMONITOR_TOKEN needs read access to this repository too -
+      # persist-credentials: false keeps it off this run's own .git/config (the security review's
+      # finding), where a pull request's build steps run next
       - name: Checkout
         uses: actions/checkout@v7
         with:
           submodules: recursive
+          token: ${{ secrets.MULTIMONITOR_TOKEN }}
+          persist-credentials: false
 
       # cmake/write_build_number.cmake, and what a problem report names the build by: a tag's
       # release by the tag alone, any other run by the branch - a pull request's own (its checkout
@@ -95,7 +101,9 @@ jobs:
         with:
           key: host
 
-      # the empty overrides leave out the clang-tidy database compile-debug prepares for the IDE
+      # the empty overrides leave out the clang-tidy database compile-debug prepares for the IDE;
+      # compile-debug builds the multimonitor rig's own library too, the way libreloaded's own make
+      # already builds gnd-sfx's beside its own (the Makefile, not this step)
       - name: Build the host library
         run: make compile-debug CLANG_TIDY_COMPILE_COMMANDS_FILE= CLANG_TIDY_BINDINGS_FILE=
 
@@ -111,6 +119,7 @@ jobs:
             bin/libreloaded/linux/maszyna-python-host.64
             vendor/libreloaded/addons/libreloaded/libreloaded.gdextension
             vendor/libreloaded/vendor/gnd-sfx/addons/gnd_sfx/bin/linux/libgndsfx.linux.template_debug.double.x86_64.so
+            vendor/multimonitor/addons/multimonitor/bin/linux/multimonitor.linux.template_debug.double.x86_64.so
           if-no-files-found: error
 
   run-tests:
@@ -121,6 +130,8 @@ jobs:
         uses: actions/checkout@v7
         with:
           submodules: recursive
+          token: ${{ secrets.MULTIMONITOR_TOKEN }}
+          persist-credentials: false
 
       - name: Fetch the double precision Godot
         run: |
@@ -200,6 +211,12 @@ jobs:
         with:
           ref: ${{ github.event.pull_request.head.sha || github.sha }}
           submodules: recursive
+          token: ${{ secrets.MULTIMONITOR_TOKEN }}
+          persist-credentials: false
+
+      # the multimonitor addon is not in a release's own packaging yet (a later PR): without
+      # vendor/multimonitor here, links leaves addons/multimonitor out, and the game builds and
+      # runs exactly as before
 
       # the build number the game shows and the installer carries, the tag and the branch, the
       # ones build-host stamped

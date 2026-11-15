@@ -160,9 +160,11 @@ compile-multimonitor-compile-debug:
 # libreloaded's Makefile), over the same checkout it already mounts - so the rig's release library
 # runs on whatever the game's own does. $(CURDIR) (this Makefile's, not the recursive one's): the
 # container's own working directory is libreloaded's, where a relative path resolved under its
-# vendor/ instead
+# vendor/ instead. $$$$(nproc): LINUX_SDK_COMMAND's own value is itself expanded again when
+# libreloaded's Makefile references it ($(LINUX_SDK_RUN) $(LINUX_SDK_COMMAND)) - one $$ pair
+# survives only that one pass, collapsing to $(nproc) before the shell ever sees it
 compile-multimonitor-compile-release-linux:
-	$(LIBRELOADED_MAKE) linux-sdk-run LINUX_SDK_COMMAND='cmake -S $(CURDIR)/$(MULTIMONITOR) -B $(CURDIR)/$(MULTIMONITOR)/build-release-linux -DCMAKE_BUILD_TYPE=Release -DGODOTCPP_TARGET=template_release && cmake --build $(CURDIR)/$(MULTIMONITOR)/build-release-linux --parallel $$(nproc)'
+	$(LIBRELOADED_MAKE) linux-sdk-run LINUX_SDK_COMMAND='cmake -S $(CURDIR)/$(MULTIMONITOR) -B $(CURDIR)/$(MULTIMONITOR)/build-release-linux -DCMAKE_BUILD_TYPE=Release -DGODOTCPP_TARGET=template_release && cmake --build $(CURDIR)/$(MULTIMONITOR)/build-release-linux --parallel $$$$(nproc)'
 
 
 # Any NDK will do for a GDExtension; GitHub's runners carry one in ANDROID_NDK_LATEST_HOME

@@ -56,15 +56,17 @@ jobs:
           persist-credentials: false
 
       # vendor/multimonitor is private and .gitmodules gives it `update = none`, so the checkout
-      # above skipped it: ci/fetch-multimonitor.sh's own read-only token, scoped to that one URL,
-      # fetches it instead
+      # above skipped it: its own read-only token, scoped to that one repository alone, fetches it
+      # into the same path instead - never the run's own token, which never sees that repository
       - name: Fetch the multimonitor submodule
-        env:
-          MULTIMONITOR_TOKEN: ${{ secrets.MULTIMONITOR_TOKEN }}
-        run: ci/fetch-multimonitor.sh
-
-      - name: Build the multimonitor library
-        run: make compile-multimonitor
+        uses: actions/checkout@v7
+        with:
+          repository: MaSzyna-Reloaded/multimonitor-addon
+          ref: dev/gdextension
+          token: ${{ secrets.MULTIMONITOR_TOKEN }}
+          path: vendor/multimonitor
+          submodules: recursive
+          persist-credentials: false
 
       # cmake/write_build_number.cmake, and what a problem report names the build by: a tag's
       # release by the tag alone, any other run by the branch - a pull request's own (its checkout
@@ -113,6 +115,11 @@ jobs:
       - name: Build the host library
         run: make compile-debug CLANG_TIDY_COMPILE_COMMANDS_FILE= CLANG_TIDY_BINDINGS_FILE=
 
+      # after ccache-action: CMAKE_CXX_COMPILER_LAUNCHER (env, above) is ccache for every build in
+      # this job, and compile-multimonitor's own cmake configure fails without it on PATH yet
+      - name: Build the multimonitor library
+        run: make compile-multimonitor
+
       # and maszyna-python-host, the process PythonScreenServer runs CPython in, the
       # libreloaded.gdextension CMake generates into libreloaded's addon - not versioned, and without
       # it Godot loads no library - and gnd-sfx's library libreloaded's build makes beside its own;
@@ -139,9 +146,14 @@ jobs:
           persist-credentials: false
 
       - name: Fetch the multimonitor submodule
-        env:
-          MULTIMONITOR_TOKEN: ${{ secrets.MULTIMONITOR_TOKEN }}
-        run: ci/fetch-multimonitor.sh
+        uses: actions/checkout@v7
+        with:
+          repository: MaSzyna-Reloaded/multimonitor-addon
+          ref: dev/gdextension
+          token: ${{ secrets.MULTIMONITOR_TOKEN }}
+          path: vendor/multimonitor
+          submodules: recursive
+          persist-credentials: false
 
       - name: Fetch the double precision Godot
         run: |

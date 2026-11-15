@@ -63,6 +63,9 @@ jobs:
           MULTIMONITOR_TOKEN: ${{ secrets.MULTIMONITOR_TOKEN }}
         run: ci/fetch-multimonitor.sh
 
+      - name: Build the multimonitor library
+        run: make compile-multimonitor
+
       # cmake/write_build_number.cmake, and what a problem report names the build by: a tag's
       # release by the tag alone, any other run by the branch - a pull request's own (its checkout
       # is detached)
@@ -122,6 +125,7 @@ jobs:
             bin/libreloaded/linux/maszyna-python-host.64
             vendor/libreloaded/addons/libreloaded/libreloaded.gdextension
             vendor/libreloaded/vendor/gnd-sfx/addons/gnd_sfx/bin/linux/libgndsfx.linux.template_debug.double.x86_64.so
+            vendor/multimonitor/addons/multimonitor/bin/linux/multimonitor.linux.template_debug.double.x86_64.so
           if-no-files-found: error
 
   run-tests:
@@ -219,10 +223,9 @@ jobs:
           submodules: recursive
           persist-credentials: false
 
-      - name: Fetch the multimonitor submodule
-        env:
-          MULTIMONITOR_TOKEN: ${{ secrets.MULTIMONITOR_TOKEN }}
-        run: ci/fetch-multimonitor.sh
+      # the multimonitor addon is not in a release's own packaging yet (a later PR): without
+      # vendor/multimonitor here, links leaves addons/multimonitor out, and the game builds and
+      # runs exactly as before
 
       # the build number the game shows and the installer carries, the tag and the branch, the
       # ones build-host stamped

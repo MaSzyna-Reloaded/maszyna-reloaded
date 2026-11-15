@@ -158,9 +158,11 @@ compile-multimonitor-compile-debug:
 
 # the same old-glibc SDK container compile-release-linux itself builds in (linux-sdk-run,
 # libreloaded's Makefile), over the same checkout it already mounts - so the rig's release library
-# runs on whatever the game's own does
+# runs on whatever the game's own does. $(CURDIR) (this Makefile's, not the recursive one's): the
+# container's own working directory is libreloaded's, where a relative path resolved under its
+# vendor/ instead
 compile-multimonitor-compile-release-linux:
-	$(LIBRELOADED_MAKE) linux-sdk-run LINUX_SDK_COMMAND='cmake -S $(MULTIMONITOR) -B $(MULTIMONITOR)/build-release-linux -DCMAKE_BUILD_TYPE=Release -DGODOTCPP_TARGET=template_release && cmake --build $(MULTIMONITOR)/build-release-linux --parallel $$(nproc)'
+	$(LIBRELOADED_MAKE) linux-sdk-run LINUX_SDK_COMMAND='cmake -S $(CURDIR)/$(MULTIMONITOR) -B $(CURDIR)/$(MULTIMONITOR)/build-release-linux -DCMAKE_BUILD_TYPE=Release -DGODOTCPP_TARGET=template_release && cmake --build $(CURDIR)/$(MULTIMONITOR)/build-release-linux --parallel $$(nproc)'
 
 
 # Any NDK will do for a GDExtension; GitHub's runners carry one in ANDROID_NDK_LATEST_HOME
@@ -172,9 +174,13 @@ compile-multimonitor-compile-android-release:
 	cmake --build $(MULTIMONITOR)/build-release-android -j$(shell nproc)
 
 
+# CMAKE_SYSTEM_PROCESSOR by hand: left to the toolchain's own guess, a fresh configure (no cache
+# from an earlier build to carry it over) named the library ...double..dll - the arch between the
+# two dots empty, since GODOTCPP_ARCH (godot-cpp's cmake/godotcpp.cmake) had nothing to read
 compile-multimonitor-compile-windows-release:
 	cmake -S $(MULTIMONITOR) -B $(MULTIMONITOR)/build-release-windows -DCMAKE_BUILD_TYPE=Release \
 	    -DGODOTCPP_TARGET=template_release -DGODOTCPP_PLATFORM=windows -DCMAKE_SYSTEM_NAME=Windows \
+	    -DCMAKE_SYSTEM_PROCESSOR=x86_64 \
 	    -DCMAKE_C_COMPILER=x86_64-w64-mingw32-gcc -DCMAKE_CXX_COMPILER=x86_64-w64-mingw32-g++ \
 	    -DCMAKE_SIZEOF_VOID_P=8
 	cmake --build $(MULTIMONITOR)/build-release-windows -j$(shell nproc)

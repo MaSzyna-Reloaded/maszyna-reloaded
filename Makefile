@@ -1,4 +1,4 @@
-.PHONY: terrain3d links libreloaded-local libreloaded-submodule plugin-local plugin-submodule compile-debug compile-release compile-profiling compile-release-symbols compile-release-linux compile-windows-release compile-android-release build-number release release-linux release-linux-nopython release-linux-symbols release-windows release-windows-nopython release-android release-clear-godot-cache windows-installer-image windows-installer-image-push run-tests check-staged-uids install-git-hooks
+.PHONY: terrain3d links libreloaded-local libreloaded-submodule plugin-local plugin-submodule compile-debug compile-release compile-profiling compile-release-symbols compile-release-linux compile-windows-release compile-android-release compile-multimonitor build-number release release-linux release-linux-nopython release-linux-symbols release-windows release-windows-nopython release-android release-clear-godot-cache windows-installer-image windows-installer-image-push run-tests check-staged-uids install-git-hooks
 .DEFAULT_GOAL = compile-debug
 
 # libreloaded is the vendor/libreloaded submodule, built with its plugin libmaszyna - MaSzyna's
@@ -29,6 +29,13 @@ LIBRELOADED_MAKE=$(MAKE) -C $(LIBRELOADED) GODOT_PROJECT_DIR=$(PROJECT_DIR) LINU
 LIBRELOADED_ADDON:=addons/libreloaded
 # The sound addon the game uses, libreloaded's own (its build makes its library)
 GND_SFX_ADDON:=vendor/gnd-sfx/addons/gnd_sfx
+
+# The multimonitor rig, a closed-source GDExtension of its own (vendor/multimonitor, private: .gitmodules
+# gives it `update = none`, ci/fetch-multimonitor.sh fetches it); make compile-multimonitor builds its
+# debug library the way its own README does, into $(MULTIMONITOR_ADDON) - links copies that addon in
+# only when the submodule is there, so a checkout without access to it builds and runs as before
+MULTIMONITOR:=vendor/multimonitor
+MULTIMONITOR_ADDON:=$(MULTIMONITOR)/addons/multimonitor
 
 # The app shows the build number (vendor/libreloaded/cmake/write_build_number.cmake), so the archive
 # name stays the same from build to build and does not carry a branch or a date
@@ -100,6 +107,7 @@ links:
 		if [ -f ".$$plugin-local" ]; then ln -sfn "$$(cat .$$plugin-local)/addons/$$plugin" "addons/$$plugin" || exit 1; \
 		else ln -sfn "../vendor/$$plugin/addons/$$plugin" "addons/$$plugin" || exit 1; fi; \
 	done
+	if [ -d $(MULTIMONITOR_ADDON) ]; then ln -sfn ../$(MULTIMONITOR_ADDON) addons/multimonitor; fi
 
 
 libreloaded-local:
@@ -129,6 +137,11 @@ plugin-submodule:
 
 compile-debug compile-release compile-profiling compile-release-symbols compile-release-linux compile-windows-release compile-android-release: $(BUILD_NUMBER_FILE) $(BUILD_TAG_FILE) $(BUILD_BRANCH_FILE) links
 	$(LIBRELOADED_MAKE) $@
+
+
+compile-multimonitor:
+	cmake -S $(MULTIMONITOR) -B $(MULTIMONITOR)/build -DGODOTCPP_TARGET=template_debug
+	cmake --build $(MULTIMONITOR)/build -j$(shell nproc)
 
 
 # Terrain3D (the ground the biomes grow on) patched and built double precision: the release

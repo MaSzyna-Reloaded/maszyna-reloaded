@@ -51,6 +51,17 @@ jobs:
         uses: actions/checkout@v7
         with:
           submodules: recursive
+          # the run's own token never lands in .git/config, where a pull request's build steps run
+          # next (the security review that flagged it)
+          persist-credentials: false
+
+      # vendor/multimonitor is private and .gitmodules gives it `update = none`, so the checkout
+      # above skipped it: ci/fetch-multimonitor.sh's own read-only token, scoped to that one URL,
+      # fetches it instead
+      - name: Fetch the multimonitor submodule
+        env:
+          MULTIMONITOR_TOKEN: ${{ secrets.MULTIMONITOR_TOKEN }}
+        run: ci/fetch-multimonitor.sh
 
       # cmake/write_build_number.cmake, and what a problem report names the build by: a tag's
       # release by the tag alone, any other run by the branch - a pull request's own (its checkout
@@ -121,6 +132,12 @@ jobs:
         uses: actions/checkout@v7
         with:
           submodules: recursive
+          persist-credentials: false
+
+      - name: Fetch the multimonitor submodule
+        env:
+          MULTIMONITOR_TOKEN: ${{ secrets.MULTIMONITOR_TOKEN }}
+        run: ci/fetch-multimonitor.sh
 
       - name: Fetch the double precision Godot
         run: |
@@ -200,6 +217,12 @@ jobs:
         with:
           ref: ${{ github.event.pull_request.head.sha || github.sha }}
           submodules: recursive
+          persist-credentials: false
+
+      - name: Fetch the multimonitor submodule
+        env:
+          MULTIMONITOR_TOKEN: ${{ secrets.MULTIMONITOR_TOKEN }}
+        run: ci/fetch-multimonitor.sh
 
       # the build number the game shows and the installer carries, the tag and the branch, the
       # ones build-host stamped

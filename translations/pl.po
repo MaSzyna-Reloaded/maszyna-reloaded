@@ -23,11 +23,11 @@ msgstr "Zatwierdź skin"
 msgid "Search scenario"
 msgstr "Szukaj scenariusza"
 
-msgid "Pre-Alpha Demo Release %s-%s-%s (build %s)"
-msgstr "Pre-Alpha Demo %s-%s-%s (kompilacja %s)"
+msgid "Alpha Demo Release %s-%s-%s (build %s)"
+msgstr "Alpha Demo %s-%s-%s (kompilacja %s)"
 
-msgid "Pre-Alpha Demo Release (unbuilt)"
-msgstr "Pre-Alpha Demo (bez kompilacji)"
+msgid "Alpha Demo Release (unbuilt)"
+msgstr "Alpha Demo (bez kompilacji)"
 
 msgid "Loading %s..."
 msgstr "Wczytywanie %s..."

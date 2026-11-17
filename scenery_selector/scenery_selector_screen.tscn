@@ -461,7 +461,7 @@ unique_name_in_owner = true
 layout_mode = 2
 theme_override_colors/font_color = Color(0.81, 0.88, 1, 0.8)
 theme_override_font_sizes/font_size = 16
-text = "Pre-Alpha Demo Release"
+text = "Alpha Demo Release"
 
 [node name="Link" type="LinkButton" parent="Footer" unique_id=1203540073]
 layout_mode = 2

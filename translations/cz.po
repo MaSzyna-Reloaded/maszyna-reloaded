@@ -23,11 +23,11 @@ msgstr "Použít vzhled"
 msgid "Search scenario"
 msgstr "Hledat scénář"
 
-msgid "Pre-Alpha Demo Release %s-%s-%s (build %s)"
-msgstr "Pre-Alpha demo %s-%s-%s (sestavení %s)"
+msgid "Alpha Demo Release %s-%s-%s (build %s)"
+msgstr "Alpha demo %s-%s-%s (sestavení %s)"
 
-msgid "Pre-Alpha Demo Release (unbuilt)"
-msgstr "Pre-Alpha demo (nesestaveno)"
+msgid "Alpha Demo Release (unbuilt)"
+msgstr "Alpha demo (nesestaveno)"
 
 msgid "Loading %s..."
 msgstr "Načítání %s..."

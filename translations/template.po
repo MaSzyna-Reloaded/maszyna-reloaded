@@ -23,10 +23,10 @@ msgstr ""
 msgid "Search scenario"
 msgstr ""
 
-msgid "Pre-Alpha Demo Release %s-%s-%s (build %s)"
+msgid "Alpha Demo Release %s-%s-%s (build %s)"
 msgstr ""
 
-msgid "Pre-Alpha Demo Release (unbuilt)"
+msgid "Alpha Demo Release (unbuilt)"
 msgstr ""
 
 msgid "Loading %s..."

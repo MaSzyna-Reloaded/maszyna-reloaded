@@ -23,11 +23,11 @@ msgstr "Festés alkalmazása"
 msgid "Search scenario"
 msgstr "Forgatókönyv keresése"
 
-msgid "Pre-Alpha Demo Release %s-%s-%s (build %s)"
-msgstr "Pre-Alpha demó %s-%s-%s (build %s)"
+msgid "Alpha Demo Release %s-%s-%s (build %s)"
+msgstr "Alpha demó %s-%s-%s (build %s)"
 
-msgid "Pre-Alpha Demo Release (unbuilt)"
-msgstr "Pre-Alpha demó (nem buildelt)"
+msgid "Alpha Demo Release (unbuilt)"
+msgstr "Alpha demó (nem buildelt)"
 
 msgid "Loading %s..."
 msgstr "%s betöltése..."

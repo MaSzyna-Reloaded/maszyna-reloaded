@@ -23,11 +23,11 @@ msgstr "应用涂装"
 msgid "Search scenario"
 msgstr "搜索场景"
 
-msgid "Pre-Alpha Demo Release %s-%s-%s (build %s)"
-msgstr "Pre-Alpha 演示版 %s-%s-%s（构建 %s）"
+msgid "Alpha Demo Release %s-%s-%s (build %s)"
+msgstr "Alpha 演示版 %s-%s-%s（构建 %s）"
 
-msgid "Pre-Alpha Demo Release (unbuilt)"
-msgstr "Pre-Alpha 演示版（未构建）"
+msgid "Alpha Demo Release (unbuilt)"
+msgstr "Alpha 演示版（未构建）"
 
 msgid "Loading %s..."
 msgstr "正在载入 %s..."

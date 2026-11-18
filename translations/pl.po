@@ -668,6 +668,9 @@ msgstr "Poprzednia kabina"
 msgid "Converter Toggle"
 msgstr "Przetwornica"
 
+msgid "Sand"
+msgstr "Piasecznica"
+
 msgid "Compressor Toggle"
 msgstr "Sprężarka"
 
@@ -757,6 +760,9 @@ msgstr "Zezwolenie na drzwi lewe"
 
 msgid "Doors Right Permit"
 msgstr "Zezwolenie na drzwi prawe"
+
+msgid "Doors Permit Revoke All"
+msgstr "Zezwolenie na drzwi: cofnij"
 
 msgid "Doors Left Toggle"
 msgstr "Drzwi lewe: otwórz/zamknij"

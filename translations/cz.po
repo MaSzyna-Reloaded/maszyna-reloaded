@@ -668,6 +668,9 @@ msgstr "Předchozí kabina"
 msgid "Converter Toggle"
 msgstr "Měnič napětí"
 
+msgid "Sand"
+msgstr "Pískování"
+
 msgid "Compressor Toggle"
 msgstr "Kompresor"
 
@@ -757,6 +760,9 @@ msgstr "Povolení levých dveří"
 
 msgid "Doors Right Permit"
 msgstr "Povolení pravých dveří"
+
+msgid "Doors Permit Revoke All"
+msgstr "Zrušit všechna povolení dveří"
 
 msgid "Doors Left Toggle"
 msgstr "Levé dveře: otevřít/zavřít"

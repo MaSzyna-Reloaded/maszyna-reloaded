@@ -668,6 +668,9 @@ msgstr "Előző vezetőállás"
 msgid "Converter Toggle"
 msgstr "Főtranszformátor"
 
+msgid "Sand"
+msgstr "Homokolás"
+
 msgid "Compressor Toggle"
 msgstr "Kompresszor"
 
@@ -757,6 +760,9 @@ msgstr "Bal ajtó engedélye"
 
 msgid "Doors Right Permit"
 msgstr "Jobb ajtó engedélye"
+
+msgid "Doors Permit Revoke All"
+msgstr "Ajtóengedélyek visszavonása"
 
 msgid "Doors Left Toggle"
 msgstr "Bal ajtó: nyitás/zárás"

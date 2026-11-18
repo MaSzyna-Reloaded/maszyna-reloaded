@@ -668,6 +668,9 @@ msgstr "上一司机室"
 msgid "Converter Toggle"
 msgstr "变流机"
 
+msgid "Sand"
+msgstr "撒砂"
+
 msgid "Compressor Toggle"
 msgstr "压缩机"
 
@@ -757,6 +760,9 @@ msgstr "左侧车门容许"
 
 msgid "Doors Right Permit"
 msgstr "右侧车门容许"
+
+msgid "Doors Permit Revoke All"
+msgstr "撤销全部车门容许"
 
 msgid "Doors Left Toggle"
 msgstr "左侧车门：开/关"

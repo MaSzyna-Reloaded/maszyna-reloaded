@@ -668,6 +668,9 @@ msgstr ""
 msgid "Converter Toggle"
 msgstr ""
 
+msgid "Sand"
+msgstr ""
+
 msgid "Compressor Toggle"
 msgstr ""
 
@@ -756,6 +759,9 @@ msgid "Doors Left Permit"
 msgstr ""
 
 msgid "Doors Right Permit"
+msgstr ""
+
+msgid "Doors Permit Revoke All"
 msgstr ""
 
 msgid "Doors Left Toggle"

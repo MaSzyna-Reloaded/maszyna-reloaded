@@ -60,3 +60,17 @@ Where the game is not libmaszyna:
   libmaszyna documents itself
 * `make install-git-hooks` once per clone: the pre-commit hook runs libmaszyna's
   `scripts/check-staged-uids` on this repository
+
+Commits of the game:
+
+* REQUIRED, ABSOLUTE: **a pull request of the game moves its dependencies in one commit.**
+  Every move of `vendor/libreloaded` and `vendor/libmaszyna` in a branch is one
+  `Update deps for <what>` commit, a bullet per fix it brings (its issue, in full); the next move
+  is amended into it and pushed with `--force-with-lease` - never a commit per commit of a
+  library. The game's own changes are commits of their own. (Operator, 2026-11-18:
+  release/26.11 carried six "Update deps" commits, one per library commit.)
+* REQUIRED: **the pull request of a release branch (`release/<version>`) is titled after the
+  release** - `Prepare the 26.11 alpha release`, in every repository - and its body lists every
+  commit on the branch with its issue (`Closes #N`); title and body are brought up to date at
+  every push to the branch. (Operator, 2026-11-18: libreloaded#102 and libmaszyna#443 kept the
+  title of their first fix.)

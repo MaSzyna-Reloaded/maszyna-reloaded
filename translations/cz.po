@@ -2162,6 +2162,12 @@ msgstr "Obrazovky kabiny kreslené skripty Pythonu se nepodařilo spustit a zůs
 msgid "Lazy loading (experimental)"
 msgstr "Líné načítání (experimentální)"
 
+msgid "Scenery loading cache"
+msgstr "Mezipaměť načítání scenérie"
+
+msgid "Maximum cache size"
+msgstr "Maximální velikost mezipaměti"
+
 msgid "All sceneries"
 msgstr "Všechny scenérie"
 

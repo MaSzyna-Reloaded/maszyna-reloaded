@@ -2177,6 +2177,12 @@ msgstr ""
 msgid "Lazy loading (experimental)"
 msgstr ""
 
+msgid "Scenery loading cache"
+msgstr ""
+
+msgid "Maximum cache size"
+msgstr ""
+
 msgid "Hold the main pipe unlock button"
 msgstr ""
 

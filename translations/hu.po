@@ -2162,6 +2162,12 @@ msgstr "A Python-szkriptek által rajzolt vezetőfülke-kijelzők nem indíthat�
 msgid "Lazy loading (experimental)"
 msgstr "Késleltetett betöltés (kísérleti)"
 
+msgid "Scenery loading cache"
+msgstr "Pálya betöltési gyorsítótár"
+
+msgid "Maximum cache size"
+msgstr "Gyorsítótár maximális mérete"
+
 msgid "All sceneries"
 msgstr "Minden pálya"
 

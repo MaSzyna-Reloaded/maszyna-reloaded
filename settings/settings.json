@@ -367,6 +367,19 @@
                     "restart_required": true
                 },
                 {
+                    "title": "Scenery loading cache",
+                    "store": "project",
+                    "key": "reloaded/cache/enabled",
+                    "type": "bool"
+                },
+                {
+                    "title": "Maximum cache size",
+                    "store": "project",
+                    "key": "reloaded/cache/max_size",
+                    "type": "int",
+                    "hint": "cache_size"
+                },
+                {
                     "title": "Self-illumination energy",
                     "store": "project",
                     "key": "maszyna/rendering/selfillum_energy",

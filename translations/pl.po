@@ -2177,6 +2177,12 @@ msgstr "Nie udało się uruchomić ekranów kabiny rysowanych przez skrypty Pyth
 msgid "Lazy loading (experimental)"
 msgstr "Leniwe ładowanie (eksperymentalne)"
 
+msgid "Scenery loading cache"
+msgstr "Cache wczytywania scenerii"
+
+msgid "Maximum cache size"
+msgstr "Maksymalny rozmiar cache"
+
 msgid "Hold the main pipe unlock button"
 msgstr "Przytrzymać przycisk odblokowania przewodu głównego"
 

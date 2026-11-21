@@ -2162,6 +2162,12 @@ msgstr "由 Python 脚本绘制的驾驶室屏幕无法启动，将保持空白�
 msgid "Lazy loading (experimental)"
 msgstr "延迟加载（实验性）"
 
+msgid "Scenery loading cache"
+msgstr "场景加载缓存"
+
+msgid "Maximum cache size"
+msgstr "最大缓存大小"
+
 msgid "All sceneries"
 msgstr "所有场景"
 

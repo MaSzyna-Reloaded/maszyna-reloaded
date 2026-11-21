@@ -19,8 +19,9 @@ extends Control
 ## "enum" "Name:value,Name:value"; "hint": "resolution" is the window's size, its choices made from
 ## the screen, and "folder" a project setting naming a file, shown as its folder with a button that
 ## opens it in the file manager, and "game_dir" the game directory (a "user" String), changed in the
-## GameDirWindow. Titles and choice names are msgids. "advanced": true puts a setting
-## under the section's folded "Advanced". "excludes" names the keys of the section's settings that
+## GameDirWindow, and "cache_size" the caches' maximum size in bytes, its choices the core's
+## (ResourceCacheServer.max_size_get_choices()). Titles and choice names are msgids. "advanced":
+## true puts a setting under the section's folded "Advanced". "excludes" names the keys of the section's settings that
 ## cannot be switched on while this one is on (TAA or MSAA and FXAA); "depends_on" the key of the
 ## one that has to be on for this one to be changed; "disabled_by" the key of the one that keeps it
 ## from being changed while it is on - or, with "disabled_by_values", while it has one of them
@@ -39,6 +40,7 @@ const TOGGLE: PackedScene = preload("setting_toggle.tscn")
 const SLIDER: PackedScene = preload("setting_slider.tscn")
 const OPTION: PackedScene = preload("setting_option.tscn")
 const RESOLUTION: PackedScene = preload("setting_resolution.tscn")
+const CACHE_SIZE: PackedScene = preload("setting_cache_size.tscn")
 const FOLDER: PackedScene = preload("setting_folder.tscn")
 const GAME_DIR: PackedScene = preload("setting_game_dir.tscn")
 const TEXT: PackedScene = preload("setting_text.tscn")
@@ -124,6 +126,7 @@ func _ready() -> void:
                 else INPUT if setting["type"] == "input"
                 else SLIDER if setting.get("hint") == "range"
                 else RESOLUTION if setting.get("hint") == "resolution"
+                else CACHE_SIZE if setting.get("hint") == "cache_size"
                 else FOLDER if setting.get("hint") == "folder"
                 else GAME_DIR if setting.get("hint") == "game_dir"
                 else TEXT if setting["type"] == "String"

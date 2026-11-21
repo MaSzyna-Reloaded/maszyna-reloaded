@@ -206,9 +206,9 @@ func _notification(what:int) -> void:
     # "%Y%m%d%H%M%S"), so the label names the library that is actually loaded. A date typed into
     # project.godot cannot do that - it kept showing 2026-09-19 through every build after it.
     var stamp:String = GameDataServer.build_get_number()
-    %BuildLabel.text = (tr("Pre-Alpha Demo Release %s-%s-%s (build %s)") % [
+    %BuildLabel.text = (tr("Alpha Demo Release %s-%s-%s (build %s)") % [
         stamp.substr(0, 4), stamp.substr(4, 2), stamp.substr(6, 2), stamp
-    ]) if stamp else tr("Pre-Alpha Demo Release (unbuilt)")
+    ]) if stamp else tr("Alpha Demo Release (unbuilt)")
 
 
 ## Shown at the start and on every way back from a game - with the sceneries read again, as files

@@ -3,14 +3,14 @@
 # on the right, both on one line. Usage:
 #   compose.sh <input.png> <build> <output.png> [line_top_y] [label]
 # line_top_y - top of the build number in 1080p pixels (default 760); the logo is centred on it.
-# label      - eyebrow above the number (default "PRE-ALPHA BUILD").
+# label      - eyebrow above the number (default "ALPHA BUILD").
 set -euo pipefail
 
 INPUT="$1"
 BUILD="$2"
 OUTPUT="$3"
 LINE_TOP="${4:-760}"
-LABEL="${5:-PRE-ALPHA BUILD}"
+LABEL="${5:-ALPHA BUILD}"
 
 REPO="$(git -C "$(dirname "$0")" rev-parse --show-toplevel)"
 LOGO="$REPO/loading_screen/logo.png"

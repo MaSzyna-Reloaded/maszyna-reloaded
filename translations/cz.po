@@ -23,11 +23,11 @@ msgstr "Použít vzhled"
 msgid "Search scenario"
 msgstr "Hledat scénář"
 
-msgid "Pre-Alpha Demo Release %s-%s-%s (build %s)"
-msgstr "Pre-Alpha demo %s-%s-%s (sestavení %s)"
+msgid "Alpha Demo Release %s-%s-%s (build %s)"
+msgstr "Alpha demo %s-%s-%s (sestavení %s)"
 
-msgid "Pre-Alpha Demo Release (unbuilt)"
-msgstr "Pre-Alpha demo (nesestaveno)"
+msgid "Alpha Demo Release (unbuilt)"
+msgstr "Alpha demo (nesestaveno)"
 
 msgid "Loading %s..."
 msgstr "Načítání %s..."
@@ -668,6 +668,9 @@ msgstr "Předchozí kabina"
 msgid "Converter Toggle"
 msgstr "Měnič napětí"
 
+msgid "Sand"
+msgstr "Pískování"
+
 msgid "Compressor Toggle"
 msgstr "Kompresor"
 
@@ -757,6 +760,9 @@ msgstr "Povolení levých dveří"
 
 msgid "Doors Right Permit"
 msgstr "Povolení pravých dveří"
+
+msgid "Doors Permit Revoke All"
+msgstr "Zrušit všechna povolení dveří"
 
 msgid "Doors Left Toggle"
 msgstr "Levé dveře: otevřít/zavřít"
@@ -2155,6 +2161,12 @@ msgstr "Obrazovky kabiny kreslené skripty Pythonu se nepodařilo spustit a zůs
 
 msgid "Lazy loading (experimental)"
 msgstr "Líné načítání (experimentální)"
+
+msgid "Scenery loading cache"
+msgstr "Mezipaměť načítání scenérie"
+
+msgid "Maximum cache size"
+msgstr "Maximální velikost mezipaměti"
 
 msgid "All sceneries"
 msgstr "Všechny scenérie"

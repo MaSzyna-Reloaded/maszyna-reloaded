@@ -23,10 +23,10 @@ msgstr ""
 msgid "Search scenario"
 msgstr ""
 
-msgid "Pre-Alpha Demo Release %s-%s-%s (build %s)"
+msgid "Alpha Demo Release %s-%s-%s (build %s)"
 msgstr ""
 
-msgid "Pre-Alpha Demo Release (unbuilt)"
+msgid "Alpha Demo Release (unbuilt)"
 msgstr ""
 
 msgid "Loading %s..."
@@ -668,6 +668,9 @@ msgstr ""
 msgid "Converter Toggle"
 msgstr ""
 
+msgid "Sand"
+msgstr ""
+
 msgid "Compressor Toggle"
 msgstr ""
 
@@ -756,6 +759,9 @@ msgid "Doors Left Permit"
 msgstr ""
 
 msgid "Doors Right Permit"
+msgstr ""
+
+msgid "Doors Permit Revoke All"
 msgstr ""
 
 msgid "Doors Left Toggle"
@@ -2169,6 +2175,12 @@ msgid "The cab screens drawn by Python scripts could not be started and stay bla
 msgstr ""
 
 msgid "Lazy loading (experimental)"
+msgstr ""
+
+msgid "Scenery loading cache"
+msgstr ""
+
+msgid "Maximum cache size"
 msgstr ""
 
 msgid "Hold the main pipe unlock button"

@@ -23,11 +23,11 @@ msgstr "Zatwierdź skin"
 msgid "Search scenario"
 msgstr "Szukaj scenariusza"
 
-msgid "Pre-Alpha Demo Release %s-%s-%s (build %s)"
-msgstr "Pre-Alpha Demo %s-%s-%s (kompilacja %s)"
+msgid "Alpha Demo Release %s-%s-%s (build %s)"
+msgstr "Alpha Demo %s-%s-%s (kompilacja %s)"
 
-msgid "Pre-Alpha Demo Release (unbuilt)"
-msgstr "Pre-Alpha Demo (bez kompilacji)"
+msgid "Alpha Demo Release (unbuilt)"
+msgstr "Alpha Demo (bez kompilacji)"
 
 msgid "Loading %s..."
 msgstr "Wczytywanie %s..."
@@ -668,6 +668,9 @@ msgstr "Poprzednia kabina"
 msgid "Converter Toggle"
 msgstr "Przetwornica"
 
+msgid "Sand"
+msgstr "Piasecznica"
+
 msgid "Compressor Toggle"
 msgstr "Sprężarka"
 
@@ -757,6 +760,9 @@ msgstr "Zezwolenie na drzwi lewe"
 
 msgid "Doors Right Permit"
 msgstr "Zezwolenie na drzwi prawe"
+
+msgid "Doors Permit Revoke All"
+msgstr "Zezwolenie na drzwi: cofnij"
 
 msgid "Doors Left Toggle"
 msgstr "Drzwi lewe: otwórz/zamknij"
@@ -2170,6 +2176,12 @@ msgstr "Nie udało się uruchomić ekranów kabiny rysowanych przez skrypty Pyth
 
 msgid "Lazy loading (experimental)"
 msgstr "Leniwe ładowanie (eksperymentalne)"
+
+msgid "Scenery loading cache"
+msgstr "Cache wczytywania scenerii"
+
+msgid "Maximum cache size"
+msgstr "Maksymalny rozmiar cache"
 
 msgid "Hold the main pipe unlock button"
 msgstr "Przytrzymać przycisk odblokowania przewodu głównego"

@@ -23,11 +23,11 @@ msgstr "应用涂装"
 msgid "Search scenario"
 msgstr "搜索场景"
 
-msgid "Pre-Alpha Demo Release %s-%s-%s (build %s)"
-msgstr "Pre-Alpha 演示版 %s-%s-%s（构建 %s）"
+msgid "Alpha Demo Release %s-%s-%s (build %s)"
+msgstr "Alpha 演示版 %s-%s-%s（构建 %s）"
 
-msgid "Pre-Alpha Demo Release (unbuilt)"
-msgstr "Pre-Alpha 演示版（未构建）"
+msgid "Alpha Demo Release (unbuilt)"
+msgstr "Alpha 演示版（未构建）"
 
 msgid "Loading %s..."
 msgstr "正在载入 %s..."
@@ -668,6 +668,9 @@ msgstr "上一司机室"
 msgid "Converter Toggle"
 msgstr "变流机"
 
+msgid "Sand"
+msgstr "撒砂"
+
 msgid "Compressor Toggle"
 msgstr "压缩机"
 
@@ -757,6 +760,9 @@ msgstr "左侧车门容许"
 
 msgid "Doors Right Permit"
 msgstr "右侧车门容许"
+
+msgid "Doors Permit Revoke All"
+msgstr "撤销全部车门容许"
 
 msgid "Doors Left Toggle"
 msgstr "左侧车门：开/关"
@@ -2155,6 +2161,12 @@ msgstr "由 Python 脚本绘制的驾驶室屏幕无法启动，将保持空白�
 
 msgid "Lazy loading (experimental)"
 msgstr "延迟加载（实验性）"
+
+msgid "Scenery loading cache"
+msgstr "场景加载缓存"
+
+msgid "Maximum cache size"
+msgstr "最大缓存大小"
 
 msgid "All sceneries"
 msgstr "所有场景"

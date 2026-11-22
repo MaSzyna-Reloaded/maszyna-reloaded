@@ -161,11 +161,47 @@ func test_applies_time_and_location_as_solar_time() -> void:
     environment_node._process(0.0)
     sky._process(0.0)
 
+    assert_eq(_drawn(sky).year, 2026)
     assert_almost_eq(_drawn(sky).latitude, 50.271, 0.000001)
+    assert_almost_eq(_drawn(sky).longitude, 15.0, 0.000001)
     assert_eq(_drawn(sky).day_of_year, 32)
     assert_almost_eq(_drawn(sky).time_of_day, 11.0, 0.000001)
     assert_eq(_drawn(sky).get_environment(), sky._environment)
     assert_eq(_drawn(sky).get_light(), sky.sun_light)
+
+
+## The solar time on another day than the clock's takes its date with it: the sun, the moon and the
+## stars stand by the date and the time, and the moon moves 13 degrees a day
+func test_solar_time_before_midnight_takes_the_day_before() -> void:
+    var environment_node: EnvironmentNode = _create_environment_node()
+    var sky: GndSkydomeMaszynaEnvironment = _create_sky(environment_node)
+
+    environment_node.longitude = 15.0
+    environment_node.timezone_offset = 2
+    environment_node.current_time = 0.5
+    environment_node.set_date(2027, 1, 1)
+    environment_node._process(0.0)
+    sky._process(0.0)
+
+    assert_eq(_drawn(sky).year, 2026)
+    assert_eq(_drawn(sky).day_of_year, 365)
+    assert_almost_eq(_drawn(sky).time_of_day, 23.5, 0.000001)
+
+
+func test_a_leap_year_has_its_last_day() -> void:
+    var environment_node: EnvironmentNode = _create_environment_node()
+    var sky: GndSkydomeMaszynaEnvironment = _create_sky(environment_node)
+
+    environment_node.longitude = 15.0
+    environment_node.timezone_offset = 1
+    environment_node.current_time = 12.0
+    environment_node.set_date(2028, 12, 31)
+    environment_node._process(0.0)
+    sky._process(0.0)
+
+    assert_eq(_drawn(sky).year, 2028)
+    assert_eq(_drawn(sky).day_of_year, 366)
+    assert_almost_eq(_drawn(sky).time_of_day, 12.0, 0.000001)
 
 
 ## The sun's light turns by steps of LIGHT_UPDATE_STEP_SECONDS of the sky's time, not with every

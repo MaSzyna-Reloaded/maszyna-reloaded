@@ -1361,6 +1361,9 @@ msgstr "场景灯光距离"
 msgid "Scenery lights cast shadows"
 msgstr "场景灯光投射阴影"
 
+msgid "Scenery lights' shadow distance"
+msgstr "场景灯光阴影距离"
+
 msgid "Economy light height offset"
 msgstr "经济模式灯光高度偏移"
 

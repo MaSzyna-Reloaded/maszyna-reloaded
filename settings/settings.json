@@ -584,6 +584,15 @@
                     "type": "bool"
                 },
                 {
+                    "title": "Scenery lights' shadow distance",
+                    "store": "project",
+                    "key": "maszyna/scenery/lights/shadow_distance",
+                    "type": "float",
+                    "hint": "range",
+                    "hint_string": "5,400,5,suffix:m",
+                    "depends_on": "maszyna/scenery/lights/cast_shadows"
+                },
+                {
                     "title": "Economy light height offset",
                     "store": "project",
                     "key": "maszyna/scenery/lights/economy_height_offset",

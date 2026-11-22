@@ -1652,6 +1652,24 @@ msgstr "泛光强度"
 msgid "Gamma"
 msgstr "伽马"
 
+msgid "Graphics quality"
+msgstr "画质"
+
+msgid "Mid"
+msgstr "中"
+
+msgid "Filmic"
+msgstr "电影级"
+
+msgid "Custom"
+msgstr "自定义"
+
+msgid "Film grain"
+msgstr "胶片颗粒"
+
+msgid "Film grain intensity"
+msgstr "胶片颗粒强度"
+
 msgid "Vertical sync"
 msgstr "垂直同步"
 

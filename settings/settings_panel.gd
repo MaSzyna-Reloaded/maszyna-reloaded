@@ -1,8 +1,8 @@
 extends "settings_screen.gd"
 
 ## The settings as a panel beside the game, a third of the screen wide, so what a change does stays
-## in sight: the sections first, and the settings of one in their place once it is opened; back -
-## the arrow - shows the sections again. It is played with the mouse, and while it is open no key
+## in sight: the graphics quality preset on top, under it the sections first, and the settings of
+## one in their place once it is opened; back - the arrow - shows the sections again. It is played with the mouse, and while it is open no key
 ## and no pad's button or axis pressed reaches the game - a key row waiting for one takes it first,
 ## and nothing else in the game acts on it (game.gd puts the world before the panel, so the panel's
 ## input comes first). A key or a button let go still does, so nothing held as the panel opens

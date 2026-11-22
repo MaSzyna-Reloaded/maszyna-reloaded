@@ -1667,6 +1667,24 @@ msgstr "Intensywność rozbłysku (bloom)"
 msgid "Gamma"
 msgstr "Gamma"
 
+msgid "Graphics quality"
+msgstr "Jakość grafiki"
+
+msgid "Mid"
+msgstr "Średnia"
+
+msgid "Filmic"
+msgstr "Filmowa"
+
+msgid "Custom"
+msgstr "Własna"
+
+msgid "Film grain"
+msgstr "Ziarno filmowe"
+
+msgid "Film grain intensity"
+msgstr "Intensywność ziarna filmowego"
+
 msgid "Vertical sync"
 msgstr "Synchronizacja pionowa"
 

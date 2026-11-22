@@ -1361,6 +1361,9 @@ msgstr "Tájfények távolsága"
 msgid "Scenery lights cast shadows"
 msgstr "A tájfények árnyékot vetnek"
 
+msgid "Scenery lights' shadow distance"
+msgstr "A tájfények árnyékainak távolsága"
+
 msgid "Economy light height offset"
 msgstr "Fények magassági eltolása takarékos módban"
 

@@ -1376,6 +1376,9 @@ msgstr ""
 msgid "Scenery lights cast shadows"
 msgstr ""
 
+msgid "Scenery lights' shadow distance"
+msgstr ""
+
 msgid "Economy light height offset"
 msgstr ""
 

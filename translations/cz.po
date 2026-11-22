@@ -1361,6 +1361,9 @@ msgstr "Dosah světel scenérie"
 msgid "Scenery lights cast shadows"
 msgstr "Světla scenérie vrhají stíny"
 
+msgid "Scenery lights' shadow distance"
+msgstr "Dosah stínů světel scenérie"
+
 msgid "Economy light height offset"
 msgstr "Výškový posun světel v úsporném režimu"
 

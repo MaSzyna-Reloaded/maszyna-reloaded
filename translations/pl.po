@@ -1376,6 +1376,9 @@ msgstr "Zasięg świateł scenerii"
 msgid "Scenery lights cast shadows"
 msgstr "Światła scenerii rzucają cienie"
 
+msgid "Scenery lights' shadow distance"
+msgstr "Zasięg cieni świateł scenerii"
+
 msgid "Economy light height offset"
 msgstr "Przesunięcie wysokości świateł w trybie ekonomicznym"
 

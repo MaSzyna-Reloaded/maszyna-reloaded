@@ -1652,6 +1652,24 @@ msgstr "Fényszóródás erőssége (bloom)"
 msgid "Gamma"
 msgstr "Gamma"
 
+msgid "Graphics quality"
+msgstr "Grafikai minőség"
+
+msgid "Mid"
+msgstr "Közepes"
+
+msgid "Filmic"
+msgstr "Filmes"
+
+msgid "Custom"
+msgstr "Egyéni"
+
+msgid "Film grain"
+msgstr "Filmszemcse"
+
+msgid "Film grain intensity"
+msgstr "Filmszemcse erőssége"
+
 msgid "Vertical sync"
 msgstr "Függőleges szinkronizálás"
 

@@ -309,6 +309,26 @@
                     "default": 1.0
                 },
                 {
+                    "title": "Film grain",
+                    "store": "user",
+                    "section": "render",
+                    "key": "film_grain_enabled",
+                    "type": "bool",
+                    "default": false
+                },
+                {
+                    "title": "Film grain intensity",
+                    "store": "user",
+                    "section": "render",
+                    "key": "film_grain_intensity",
+                    "type": "float",
+                    "hint": "range",
+                    "hint_string": "0,1,0.01",
+                    "default": 0.12,
+                    "advanced": true,
+                    "depends_on": "film_grain_enabled"
+                },
+                {
                     "title": "Shadow texture quality",
                     "store": "project",
                     "key": "reloaded/shadows/texture_quality",
@@ -1340,6 +1360,228 @@
                     "hint": "folder"
                 }
             ]
+        }
+    ],
+    "presets": [
+        {
+            "name": "low",
+            "title": "Low",
+            "values": {
+                "render": {
+                    "use_taa": false,
+                    "screen_space_aa": 1,
+                    "msaa_3d": 0,
+                    "upscaling": 2,
+                    "scaling_3d_scale_percent": 75,
+                    "sdfgi_enabled": false,
+                    "ssao_enabled": false,
+                    "ssil_enabled": false,
+                    "ssr_enabled": false,
+                    "volumetric_fog_enabled": false,
+                    "glow_enabled": false,
+                    "film_grain_enabled": false
+                },
+                "project_settings": {
+                    "gnd_skydome/sunshafts_enabled": false,
+                    "reloaded/shadows/texture_quality": 0,
+                    "rendering/lights_and_shadows/directional_shadow/soft_shadow_filter_quality": 0,
+                    "reloaded/scenery/tracks/distance": 1000.0,
+                    "reloaded/scenery/shadows/enabled": true,
+                    "reloaded/scenery/shadows/mode": 0,
+                    "reloaded/scenery/shadows/max_distance": 300.0,
+                    "maszyna/scenery/lights/mode": 1,
+                    "reloaded/scenery/lights/distance": 150.0,
+                    "maszyna/scenery/lights/cast_shadows": false,
+                    "reloaded/cabin/improve_shadows_quality": false,
+                    "reloaded/cabin/shadows/mode": 0,
+                    "maszyna/cabin/indicator_glow_enabled": false,
+                    "maszyna/cabin/real_instruments_lights": false,
+                    "maszyna/cabin/screen_glow_enabled": false,
+                    "reloaded/vehicles/detail_distance": 150.0,
+                    "maszyna/rendering/real_mirrors": false,
+                    "maszyna/vehicles/interior_lights/shadows": false,
+                    "reloaded/smoke/dynamic/distance": 600.0,
+                    "reloaded/smoke/dynamic/max_particles": 500,
+                    "reloaded/smoke/static/distance": 600.0,
+                    "reloaded/smoke/static/max_particles": 125
+                }
+            }
+        },
+        {
+            "name": "mid",
+            "title": "Mid",
+            "values": {
+                "render": {
+                    "use_taa": true,
+                    "screen_space_aa": 0,
+                    "msaa_3d": 0,
+                    "upscaling": 0,
+                    "scaling_3d_scale_percent": 100,
+                    "sdfgi_enabled": false,
+                    "ssao_enabled": true,
+                    "ssil_enabled": false,
+                    "ssr_enabled": false,
+                    "volumetric_fog_enabled": true,
+                    "glow_enabled": true,
+                    "film_grain_enabled": false
+                },
+                "project_settings": {
+                    "gnd_skydome/sunshafts_enabled": false,
+                    "reloaded/shadows/texture_quality": 0,
+                    "rendering/lights_and_shadows/directional_shadow/soft_shadow_filter_quality": 1,
+                    "reloaded/scenery/tracks/distance": 1500.0,
+                    "reloaded/scenery/shadows/enabled": true,
+                    "reloaded/scenery/shadows/mode": 1,
+                    "reloaded/scenery/shadows/max_distance": 600.0,
+                    "maszyna/scenery/lights/mode": 1,
+                    "reloaded/scenery/lights/distance": 250.0,
+                    "maszyna/scenery/lights/cast_shadows": false,
+                    "reloaded/cabin/improve_shadows_quality": false,
+                    "reloaded/cabin/shadows/mode": 1,
+                    "maszyna/cabin/indicator_glow_enabled": true,
+                    "maszyna/cabin/real_instruments_lights": false,
+                    "maszyna/cabin/screen_glow_enabled": true,
+                    "reloaded/vehicles/detail_distance": 250.0,
+                    "maszyna/rendering/real_mirrors": false,
+                    "maszyna/vehicles/interior_lights/shadows": false,
+                    "reloaded/smoke/dynamic/distance": 1000.0,
+                    "reloaded/smoke/dynamic/max_particles": 1000,
+                    "reloaded/smoke/static/distance": 1000.0,
+                    "reloaded/smoke/static/max_particles": 250
+                }
+            }
+        },
+        {
+            "name": "high",
+            "title": "High",
+            "values": {
+                "render": {
+                    "use_taa": true,
+                    "screen_space_aa": 0,
+                    "msaa_3d": 0,
+                    "upscaling": 0,
+                    "scaling_3d_scale_percent": 100,
+                    "sdfgi_enabled": true,
+                    "ssao_enabled": true,
+                    "ssil_enabled": true,
+                    "ssr_enabled": true,
+                    "volumetric_fog_enabled": true,
+                    "glow_enabled": true,
+                    "film_grain_enabled": false
+                },
+                "project_settings": {
+                    "gnd_skydome/sunshafts_enabled": true,
+                    "reloaded/shadows/texture_quality": 1,
+                    "rendering/lights_and_shadows/directional_shadow/soft_shadow_filter_quality": 2,
+                    "reloaded/scenery/tracks/distance": 2000.0,
+                    "reloaded/scenery/shadows/enabled": true,
+                    "reloaded/scenery/shadows/mode": 2,
+                    "reloaded/scenery/shadows/max_distance": 1000.0,
+                    "maszyna/scenery/lights/mode": 1,
+                    "reloaded/scenery/lights/distance": 400.0,
+                    "maszyna/scenery/lights/cast_shadows": true,
+                    "reloaded/cabin/improve_shadows_quality": true,
+                    "reloaded/cabin/shadows/mode": 2,
+                    "maszyna/cabin/indicator_glow_enabled": true,
+                    "maszyna/cabin/real_instruments_lights": true,
+                    "maszyna/cabin/screen_glow_enabled": true,
+                    "reloaded/vehicles/detail_distance": 350.0,
+                    "maszyna/rendering/real_mirrors": false,
+                    "maszyna/vehicles/interior_lights/shadows": false,
+                    "reloaded/smoke/dynamic/distance": 1500.0,
+                    "reloaded/smoke/dynamic/max_particles": 2000,
+                    "reloaded/smoke/static/distance": 1500.0,
+                    "reloaded/smoke/static/max_particles": 500
+                }
+            }
+        },
+        {
+            "name": "ultra",
+            "title": "Ultra",
+            "values": {
+                "render": {
+                    "use_taa": true,
+                    "screen_space_aa": 0,
+                    "msaa_3d": 0,
+                    "upscaling": 0,
+                    "scaling_3d_scale_percent": 100,
+                    "sdfgi_enabled": true,
+                    "ssao_enabled": true,
+                    "ssil_enabled": true,
+                    "ssr_enabled": true,
+                    "volumetric_fog_enabled": true,
+                    "glow_enabled": true,
+                    "film_grain_enabled": false
+                },
+                "project_settings": {
+                    "gnd_skydome/sunshafts_enabled": true,
+                    "reloaded/shadows/texture_quality": 2,
+                    "rendering/lights_and_shadows/directional_shadow/soft_shadow_filter_quality": 3,
+                    "reloaded/scenery/tracks/distance": 3000.0,
+                    "reloaded/scenery/shadows/enabled": true,
+                    "reloaded/scenery/shadows/mode": 2,
+                    "reloaded/scenery/shadows/max_distance": 1500.0,
+                    "maszyna/scenery/lights/mode": 1,
+                    "reloaded/scenery/lights/distance": 600.0,
+                    "maszyna/scenery/lights/cast_shadows": true,
+                    "reloaded/cabin/improve_shadows_quality": true,
+                    "reloaded/cabin/shadows/mode": 2,
+                    "maszyna/cabin/indicator_glow_enabled": true,
+                    "maszyna/cabin/real_instruments_lights": true,
+                    "maszyna/cabin/screen_glow_enabled": true,
+                    "reloaded/vehicles/detail_distance": 500.0,
+                    "maszyna/rendering/real_mirrors": false,
+                    "maszyna/vehicles/interior_lights/shadows": true,
+                    "reloaded/smoke/dynamic/distance": 2500.0,
+                    "reloaded/smoke/dynamic/max_particles": 4000,
+                    "reloaded/smoke/static/distance": 2500.0,
+                    "reloaded/smoke/static/max_particles": 1000
+                }
+            }
+        },
+        {
+            "name": "filmic",
+            "title": "Filmic",
+            "values": {
+                "render": {
+                    "use_taa": true,
+                    "screen_space_aa": 0,
+                    "msaa_3d": 0,
+                    "upscaling": 0,
+                    "scaling_3d_scale_percent": 100,
+                    "sdfgi_enabled": true,
+                    "ssao_enabled": true,
+                    "ssil_enabled": true,
+                    "ssr_enabled": true,
+                    "volumetric_fog_enabled": true,
+                    "glow_enabled": true,
+                    "film_grain_enabled": true
+                },
+                "project_settings": {
+                    "gnd_skydome/sunshafts_enabled": true,
+                    "reloaded/shadows/texture_quality": 3,
+                    "rendering/lights_and_shadows/directional_shadow/soft_shadow_filter_quality": 3,
+                    "reloaded/scenery/tracks/distance": 3000.0,
+                    "reloaded/scenery/shadows/enabled": true,
+                    "reloaded/scenery/shadows/mode": 2,
+                    "reloaded/scenery/shadows/max_distance": 1500.0,
+                    "maszyna/scenery/lights/mode": 2,
+                    "reloaded/scenery/lights/distance": 600.0,
+                    "maszyna/scenery/lights/cast_shadows": true,
+                    "reloaded/cabin/improve_shadows_quality": true,
+                    "reloaded/cabin/shadows/mode": 2,
+                    "maszyna/cabin/indicator_glow_enabled": true,
+                    "maszyna/cabin/real_instruments_lights": true,
+                    "maszyna/cabin/screen_glow_enabled": true,
+                    "reloaded/vehicles/detail_distance": 500.0,
+                    "maszyna/rendering/real_mirrors": false,
+                    "maszyna/vehicles/interior_lights/shadows": true,
+                    "reloaded/smoke/dynamic/distance": 2500.0,
+                    "reloaded/smoke/dynamic/max_particles": 4000,
+                    "reloaded/smoke/static/distance": 2500.0,
+                    "reloaded/smoke/static/max_particles": 1000
+                }
+            }
         }
     ]
 }

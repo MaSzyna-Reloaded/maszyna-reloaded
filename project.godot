@@ -900,7 +900,6 @@ radio_call3_send={
 
 starter/group_sceneries=true
 bugtracking/endpoint="https://maszyna-reloaded-reports.marcin-j-nowak.workers.dev/"
-scenery/lights/energy=2.0
 scenery/lights/volumetric_fog_energy=16.0
 scenery/lights/lamp_attenuation=0.10000000000000002
 smoke/generator_mode=1

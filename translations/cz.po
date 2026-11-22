@@ -1652,6 +1652,24 @@ msgstr "Intenzita rozptylu světla (bloom)"
 msgid "Gamma"
 msgstr "Gama"
 
+msgid "Graphics quality"
+msgstr "Kvalita grafiky"
+
+msgid "Mid"
+msgstr "Střední"
+
+msgid "Filmic"
+msgstr "Filmová"
+
+msgid "Custom"
+msgstr "Vlastní"
+
+msgid "Film grain"
+msgstr "Filmové zrno"
+
+msgid "Film grain intensity"
+msgstr "Intenzita filmového zrna"
+
 msgid "Vertical sync"
 msgstr "Vertikální synchronizace"
 

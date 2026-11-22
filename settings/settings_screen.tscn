@@ -9,6 +9,7 @@
 [ext_resource type="PackedScene" path="res://ui/ui_window.tscn" id="7_window"]
 [ext_resource type="Script" path="res://ui/ui_button.gd" id="8_button"]
 [ext_resource type="Script" path="res://ui/ui_action_buttons.gd" id="9_action_buttons"]
+[ext_resource type="PackedScene" path="res://settings/setting_preset.tscn" id="10_preset"]
 
 [node name="SettingsScreen" type="Control" node_paths=PackedStringArray("window")]
 visible = false
@@ -26,6 +27,17 @@ window = NodePath("SettingsWindow")
 [node name="SettingsWindow" parent="." instance=ExtResource("7_window")]
 unique_name_in_owner = true
 title = "Settings"
+
+[node name="PresetSection" type="PanelContainer" parent="SettingsWindow/Frame/Layout/Body"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_type_variation = &"FocusSection"
+script = ExtResource("5_focus")
+
+[node name="Preset" parent="SettingsWindow/Frame/Layout/Body/PresetSection" instance=ExtResource("10_preset")]
+unique_name_in_owner = true
+layout_mode = 2
+title = "Graphics quality"
 
 [node name="Content" type="HBoxContainer" parent="SettingsWindow/Frame/Layout/Body"]
 unique_name_in_owner = true
@@ -118,6 +130,13 @@ confirm_intent = 2
 [connection signal="item_selected" from="SettingsWindow/Frame/Layout/Body/Content/SectionList" to="." method="_on_section_list_item_selected"]
 [connection signal="navigate_down" from="SettingsWindow/Frame/Layout/Body/Content/SectionList" to="." method="focus_actions"]
 [connection signal="navigate_right" from="SettingsWindow/Frame/Layout/Body/Content/SectionList" to="." method="focus_page"]
+[connection signal="navigate_up" from="SettingsWindow/Frame/Layout/Body/Content/SectionList" to="." method="focus_preset"]
+[connection signal="activated" from="SettingsWindow/Frame/Layout/Body/PresetSection" to="SettingsWindow/Frame/Layout/Body/PresetSection/Preset" method="activate"]
+[connection signal="cancelled" from="SettingsWindow/Frame/Layout/Body/PresetSection" to="." method="ask_save_or_discard"]
+[connection signal="navigate_down" from="SettingsWindow/Frame/Layout/Body/PresetSection" to="." method="focus_section_list"]
+[connection signal="navigate_left" from="SettingsWindow/Frame/Layout/Body/PresetSection" to="SettingsWindow/Frame/Layout/Body/PresetSection/Preset" method="step_down"]
+[connection signal="navigate_right" from="SettingsWindow/Frame/Layout/Body/PresetSection" to="SettingsWindow/Frame/Layout/Body/PresetSection/Preset" method="step_up"]
+[connection signal="preset_chosen" from="SettingsWindow/Frame/Layout/Body/PresetSection/Preset" to="." method="apply_preset"]
 [connection signal="cancelled" from="SettingsWindow/Frame/Layout/Body/ActionsSection" to="." method="ask_save_or_discard"]
 [connection signal="navigate_up" from="SettingsWindow/Frame/Layout/Body/ActionsSection" to="." method="focus_page"]
 [connection signal="pressed" from="SettingsWindow/Frame/Layout/Body/ActionsSection/ActionButtons/DefaultsButton" to="." method="restore_defaults"]

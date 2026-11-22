@@ -1667,6 +1667,24 @@ msgstr ""
 msgid "Gamma"
 msgstr ""
 
+msgid "Graphics quality"
+msgstr ""
+
+msgid "Mid"
+msgstr ""
+
+msgid "Filmic"
+msgstr ""
+
+msgid "Custom"
+msgstr ""
+
+msgid "Film grain"
+msgstr ""
+
+msgid "Film grain intensity"
+msgstr ""
+
 msgid "Vertical sync"
 msgstr ""
 

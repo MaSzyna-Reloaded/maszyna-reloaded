@@ -22,5 +22,9 @@ substitutions `AGENTS.md` lists.
 request** - libmaszyna's `AGENTS.md`, "Commit style". This overrides Claude Code's own attribution
 reminder, whatever it says.
 
+**A pull request of the game moves its dependencies in one `Update deps` commit**, amended at every
+next move, and the pull request of `release/<version>` is titled after the release - `AGENTS.md`,
+"Commits of the game".
+
 `TODO.md` holds the open work of the game; `FINDINGS.md` the rules left by root causes found in
 the game - read it, and libmaszyna's `FINDINGS.md`, before diagnosing anything they cover.

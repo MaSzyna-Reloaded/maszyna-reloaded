@@ -23,11 +23,11 @@ msgstr "Festés alkalmazása"
 msgid "Search scenario"
 msgstr "Forgatókönyv keresése"
 
-msgid "Pre-Alpha Demo Release %s-%s-%s (build %s)"
-msgstr "Pre-Alpha demó %s-%s-%s (build %s)"
+msgid "Alpha Demo Release %s-%s-%s (build %s)"
+msgstr "Alpha demó %s-%s-%s (build %s)"
 
-msgid "Pre-Alpha Demo Release (unbuilt)"
-msgstr "Pre-Alpha demó (nem buildelt)"
+msgid "Alpha Demo Release (unbuilt)"
+msgstr "Alpha demó (nem buildelt)"
 
 msgid "Loading %s..."
 msgstr "%s betöltése..."
@@ -668,6 +668,9 @@ msgstr "Előző vezetőállás"
 msgid "Converter Toggle"
 msgstr "Főtranszformátor"
 
+msgid "Sand"
+msgstr "Homokolás"
+
 msgid "Compressor Toggle"
 msgstr "Kompresszor"
 
@@ -757,6 +760,9 @@ msgstr "Bal ajtó engedélye"
 
 msgid "Doors Right Permit"
 msgstr "Jobb ajtó engedélye"
+
+msgid "Doors Permit Revoke All"
+msgstr "Ajtóengedélyek visszavonása"
 
 msgid "Doors Left Toggle"
 msgstr "Bal ajtó: nyitás/zárás"
@@ -1355,6 +1361,9 @@ msgstr "Tájfények távolsága"
 msgid "Scenery lights cast shadows"
 msgstr "A tájfények árnyékot vetnek"
 
+msgid "Scenery lights' shadow distance"
+msgstr "A tájfények árnyékainak távolsága"
+
 msgid "Economy light height offset"
 msgstr "Fények magassági eltolása takarékos módban"
 
@@ -1645,6 +1654,24 @@ msgstr "Fényszóródás erőssége (bloom)"
 
 msgid "Gamma"
 msgstr "Gamma"
+
+msgid "Graphics quality"
+msgstr "Grafikai minőség"
+
+msgid "Mid"
+msgstr "Közepes"
+
+msgid "Filmic"
+msgstr "Filmes"
+
+msgid "Custom"
+msgstr "Egyéni"
+
+msgid "Film grain"
+msgstr "Filmszemcse"
+
+msgid "Film grain intensity"
+msgstr "Filmszemcse erőssége"
 
 msgid "Vertical sync"
 msgstr "Függőleges szinkronizálás"
@@ -2155,6 +2182,12 @@ msgstr "A Python-szkriptek által rajzolt vezetőfülke-kijelzők nem indíthat�
 
 msgid "Lazy loading (experimental)"
 msgstr "Késleltetett betöltés (kísérleti)"
+
+msgid "Scenery loading cache"
+msgstr "Pálya betöltési gyorsítótár"
+
+msgid "Maximum cache size"
+msgstr "Gyorsítótár maximális mérete"
 
 msgid "All sceneries"
 msgstr "Minden pálya"

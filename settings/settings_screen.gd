@@ -1,12 +1,13 @@
 extends Control
 
-## The settings, over the screen that opened it, in a window of the game (UIWindow): the sections
-## on the left, the settings of the selected one on the right, both built from settings.json. A
+## The settings, over the screen that opened it, in a window of the game (UIWindow): the graphics
+## quality preset on top, the sections on the left, the settings of the selected one on the right,
+## built from settings.json. A
 ## change is in effect at once; "Save" writes the changes to the file and closes; "Discard
 ## changes", once the player confirms it, puts back what the file holds - what there was when the
 ## screen opened - and closes; the close button and Escape ask whether to save or to discard, or
 ## close at once when nothing was changed. Tab
-## and Shift+Tab walk the sidebar, the page and the buttons. The project's settings that a server
+## and Shift+Tab walk the preset, the sidebar, the page and the buttons. The project's settings that a server
 ## reads at its init take effect on the next start (setting_row.gd). The window (UIWindow) keeps
 ## the keys and the mouse to itself.
 ##
@@ -19,14 +20,19 @@ extends Control
 ## "enum" "Name:value,Name:value"; "hint": "resolution" is the window's size, its choices made from
 ## the screen, and "folder" a project setting naming a file, shown as its folder with a button that
 ## opens it in the file manager, and "game_dir" the game directory (a "user" String), changed in the
-## GameDirWindow. Titles and choice names are msgids. "advanced": true puts a setting
-## under the section's folded "Advanced". "excludes" names the keys of the section's settings that
+## GameDirWindow, and "cache_size" the caches' maximum size in bytes, its choices the core's
+## (ResourceCacheServer.max_size_get_choices()). Titles and choice names are msgids. "advanced":
+## true puts a setting under the section's folded "Advanced". "excludes" names the keys of the section's settings that
 ## cannot be switched on while this one is on (TAA or MSAA and FXAA); "depends_on" the key of the
 ## one that has to be on for this one to be changed; "disabled_by" the key of the one that keeps it
 ## from being changed while it is on - or, with "disabled_by_values", while it has one of them
 ## (TAA while the upscaling is FSR 2.2). "restart_required": true marks one that takes effect only after
 ## the game restarts - a change of it lights the note above the buttons, and Save asks whether to
 ## restart.
+##
+## settings.json's "presets" (UserSettings.preset_list(), each a "name", a "title" and its "values"
+## by section and key) are chosen above every section, at the top of the window (SettingPreset):
+## every value of the chosen one is set at once and shown on every page (apply_preset()).
 ##
 ## A section with an "input_group" in place of its "settings" holds the keys of the input actions
 ## of that group (InputBindings.GROUPS), a row each (setting_input.gd): the player's binding of an
@@ -39,6 +45,7 @@ const TOGGLE: PackedScene = preload("setting_toggle.tscn")
 const SLIDER: PackedScene = preload("setting_slider.tscn")
 const OPTION: PackedScene = preload("setting_option.tscn")
 const RESOLUTION: PackedScene = preload("setting_resolution.tscn")
+const CACHE_SIZE: PackedScene = preload("setting_cache_size.tscn")
 const FOLDER: PackedScene = preload("setting_folder.tscn")
 const GAME_DIR: PackedScene = preload("setting_game_dir.tscn")
 const TEXT: PackedScene = preload("setting_text.tscn")
@@ -124,6 +131,7 @@ func _ready() -> void:
                 else INPUT if setting["type"] == "input"
                 else SLIDER if setting.get("hint") == "range"
                 else RESOLUTION if setting.get("hint") == "resolution"
+                else CACHE_SIZE if setting.get("hint") == "cache_size"
                 else FOLDER if setting.get("hint") == "folder"
                 else GAME_DIR if setting.get("hint") == "game_dir"
                 else TEXT if setting["type"] == "String"
@@ -177,6 +185,7 @@ func _ready() -> void:
 ## Shows what is in effect now
 func open() -> void:
     _ui_sounds.play(&"list_item_click")
+    %Preset.revert()
     for page: SettingsPage in _pages:
         page.revert()
         page.remember_values()
@@ -227,6 +236,15 @@ func apply_keyboard_preset(preset: int) -> void:
     )
 
 
+## Every value of the preset set at once (UserSettings.preset_set()), in effect at once like any
+## change, and every page shows them - a preset holds settings of many sections
+func apply_preset(preset: String) -> void:
+    _ui_sounds.play(&"list_item_click")
+    UserSettings.preset_set(preset)
+    for page: SettingsPage in _pages:
+        page.revert()
+
+
 ## "Discard changes": the changes go once the player confirms it
 func cancel() -> void:
     %DiscardDialog.ask()
@@ -256,8 +274,18 @@ func choose_game_dir(path: String, row: SettingGameDir) -> void:
     row.set_game_dir(path)
 
 
-## The sidebar, the page and the buttons are exclusive; every way between them ends here
+## The preset, the sidebar, the page and the buttons are exclusive; every way between them ends
+## here. Left and right on the preset choose it, Enter goes to the next one (the scene's wiring).
+func focus_preset() -> void:
+    %SectionList.release_section_focus()
+    _pages[_page].release_section_focus()
+    %ActionsSection.release_section_focus()
+    %ActionButtons.release_button_focus()
+    %PresetSection.grab_section_focus()
+
+
 func focus_section_list() -> void:
+    %PresetSection.release_section_focus()
     _pages[_page].release_section_focus()
     %ActionsSection.release_section_focus()
     %ActionButtons.release_button_focus()
@@ -265,6 +293,7 @@ func focus_section_list() -> void:
 
 
 func focus_page() -> void:
+    %PresetSection.release_section_focus()
     %SectionList.release_section_focus()
     %ActionsSection.release_section_focus()
     %ActionButtons.release_button_focus()
@@ -273,6 +302,7 @@ func focus_page() -> void:
 
 ## The buttons take the keys themselves (UIActionButtons): left and right choose, Enter presses
 func focus_actions() -> void:
+    %PresetSection.release_section_focus()
     %SectionList.release_section_focus()
     _pages[_page].release_section_focus()
     %ActionsSection.grab_section_focus()
@@ -284,6 +314,7 @@ func _update_restart_note() -> void:
 
 
 func _close() -> void:
+    %PresetSection.release_section_focus()
     %SectionList.release_section_focus()
     _pages[_page].release_section_focus()
     %ActionsSection.release_section_focus()
@@ -293,8 +324,8 @@ func _close() -> void:
     visible = false
 
 
-## Tab and Shift+Tab walk the sidebar, the page and the buttons, round; none of them takes Tab
-## itself (the buttons' row has tab_walks_buttons off), so the key does nothing more there
+## Tab and Shift+Tab walk the preset, the sidebar, the page and the buttons, round; none of them
+## takes Tab itself (the buttons' row has tab_walks_buttons off), so the key does nothing more there
 func _on_settings_window_window_input(event: InputEvent) -> void:
     var step: int = 0
     if event.is_action_pressed("menu_next_section", true, true):
@@ -309,12 +340,14 @@ func _on_settings_window_window_input(event: InputEvent) -> void:
     window.set_input_as_handled()
     # a value being typed is left - and taken - with the section
     window.gui_release_focus()
-    var sections: Array[Callable] = [focus_section_list, focus_page, focus_actions]
-    var at: int = 0
-    if _pages[_page].focused:
-        at = 1
-    elif %ActionsSection.focused:
+    var sections: Array[Callable] = [focus_preset, focus_section_list, focus_page, focus_actions]
+    var at: int = 1
+    if %PresetSection.focused:
+        at = 0
+    elif _pages[_page].focused:
         at = 2
+    elif %ActionsSection.focused:
+        at = 3
     sections[wrapi(at + step, 0, sections.size())].call()
 
 

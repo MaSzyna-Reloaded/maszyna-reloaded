@@ -14,6 +14,9 @@ enum Store {
     PROJECT,
     ## A setting of UserSettings' own, in its own section
     USER,
+    ## The preset the other settings match (UserSettings.preset_get_current()) - no value of its
+    ## own: choosing one sets theirs (SettingPreset)
+    PRESET,
 }
 
 ## UserSettings.hpp PROJECT_SETTINGS_SECTION
@@ -43,7 +46,7 @@ const ADVANCED_TITLE_FONT_SIZE: int = 14
 const UNAVAILABLE_ALPHA: float = 0.4
 
 ## The setting's name, as a msgid - the label translates it
-var title: String = ""
+@export var title: String = ""
 var store: Store = Store.PROJECT
 ## UserSettings section of a USER setting; a PROJECT setting has none of its own
 var section: String = ""
@@ -326,10 +329,13 @@ static func get_default_value(setting: Dictionary) -> Variant:
 
 
 ## The value a setting has now - of a USER one setting_default when it was never set; a PROJECT
-## setting has a value of the project's own and no section
+## setting has a value of the project's own and no section; a PRESET is the name of the preset the
+## settings match, none when they match no preset
 static func read_setting(
         setting_store: Store, setting_section: String, setting_key: String,
         setting_default: Variant) -> Variant:
     if setting_store == Store.PROJECT:
         return ProjectSettings.get_setting(setting_key)
+    if setting_store == Store.PRESET:
+        return UserSettings.preset_get_current()
     return UserSettings.get_setting(setting_section, setting_key, setting_default)

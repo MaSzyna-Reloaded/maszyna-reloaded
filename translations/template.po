@@ -23,10 +23,10 @@ msgstr ""
 msgid "Search scenario"
 msgstr ""
 
-msgid "Pre-Alpha Demo Release %s-%s-%s (build %s)"
+msgid "Alpha Demo Release %s-%s-%s (build %s)"
 msgstr ""
 
-msgid "Pre-Alpha Demo Release (unbuilt)"
+msgid "Alpha Demo Release (unbuilt)"
 msgstr ""
 
 msgid "Loading %s..."
@@ -668,6 +668,9 @@ msgstr ""
 msgid "Converter Toggle"
 msgstr ""
 
+msgid "Sand"
+msgstr ""
+
 msgid "Compressor Toggle"
 msgstr ""
 
@@ -756,6 +759,9 @@ msgid "Doors Left Permit"
 msgstr ""
 
 msgid "Doors Right Permit"
+msgstr ""
+
+msgid "Doors Permit Revoke All"
 msgstr ""
 
 msgid "Doors Left Toggle"
@@ -1370,6 +1376,9 @@ msgstr ""
 msgid "Scenery lights cast shadows"
 msgstr ""
 
+msgid "Scenery lights' shadow distance"
+msgstr ""
+
 msgid "Economy light height offset"
 msgstr ""
 
@@ -1659,6 +1668,24 @@ msgid "Bloom intensity"
 msgstr ""
 
 msgid "Gamma"
+msgstr ""
+
+msgid "Graphics quality"
+msgstr ""
+
+msgid "Mid"
+msgstr ""
+
+msgid "Filmic"
+msgstr ""
+
+msgid "Custom"
+msgstr ""
+
+msgid "Film grain"
+msgstr ""
+
+msgid "Film grain intensity"
 msgstr ""
 
 msgid "Vertical sync"
@@ -2171,6 +2198,12 @@ msgstr ""
 msgid "Lazy loading (experimental)"
 msgstr ""
 
+msgid "Scenery loading cache"
+msgstr ""
+
+msgid "Maximum cache size"
+msgstr ""
+
 msgid "Hold the main pipe unlock button"
 msgstr ""
 
@@ -2283,4 +2316,311 @@ msgid "Fully coupled"
 msgstr ""
 
 msgid "Permanently coupled"
+msgstr ""
+
+# the AI driver's hints (libmaszyna's ai_driver/maszyna_driver_hints.gd, TEXTS, in its enum's order)
+msgid "Switch on battery"
+msgstr ""
+
+msgid "Switch off battery"
+msgstr ""
+
+msgid "Switch on radio"
+msgstr ""
+
+msgid "Switch off radio"
+msgstr ""
+
+msgid "Tune into channel %.0f"
+msgstr ""
+
+msgid "Switch on oil pump"
+msgstr ""
+
+msgid "Switch off oil pump"
+msgstr ""
+
+msgid "Switch on fuel pump"
+msgstr ""
+
+msgid "Switch off fuel pump"
+msgstr ""
+
+msgid "Switch pantograph 3-way valve to primary air source"
+msgstr ""
+
+msgid "Switch pantograph 3-way valve to auxiliary air source"
+msgstr ""
+
+msgid "Switch on pantograph compressor"
+msgstr ""
+
+msgid "Switch off pantograph compressor"
+msgstr ""
+
+msgid "Enable pantographs valve"
+msgstr ""
+
+msgid "Disable pantographcs valve"
+msgstr ""
+
+msgid "Raise pantograph A"
+msgstr ""
+
+msgid "Lower pantograph A"
+msgstr ""
+
+msgid "Raise pantograph B"
+msgstr ""
+
+msgid "Lower pantograph B"
+msgstr ""
+
+msgid "Switch on converter"
+msgstr ""
+
+msgid "Switch off converter"
+msgstr ""
+
+msgid "Reset converter overload relay"
+msgstr ""
+
+msgid "Reset main circuit ground relay"
+msgstr ""
+
+msgid "Reset traction motors overload relay"
+msgstr ""
+
+msgid "Close line breaker"
+msgstr ""
+
+msgid "Open line breaker"
+msgstr ""
+
+msgid "Switch on compressor"
+msgstr ""
+
+msgid "Switch off compressor"
+msgstr ""
+
+msgid "Switch on front motor blowers"
+msgstr ""
+
+msgid "Switch off front motor blowers"
+msgstr ""
+
+msgid "Switch on rear motor blowers"
+msgstr ""
+
+msgid "Switch off rear motor blowers"
+msgstr ""
+
+msgid "Apply spring brake"
+msgstr ""
+
+msgid "Release spring brake"
+msgstr ""
+
+msgid "Apply manual brake"
+msgstr ""
+
+msgid "Release manual brake"
+msgstr ""
+
+msgid "Set engine to idle"
+msgstr ""
+
+msgid "Set master controller to series mode"
+msgstr ""
+
+msgid "Switch on water heater"
+msgstr ""
+
+msgid "Switch off water heater"
+msgstr ""
+
+msgid "Switch on water heater breaker"
+msgstr ""
+
+msgid "Switch off water heater breaker"
+msgstr ""
+
+msgid "Switch on water pump"
+msgstr ""
+
+msgid "Switch off water pump"
+msgstr ""
+
+msgid "Switch on water pump breaker"
+msgstr ""
+
+msgid "Switch off water pump breaker"
+msgstr ""
+
+msgid "Link water circuits"
+msgstr ""
+
+msgid "Unlink water circuits"
+msgstr ""
+
+msgid "Wait for warm up to complete"
+msgstr ""
+
+msgid "Set master controller to neutral"
+msgstr ""
+
+msgid "Set master controller to position %.0f"
+msgstr ""
+
+msgid "Set brake controller to pipe filling mode"
+msgstr ""
+
+msgid "Release train brake"
+msgstr ""
+
+msgid "Apply train brake"
+msgstr ""
+
+msgid "Set reverser to forward"
+msgstr ""
+
+msgid "Set reverser to reverse"
+msgstr ""
+
+msgid "Switch reverser to opposite direction"
+msgstr ""
+
+msgid "Set reverser to neutral"
+msgstr ""
+
+msgid "Wait for main reservoir to fill"
+msgstr ""
+
+msgid "Wait for sufficient air pressure in pantograph subsystem"
+msgstr ""
+
+msgid "Switch on sanding"
+msgstr ""
+
+msgid "Switch off sanding"
+msgstr ""
+
+msgid "Switch on door locks"
+msgstr ""
+
+msgid "Switch on departure signal"
+msgstr ""
+
+msgid "Switch off departure signal"
+msgstr ""
+
+msgid "Open doors"
+msgstr ""
+
+msgid "Close doors"
+msgstr ""
+
+msgid "Grant permit to open doors"
+msgstr ""
+
+msgid "Revoke permit to open doors"
+msgstr ""
+
+msgid "Close all doors"
+msgstr ""
+
+msgid "Sound the horn"
+msgstr ""
+
+msgid "Switch off horn"
+msgstr ""
+
+msgid "Switch on consist lights"
+msgstr ""
+
+msgid "Switch off consist lights"
+msgstr ""
+
+msgid "Switch on consist heating"
+msgstr ""
+
+msgid "Switch off consist heating"
+msgstr ""
+
+msgid "Acknowledge alerter"
+msgstr ""
+
+msgid "Acknowledge SHP"
+msgstr ""
+
+msgid "Attach coupling adapter"
+msgstr ""
+
+msgid "Remove coupling adapter"
+msgstr ""
+
+msgid "Switch off field shunting"
+msgstr ""
+
+msgid "Reduce tractive force"
+msgstr ""
+
+msgid "Increase tractive force"
+msgstr ""
+
+msgid "Reduce braking force"
+msgstr ""
+
+msgid "Increase braking force"
+msgstr ""
+
+msgid "Release train brakes"
+msgstr ""
+
+msgid "Lap train brake"
+msgstr ""
+
+msgid "Apply independent brake"
+msgstr ""
+
+msgid "Release independent brake"
+msgstr ""
+
+msgid "Apply anti slip brake"
+msgstr ""
+
+msgid "Wait for passenger exchange to complete"
+msgstr ""
+
+msgid "Wait for departure time"
+msgstr ""
+
+msgid "Switch on Pc 1 head lamp code"
+msgstr ""
+
+msgid "Switch on Pc 2 head lamp code"
+msgstr ""
+
+msgid "Switch on Pc 5 tail lamp code"
+msgstr ""
+
+msgid "Switch on Tb 1 head lamp code"
+msgstr ""
+
+msgid "Switch off lights"
+msgstr ""
+
+msgid "Actuate"
+msgstr ""
+
+msgid "Stop actuating"
+msgstr ""
+
+msgid "Apply tractive force to compress buffers"
+msgstr ""
+
+msgid "Activate cabin"
+msgstr ""
+
+msgid "Deactivate cabin"
 msgstr ""

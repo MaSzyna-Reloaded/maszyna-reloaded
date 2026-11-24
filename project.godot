@@ -85,6 +85,10 @@ text_editor/behavior/files/trim_trailing_whitespace_on_save=true
 
 enabled=PackedStringArray("res://addons/debug_menu/plugin.cfg", "res://addons/gnd_sfx/plugin.cfg", "res://addons/gut/plugin.cfg", "res://addons/libreloaded/editor/scenery_streaming/plugin.cfg", "res://addons/libmaszyna/editor/maszyna_vehicles/plugin.cfg", "res://addons/libmaszyna/editor/e3d_toolbar/plugin.cfg", "res://addons/libmaszyna/editor/fiz_toolbar/plugin.cfg", "res://addons/libmaszyna/editor/nodebank/plugin.cfg", "res://addons/libmaszyna/editor/scenery_info/plugin.cfg", "res://addons/libmaszyna/editor/scn_toolbar/plugin.cfg", "res://addons/libreloaded/editor/scenery_toolbar/plugin.cfg", "res://addons/libreloaded/editor/tracks/plugin.cfg", "res://addons/libreloaded/plugin.cfg", "res://addons/libmaszyna/plugin.cfg", "res://addons/gnd_skydome/plugin.cfg", "res://addons/gnd_weather/plugin.cfg")
 
+[gnd_skydome]
+
+sky/show_below_horizon=false
+
 [gnd_weather]
 
 precipitation_wind_strength=10.0
@@ -563,6 +567,11 @@ converter_toggle={
 , Object(InputEventJoypadButton,"resource_local_to_scene":false,"resource_name":"","device":-1,"button_index":11,"pressure":0.0,"pressed":false,"metadata/pad_modifier":1,"script":null)
 ]
 }
+sand={
+"deadzone": 0.5,
+"events": [Object(InputEventKey,"resource_local_to_scene":false,"resource_name":"","device":-1,"window_id":0,"alt_pressed":false,"shift_pressed":true,"ctrl_pressed":false,"meta_pressed":false,"pressed":false,"keycode":88,"physical_keycode":0,"key_label":0,"unicode":88,"location":0,"echo":false,"script":null)
+]
+}
 compressor_toggle={
 "deadzone": 0.5,
 "events": [Object(InputEventKey,"resource_local_to_scene":false,"resource_name":"","device":-1,"window_id":0,"alt_pressed":false,"shift_pressed":false,"ctrl_pressed":false,"meta_pressed":false,"pressed":false,"keycode":67,"physical_keycode":0,"key_label":0,"unicode":99,"location":0,"echo":false,"script":null)
@@ -725,6 +734,11 @@ doors_left_permit={
 doors_right_permit={
 "deadzone": 0.5,
 "events": [Object(InputEventKey,"resource_local_to_scene":false,"resource_name":"","device":-1,"window_id":0,"alt_pressed":false,"shift_pressed":true,"ctrl_pressed":false,"meta_pressed":false,"pressed":false,"keycode":46,"physical_keycode":0,"key_label":0,"unicode":62,"location":0,"echo":false,"script":null)
+]
+}
+doors_permit_revoke_all={
+"deadzone": 0.5,
+"events": [Object(InputEventKey,"resource_local_to_scene":false,"resource_name":"","device":-1,"window_id":0,"alt_pressed":false,"shift_pressed":false,"ctrl_pressed":true,"meta_pressed":false,"pressed":false,"keycode":46,"physical_keycode":0,"key_label":0,"unicode":46,"location":0,"echo":false,"script":null)
 ]
 }
 doors_permit_preset_previous={
@@ -890,7 +904,6 @@ radio_call3_send={
 
 starter/group_sceneries=true
 bugtracking/endpoint="https://maszyna-reloaded-reports.marcin-j-nowak.workers.dev/"
-scenery/lights/energy=2.0
 scenery/lights/volumetric_fog_energy=16.0
 scenery/lights/lamp_attenuation=0.10000000000000002
 smoke/generator_mode=1

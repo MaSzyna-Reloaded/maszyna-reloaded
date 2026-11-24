@@ -65,7 +65,6 @@ const RAINBOW_RAIN_END: float = 0.5
 const RAINBOW_CLOUD_FADE_START: float = 0.2
 const RAINBOW_CLOUD_FADE_END: float = 0.5
 const SECONDS_PER_DAY: int = 86400
-const MAXIMUM_DAY_OF_YEAR: int = 365
 # Time is pushed to Skydome at a fixed rate and Skydome interpolates in between
 # (same as WorldTimer in forest-test-scene levels/test_biomes.gd:227).
 const TIME_UPDATE_INTERVAL: float = 0.1
@@ -113,13 +112,20 @@ func create_nodes(world_environment: WorldEnvironment, _sky_environment: Environ
     world_environment.add_child(weather, false, Node.INTERNAL_MODE_BACK)
 
 
+# The editor runs this node (@tool) in the world scene, not the game's autoloads: CabinSystem has no
+# script running there and GameProjectSettings registers nothing, so the cabs and the settings the
+# game registers as it starts are left to the game.
 func _enter_tree() -> void:
     super()
+    if Engine.is_editor_hint():
+        return
     CabinSystem.vehicle_cabin_built.connect(_on_vehicle_cabin_built)
 
 
 func _exit_tree() -> void:
     super()
+    if Engine.is_editor_hint():
+        return
     CabinSystem.vehicle_cabin_built.disconnect(_on_vehicle_cabin_built)
 
 
@@ -156,11 +162,13 @@ func _set_skydome_param(property: StringName, value: Variant) -> void:
 func apply_visual_configuration() -> void:
     if not skydome:
         return
-    # only what differs: each of them makes Skydome set its effect up again
-    for property: StringName in SUNSHAFT_PROPERTIES:
-        var value: Variant = ProjectSettings.get_setting(SUNSHAFT_SETTINGS_PREFIX + property)
-        if not value == SkydomeServer.skydome_get_param(skydome.get_rid(), property):
-            _set_skydome_param(property, value)
+    # only what differs: each of them makes Skydome set its effect up again; the editor has none of
+    # these settings (GameProjectSettings registers them as the game starts) and keeps the node's
+    if not Engine.is_editor_hint():
+        for property: StringName in SUNSHAFT_PROPERTIES:
+            var value: Variant = ProjectSettings.get_setting(SUNSHAFT_SETTINGS_PREFIX + property)
+            if not value == SkydomeServer.skydome_get_param(skydome.get_rid(), property):
+                _set_skydome_param(property, value)
     # the rain look of the player's Weather settings (gnd_weather/<property>) - WeatherNode reads its
     # project settings only on ready
     for property: StringName in WeatherSettings.PROPERTIES:
@@ -183,9 +191,9 @@ func apply_visual_configuration() -> void:
     weather.global_wind_strength = lerpf(
         WIND_STRENGTH_MIN, WIND_STRENGTH_MAX, environment_node.wind_strength
     )
-    weather.global_wind_turbulence = float(
-        ProjectSettings.get_setting(WIND_TURBULENCE_SETTING)
-    )
+    # registered as the game starts (GameProjectSettings): the editor keeps the weather's own
+    if not Engine.is_editor_hint():
+        weather.global_wind_turbulence = float(ProjectSettings.get_setting(WIND_TURBULENCE_SETTING))
     _set_skydome_param(&"rainbow_intensity", (
         RAINBOW_INTENSITY_MAX
         * smoothstep(RAINBOW_RAIN_START, RAINBOW_RAIN_END, precipitation)
@@ -312,21 +320,27 @@ func _push_time(snap: bool) -> void:
     if snap:
         _set_skydome_param(&"time_transition_duration", 0.0)
 
-    var year_start: int = Time.get_unix_time_from_datetime_dict(
-        {"year": environment_node.year, "month": 1, "day": 1}
-    )
-    var date_time: int = Time.get_unix_time_from_datetime_dict(
+    # Skydome takes its date and time_of_day as the local solar time at its longitude and has no
+    # timezone: the local clock time is converted here, and the date with it where the solar time
+    # is on another day than the clock; the year and the longitude give Skydome the universal time
+    # the sun, the moon and the stars stand by.
+    var solar_hours: float = environment_node.current_time - environment_node.timezone_offset \
+            + environment_node.longitude / 15.0
+    var solar_day_offset: int = floori(solar_hours / 24.0)
+    var clock_date: int = Time.get_unix_time_from_datetime_dict(
         {"year": environment_node.year, "month": environment_node.month, "day": environment_node.day}
     )
-    var day_of_year: int = (date_time - year_start) / SECONDS_PER_DAY + 1
+    var solar_date: Dictionary = Time.get_datetime_dict_from_unix_time(
+        clock_date + solar_day_offset * SECONDS_PER_DAY
+    )
+    var year_start: int = Time.get_unix_time_from_datetime_dict(
+        {"year": solar_date["year"], "month": 1, "day": 1}
+    )
+    var day_of_year: int = (Time.get_unix_time_from_datetime_dict(solar_date) - year_start) / SECONDS_PER_DAY + 1
 
+    _set_skydome_param(&"year", solar_date["year"])
     _set_skydome_param(&"latitude", environment_node.latitude)
-    _set_skydome_param(&"day_of_year", mini(day_of_year, MAXIMUM_DAY_OF_YEAR))
-    # Skydome treats time_of_day as local solar time (Skydome.gd:1052) and has no longitude
-    # nor timezone, so the local clock time is converted here.
-    _set_skydome_param(&"time_of_day", wrapf(
-        environment_node.current_time - environment_node.timezone_offset + environment_node.longitude / 15.0,
-        0.0,
-        24.0
-    ))
+    _set_skydome_param(&"longitude", environment_node.longitude)
+    _set_skydome_param(&"day_of_year", day_of_year)
+    _set_skydome_param(&"time_of_day", solar_hours - solar_day_offset * 24.0)
     _set_skydome_param(&"time_transition_duration", transition_duration)

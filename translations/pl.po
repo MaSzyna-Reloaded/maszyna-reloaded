@@ -23,11 +23,11 @@ msgstr "Zatwierdź skin"
 msgid "Search scenario"
 msgstr "Szukaj scenariusza"
 
-msgid "Pre-Alpha Demo Release %s-%s-%s (build %s)"
-msgstr "Pre-Alpha Demo %s-%s-%s (kompilacja %s)"
+msgid "Alpha Demo Release %s-%s-%s (build %s)"
+msgstr "Alpha Demo %s-%s-%s (kompilacja %s)"
 
-msgid "Pre-Alpha Demo Release (unbuilt)"
-msgstr "Pre-Alpha Demo (bez kompilacji)"
+msgid "Alpha Demo Release (unbuilt)"
+msgstr "Alpha Demo (bez kompilacji)"
 
 msgid "Loading %s..."
 msgstr "Wczytywanie %s..."
@@ -668,6 +668,9 @@ msgstr "Poprzednia kabina"
 msgid "Converter Toggle"
 msgstr "Przetwornica"
 
+msgid "Sand"
+msgstr "Piasecznica"
+
 msgid "Compressor Toggle"
 msgstr "Sprężarka"
 
@@ -757,6 +760,9 @@ msgstr "Zezwolenie na drzwi lewe"
 
 msgid "Doors Right Permit"
 msgstr "Zezwolenie na drzwi prawe"
+
+msgid "Doors Permit Revoke All"
+msgstr "Zezwolenie na drzwi: cofnij"
 
 msgid "Doors Left Toggle"
 msgstr "Drzwi lewe: otwórz/zamknij"
@@ -1370,6 +1376,9 @@ msgstr "Zasięg świateł scenerii"
 msgid "Scenery lights cast shadows"
 msgstr "Światła scenerii rzucają cienie"
 
+msgid "Scenery lights' shadow distance"
+msgstr "Zasięg cieni świateł scenerii"
+
 msgid "Economy light height offset"
 msgstr "Przesunięcie wysokości świateł w trybie ekonomicznym"
 
@@ -1660,6 +1669,24 @@ msgstr "Intensywność rozbłysku (bloom)"
 
 msgid "Gamma"
 msgstr "Gamma"
+
+msgid "Graphics quality"
+msgstr "Jakość grafiki"
+
+msgid "Mid"
+msgstr "Średnia"
+
+msgid "Filmic"
+msgstr "Filmowa"
+
+msgid "Custom"
+msgstr "Własna"
+
+msgid "Film grain"
+msgstr "Ziarno filmowe"
+
+msgid "Film grain intensity"
+msgstr "Intensywność ziarna filmowego"
 
 msgid "Vertical sync"
 msgstr "Synchronizacja pionowa"
@@ -2171,6 +2198,12 @@ msgstr "Nie udało się uruchomić ekranów kabiny rysowanych przez skrypty Pyth
 msgid "Lazy loading (experimental)"
 msgstr "Leniwe ładowanie (eksperymentalne)"
 
+msgid "Scenery loading cache"
+msgstr "Cache wczytywania scenerii"
+
+msgid "Maximum cache size"
+msgstr "Maksymalny rozmiar cache"
+
 msgid "Hold the main pipe unlock button"
 msgstr "Przytrzymać przycisk odblokowania przewodu głównego"
 
@@ -2284,3 +2317,310 @@ msgstr "Pełne sprzęgnięcie"
 
 msgid "Permanently coupled"
 msgstr "Sprzęg stały"
+
+# the AI driver's hints (libmaszyna's ai_driver/maszyna_driver_hints.gd, TEXTS, in its enum's order)
+msgid "Switch on battery"
+msgstr "Włączyć baterię"
+
+msgid "Switch off battery"
+msgstr "Wyłączyć baterię"
+
+msgid "Switch on radio"
+msgstr "Włączyć radio"
+
+msgid "Switch off radio"
+msgstr "Wyłączyć radio"
+
+msgid "Tune into channel %.0f"
+msgstr "Nastawić kanał radia %.0f"
+
+msgid "Switch on oil pump"
+msgstr "Włączyć pompę oleju"
+
+msgid "Switch off oil pump"
+msgstr "Wyłączyć pompę oleju"
+
+msgid "Switch on fuel pump"
+msgstr "Włączyć pompę paliwa"
+
+msgid "Switch off fuel pump"
+msgstr "Wyłączyć pompę paliwa"
+
+msgid "Switch pantograph 3-way valve to primary air source"
+msgstr "Przełączyć zawór trójdrogowy pantografów na zasilanie głównym zbiornikiem"
+
+msgid "Switch pantograph 3-way valve to auxiliary air source"
+msgstr "Przełączyć zawór trójdrogowy pantografów na zasilanie zbiornikiem pomocniczym"
+
+msgid "Switch on pantograph compressor"
+msgstr "Włączyć sprężarkę pantografów"
+
+msgid "Switch off pantograph compressor"
+msgstr "Wyłączyć sprężarkę pantografów"
+
+msgid "Enable pantographs valve"
+msgstr "Włączyć zawór pantografów"
+
+msgid "Disable pantographcs valve"
+msgstr "Wyłączyć zawór pantografów"
+
+msgid "Raise pantograph A"
+msgstr "Podnieść pantograf A"
+
+msgid "Lower pantograph A"
+msgstr "Opuścić pantograf A"
+
+msgid "Raise pantograph B"
+msgstr "Podnieść pantograf B"
+
+msgid "Lower pantograph B"
+msgstr "Opuścić pantograf B"
+
+msgid "Switch on converter"
+msgstr "Włączyć przetwornicę"
+
+msgid "Switch off converter"
+msgstr "Wyłączyć przetwornicę"
+
+msgid "Reset converter overload relay"
+msgstr "Skasować przekaźnik nadmiarowy przetwornicy"
+
+msgid "Reset main circuit ground relay"
+msgstr "Skasować przekaźnik ziemnozwarciowy obwodu głównego"
+
+msgid "Reset traction motors overload relay"
+msgstr "Skasować przekaźnik nadmiarowy silników trakcyjnych"
+
+msgid "Close line breaker"
+msgstr "Załączyć wyłącznik szybki"
+
+msgid "Open line breaker"
+msgstr "Rozłączyć wyłącznik szybki"
+
+msgid "Switch on compressor"
+msgstr "Włączyć sprężarkę"
+
+msgid "Switch off compressor"
+msgstr "Wyłączyć sprężarkę"
+
+msgid "Switch on front motor blowers"
+msgstr "Włączyć przednie wentylatory silników"
+
+msgid "Switch off front motor blowers"
+msgstr "Wyłączyć przednie wentylatory silników"
+
+msgid "Switch on rear motor blowers"
+msgstr "Włączyć tylne wentylatory silników"
+
+msgid "Switch off rear motor blowers"
+msgstr "Wyłączyć tylne wentylatory silników"
+
+msgid "Apply spring brake"
+msgstr "Zaciągnąć hamulec sprężynowy"
+
+msgid "Release spring brake"
+msgstr "Zwolnić hamulec sprężynowy"
+
+msgid "Apply manual brake"
+msgstr "Zaciągnąć hamulec ręczny"
+
+msgid "Release manual brake"
+msgstr "Zwolnić hamulec ręczny"
+
+msgid "Set engine to idle"
+msgstr "Ustawić nastawnik jazdy na pozycję jałową"
+
+msgid "Set master controller to series mode"
+msgstr "Ustawić nastawnik jazdy na jazdę szeregową"
+
+msgid "Switch on water heater"
+msgstr "Włączyć podgrzewacz wody"
+
+msgid "Switch off water heater"
+msgstr "Wyłączyć podgrzewacz wody"
+
+msgid "Switch on water heater breaker"
+msgstr "Włączyć wyłącznik podgrzewacza wody"
+
+msgid "Switch off water heater breaker"
+msgstr "Wyłączyć wyłącznik podgrzewacza wody"
+
+msgid "Switch on water pump"
+msgstr "Włączyć pompę wody"
+
+msgid "Switch off water pump"
+msgstr "Wyłączyć pompę wody"
+
+msgid "Switch on water pump breaker"
+msgstr "Włączyć wyłącznik pompy wody"
+
+msgid "Switch off water pump breaker"
+msgstr "Wyłączyć wyłącznik pompy wody"
+
+msgid "Link water circuits"
+msgstr "Połączyć obiegi wody"
+
+msgid "Unlink water circuits"
+msgstr "Rozłączyć obiegi wody"
+
+msgid "Wait for warm up to complete"
+msgstr "Zaczekać na zakończenie podgrzewania"
+
+msgid "Set master controller to neutral"
+msgstr "Ustawić nastawnik jazdy na zero"
+
+msgid "Set master controller to position %.0f"
+msgstr "Ustawić nastawnik jazdy na pozycję %.0f"
+
+msgid "Set brake controller to pipe filling mode"
+msgstr "Ustawić zawór rozrządczy na napełnianie przewodu głównego"
+
+msgid "Release train brake"
+msgstr "Zwolnić hamulec zespolony"
+
+msgid "Apply train brake"
+msgstr "Zaciągnąć hamulec zespolony"
+
+msgid "Set reverser to forward"
+msgstr "Ustawić nawrotnik na jazdę do przodu"
+
+msgid "Set reverser to reverse"
+msgstr "Ustawić nawrotnik na jazdę do tyłu"
+
+msgid "Switch reverser to opposite direction"
+msgstr "Przełączyć nawrotnik na kierunek przeciwny"
+
+msgid "Set reverser to neutral"
+msgstr "Ustawić nawrotnik na zero"
+
+msgid "Wait for main reservoir to fill"
+msgstr "Zaczekać na napełnienie głównego zbiornika"
+
+msgid "Wait for sufficient air pressure in pantograph subsystem"
+msgstr "Zaczekać na odpowiednie ciśnienie w układzie pantografów"
+
+msgid "Switch on sanding"
+msgstr "Włączyć piasecznicę"
+
+msgid "Switch off sanding"
+msgstr "Wyłączyć piasecznicę"
+
+msgid "Switch on door locks"
+msgstr "Włączyć blokadę drzwi"
+
+msgid "Switch on departure signal"
+msgstr "Włączyć sygnał odjazdu"
+
+msgid "Switch off departure signal"
+msgstr "Wyłączyć sygnał odjazdu"
+
+msgid "Open doors"
+msgstr "Otworzyć drzwi"
+
+msgid "Close doors"
+msgstr "Zamknąć drzwi"
+
+msgid "Grant permit to open doors"
+msgstr "Zezwolić na otwarcie drzwi"
+
+msgid "Revoke permit to open doors"
+msgstr "Cofnąć zezwolenie na otwarcie drzwi"
+
+msgid "Close all doors"
+msgstr "Zamknąć wszystkie drzwi"
+
+msgid "Sound the horn"
+msgstr "Dać sygnał syreną"
+
+msgid "Switch off horn"
+msgstr "Wyłączyć syrenę"
+
+msgid "Switch on consist lights"
+msgstr "Włączyć oświetlenie składu"
+
+msgid "Switch off consist lights"
+msgstr "Wyłączyć oświetlenie składu"
+
+msgid "Switch on consist heating"
+msgstr "Włączyć ogrzewanie składu"
+
+msgid "Switch off consist heating"
+msgstr "Wyłączyć ogrzewanie składu"
+
+msgid "Acknowledge alerter"
+msgstr "Zbić czuwak"
+
+msgid "Acknowledge SHP"
+msgstr "Zbić SHP"
+
+msgid "Attach coupling adapter"
+msgstr "Założyć adapter sprzęgu"
+
+msgid "Remove coupling adapter"
+msgstr "Zdjąć adapter sprzęgu"
+
+msgid "Switch off field shunting"
+msgstr "Wyłączyć bocznikowanie"
+
+msgid "Reduce tractive force"
+msgstr "Zmniejszyć siłę pociągową"
+
+msgid "Increase tractive force"
+msgstr "Zwiększyć siłę pociągową"
+
+msgid "Reduce braking force"
+msgstr "Zmniejszyć siłę hamowania"
+
+msgid "Increase braking force"
+msgstr "Zwiększyć siłę hamowania"
+
+msgid "Release train brakes"
+msgstr "Zwolnić hamulce zespolone"
+
+msgid "Lap train brake"
+msgstr "Ustawić hamulec zespolony w położeniu zatrzymania"
+
+msgid "Apply independent brake"
+msgstr "Zaciągnąć hamulec pomocniczy"
+
+msgid "Release independent brake"
+msgstr "Zwolnić hamulec pomocniczy"
+
+msgid "Apply anti slip brake"
+msgstr "Włączyć przeciwpoślizg"
+
+msgid "Wait for passenger exchange to complete"
+msgstr "Zaczekać na zakończenie wymiany pasażerów"
+
+msgid "Wait for departure time"
+msgstr "Zaczekać na czas odjazdu"
+
+msgid "Switch on Pc 1 head lamp code"
+msgstr "Włączyć sygnał świetlny Pc1"
+
+msgid "Switch on Pc 2 head lamp code"
+msgstr "Włączyć sygnał świetlny Pc2"
+
+msgid "Switch on Pc 5 tail lamp code"
+msgstr "Włączyć sygnał świetlny Pc5"
+
+msgid "Switch on Tb 1 head lamp code"
+msgstr "Włączyć sygnał świetlny Tb1"
+
+msgid "Switch off lights"
+msgstr "Wyłączyć światła"
+
+msgid "Actuate"
+msgstr "Uruchomić"
+
+msgid "Stop actuating"
+msgstr "Zatrzymać działanie"
+
+msgid "Apply tractive force to compress buffers"
+msgstr "Zastosować siłę pociągową do ścisnięcia zderzaków"
+
+msgid "Activate cabin"
+msgstr "Aktywować kabinę"
+
+msgid "Deactivate cabin"
+msgstr "Deaktywować kabinę"

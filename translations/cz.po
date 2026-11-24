@@ -23,11 +23,11 @@ msgstr "Použít vzhled"
 msgid "Search scenario"
 msgstr "Hledat scénář"
 
-msgid "Pre-Alpha Demo Release %s-%s-%s (build %s)"
-msgstr "Pre-Alpha demo %s-%s-%s (sestavení %s)"
+msgid "Alpha Demo Release %s-%s-%s (build %s)"
+msgstr "Alpha demo %s-%s-%s (sestavení %s)"
 
-msgid "Pre-Alpha Demo Release (unbuilt)"
-msgstr "Pre-Alpha demo (nesestaveno)"
+msgid "Alpha Demo Release (unbuilt)"
+msgstr "Alpha demo (nesestaveno)"
 
 msgid "Loading %s..."
 msgstr "Načítání %s..."
@@ -668,6 +668,9 @@ msgstr "Předchozí kabina"
 msgid "Converter Toggle"
 msgstr "Měnič napětí"
 
+msgid "Sand"
+msgstr "Pískování"
+
 msgid "Compressor Toggle"
 msgstr "Kompresor"
 
@@ -757,6 +760,9 @@ msgstr "Povolení levých dveří"
 
 msgid "Doors Right Permit"
 msgstr "Povolení pravých dveří"
+
+msgid "Doors Permit Revoke All"
+msgstr "Zrušit všechna povolení dveří"
 
 msgid "Doors Left Toggle"
 msgstr "Levé dveře: otevřít/zavřít"
@@ -1355,6 +1361,9 @@ msgstr "Dosah světel scenérie"
 msgid "Scenery lights cast shadows"
 msgstr "Světla scenérie vrhají stíny"
 
+msgid "Scenery lights' shadow distance"
+msgstr "Dosah stínů světel scenérie"
+
 msgid "Economy light height offset"
 msgstr "Výškový posun světel v úsporném režimu"
 
@@ -1645,6 +1654,24 @@ msgstr "Intenzita rozptylu světla (bloom)"
 
 msgid "Gamma"
 msgstr "Gama"
+
+msgid "Graphics quality"
+msgstr "Kvalita grafiky"
+
+msgid "Mid"
+msgstr "Střední"
+
+msgid "Filmic"
+msgstr "Filmová"
+
+msgid "Custom"
+msgstr "Vlastní"
+
+msgid "Film grain"
+msgstr "Filmové zrno"
+
+msgid "Film grain intensity"
+msgstr "Intenzita filmového zrna"
 
 msgid "Vertical sync"
 msgstr "Vertikální synchronizace"
@@ -2155,6 +2182,12 @@ msgstr "Obrazovky kabiny kreslené skripty Pythonu se nepodařilo spustit a zůs
 
 msgid "Lazy loading (experimental)"
 msgstr "Líné načítání (experimentální)"
+
+msgid "Scenery loading cache"
+msgstr "Mezipaměť načítání scenérie"
+
+msgid "Maximum cache size"
+msgstr "Maximální velikost mezipaměti"
 
 msgid "All sceneries"
 msgstr "Všechny scenérie"

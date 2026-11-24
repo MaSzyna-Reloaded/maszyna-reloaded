@@ -46,24 +46,36 @@ func _on_refresh_timer_timeout() -> void:
     if driver_state:
         hints = driver_state.hints
     var cab_logic:CabinLogic = CabinSystem.vehicle_get_cab_logic(vehicle)
+    # two hints the same key already does at once (closing the left and the right doors with one
+    # all-doors button) are the one step to the player, shown once
+    var shown:Array[Dictionary] = []
+    for hint:DriverHint in hints:
+        var action:StringName = &""
+        var event:InputEvent = null
+        if cab_logic and hint.control:
+            action = cab_logic.get_action(hint.control, hint.gesture)
+            if action and InputMap.has_action(action):
+                var events: Array[InputEvent] = InputBindings.get_shown_events(action)
+                if events:
+                    event = events[0]
+        var duplicate:bool = false
+        for entry:Dictionary in shown:
+            if entry["action"] == action and entry["text"] == hint.text and entry["done"] == hint.done:
+                duplicate = true
+                break
+        if duplicate:
+            continue
+        shown.append({"action": action, "event": event, "text": hint.text, "done": hint.done})
     var rows:Array[Node] = %HintList.get_children()
-    for index:int in hints.size():
+    for index:int in shown.size():
         var row:DriverHintRow
         if index < rows.size():
             row = rows[index] as DriverHintRow
         else:
             row = ROW.instantiate()
             %HintList.add_child(row)
-        var hint:DriverHint = hints[index]
-        var event:InputEvent = null
-        if cab_logic and hint.control:
-            var action:StringName = cab_logic.get_action(hint.control, hint.gesture)
-            if action and InputMap.has_action(action):
-                var events: Array[InputEvent] = InputBindings.get_shown_events(action)
-                if events:
-                    event = events[0]
-        row.show_hint(event, hint.text, hint.done)
+        row.show_hint(shown[index]["event"], shown[index]["text"], shown[index]["done"])
         row.visible = true
-    for index:int in range(hints.size(), rows.size()):
+    for index:int in range(shown.size(), rows.size()):
         (rows[index] as Control).visible = false
-    %EmptyText.visible = not hints
+    %EmptyText.visible = not shown

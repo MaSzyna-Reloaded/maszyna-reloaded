@@ -1400,9 +1400,6 @@ msgstr "Napmagasság teljes nappalnál"
 msgid "Cabin"
 msgstr "Vezetőfülke"
 
-msgid "Improved cabin shadows"
-msgstr "Jobb árnyékok a vezetőfülkében"
-
 msgid "Indicator glow"
 msgstr "Jelzőlámpák fénye"
 

@@ -1415,9 +1415,6 @@ msgstr ""
 msgid "Cabin"
 msgstr ""
 
-msgid "Improved cabin shadows"
-msgstr ""
-
 msgid "Indicator glow"
 msgstr ""
 

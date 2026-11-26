@@ -678,12 +678,6 @@
             "title": "Cabin",
             "settings": [
                 {
-                    "title": "Improved cabin shadows",
-                    "store": "project",
-                    "key": "reloaded/cabin/improve_shadows_quality",
-                    "type": "bool"
-                },
-                {
                     "title": "Indicator glow",
                     "store": "project",
                     "key": "maszyna/cabin/indicator_glow_enabled",
@@ -753,101 +747,6 @@
                     "type": "float",
                     "hint": "range",
                     "hint_string": "0.05,4,0.05,suffix:m",
-                    "advanced": true
-                },
-                {
-                    "title": "Shadows",
-                    "store": "project",
-                    "key": "reloaded/cabin/shadows/enabled",
-                    "type": "bool",
-                    "depends_on": "reloaded/cabin/improve_shadows_quality"
-                },
-                {
-                    "title": "Shadow mode",
-                    "store": "project",
-                    "key": "reloaded/cabin/shadows/mode",
-                    "type": "int",
-                    "hint": "enum",
-                    "hint_string": "Orthogonal:0,PSSM 2 Splits:1,PSSM 4 Splits:2",
-                    "depends_on": "reloaded/cabin/improve_shadows_quality"
-                },
-                {
-                    "title": "Shadow distance",
-                    "store": "project",
-                    "key": "reloaded/cabin/shadows/max_distance",
-                    "type": "float",
-                    "hint": "range",
-                    "hint_string": "0,10000,1,suffix:m",
-                    "advanced": true
-                },
-                {
-                    "title": "Shadow blur",
-                    "store": "project",
-                    "key": "reloaded/cabin/shadows/blur",
-                    "type": "float",
-                    "hint": "range",
-                    "hint_string": "0,10,0.01,or_greater",
-                    "advanced": true
-                },
-                {
-                    "title": "Shadow opacity",
-                    "store": "project",
-                    "key": "reloaded/cabin/shadows/opacity",
-                    "type": "float",
-                    "hint": "range",
-                    "hint_string": "0,1,0.01",
-                    "advanced": true
-                },
-                {
-                    "title": "Shadow bias",
-                    "store": "project",
-                    "key": "reloaded/cabin/shadows/bias",
-                    "type": "float",
-                    "hint": "range",
-                    "hint_string": "0,10,0.001,or_greater",
-                    "advanced": true
-                },
-                {
-                    "title": "Shadow normal bias",
-                    "store": "project",
-                    "key": "reloaded/cabin/shadows/normal_bias",
-                    "type": "float",
-                    "hint": "range",
-                    "hint_string": "0,32,0.001,or_greater",
-                    "advanced": true
-                },
-                {
-                    "title": "Blend shadow splits",
-                    "store": "project",
-                    "key": "reloaded/cabin/shadows/blend_splits",
-                    "type": "bool",
-                    "advanced": true
-                },
-                {
-                    "title": "Shadow split 1",
-                    "store": "project",
-                    "key": "reloaded/cabin/shadows/split_1",
-                    "type": "float",
-                    "hint": "range",
-                    "hint_string": "0,1,0.001",
-                    "advanced": true
-                },
-                {
-                    "title": "Shadow split 2",
-                    "store": "project",
-                    "key": "reloaded/cabin/shadows/split_2",
-                    "type": "float",
-                    "hint": "range",
-                    "hint_string": "0,1,0.001",
-                    "advanced": true
-                },
-                {
-                    "title": "Shadow split 3",
-                    "store": "project",
-                    "key": "reloaded/cabin/shadows/split_3",
-                    "type": "float",
-                    "hint": "range",
-                    "hint_string": "0,1,0.001",
                     "advanced": true
                 }
             ]
@@ -1401,8 +1300,6 @@
                     "maszyna/scenery/lights/mode": 1,
                     "reloaded/scenery/lights/distance": 150.0,
                     "maszyna/scenery/lights/cast_shadows": false,
-                    "reloaded/cabin/improve_shadows_quality": false,
-                    "reloaded/cabin/shadows/mode": 0,
                     "maszyna/cabin/indicator_glow_enabled": false,
                     "maszyna/cabin/real_instruments_lights": false,
                     "maszyna/cabin/screen_glow_enabled": false,
@@ -1445,8 +1342,6 @@
                     "maszyna/scenery/lights/mode": 1,
                     "reloaded/scenery/lights/distance": 250.0,
                     "maszyna/scenery/lights/cast_shadows": false,
-                    "reloaded/cabin/improve_shadows_quality": false,
-                    "reloaded/cabin/shadows/mode": 1,
                     "maszyna/cabin/indicator_glow_enabled": true,
                     "maszyna/cabin/real_instruments_lights": false,
                     "maszyna/cabin/screen_glow_enabled": true,
@@ -1489,8 +1384,6 @@
                     "maszyna/scenery/lights/mode": 1,
                     "reloaded/scenery/lights/distance": 400.0,
                     "maszyna/scenery/lights/cast_shadows": true,
-                    "reloaded/cabin/improve_shadows_quality": true,
-                    "reloaded/cabin/shadows/mode": 2,
                     "maszyna/cabin/indicator_glow_enabled": true,
                     "maszyna/cabin/real_instruments_lights": true,
                     "maszyna/cabin/screen_glow_enabled": true,
@@ -1533,8 +1426,6 @@
                     "maszyna/scenery/lights/mode": 1,
                     "reloaded/scenery/lights/distance": 600.0,
                     "maszyna/scenery/lights/cast_shadows": true,
-                    "reloaded/cabin/improve_shadows_quality": true,
-                    "reloaded/cabin/shadows/mode": 2,
                     "maszyna/cabin/indicator_glow_enabled": true,
                     "maszyna/cabin/real_instruments_lights": true,
                     "maszyna/cabin/screen_glow_enabled": true,
@@ -1577,8 +1468,6 @@
                     "maszyna/scenery/lights/mode": 2,
                     "reloaded/scenery/lights/distance": 600.0,
                     "maszyna/scenery/lights/cast_shadows": true,
-                    "reloaded/cabin/improve_shadows_quality": true,
-                    "reloaded/cabin/shadows/mode": 2,
                     "maszyna/cabin/indicator_glow_enabled": true,
                     "maszyna/cabin/real_instruments_lights": true,
                     "maszyna/cabin/screen_glow_enabled": true,

@@ -1415,9 +1415,6 @@ msgstr "Wysokość słońca przy pełnym dniu"
 msgid "Cabin"
 msgstr "Kabina"
 
-msgid "Improved cabin shadows"
-msgstr "Lepsze cienie w kabinie"
-
 msgid "Indicator glow"
 msgstr "Poświata kontrolek"
 

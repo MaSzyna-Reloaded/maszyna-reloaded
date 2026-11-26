@@ -1400,9 +1400,6 @@ msgstr "完全白昼时的太阳高度"
 msgid "Cabin"
 msgstr "驾驶室"
 
-msgid "Improved cabin shadows"
-msgstr "增强驾驶室阴影"
-
 msgid "Indicator glow"
 msgstr "指示灯辉光"
 

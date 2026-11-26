@@ -1400,9 +1400,6 @@ msgstr "Výška slunce za plného dne"
 msgid "Cabin"
 msgstr "Kabina"
 
-msgid "Improved cabin shadows"
-msgstr "Lepší stíny v kabině"
-
 msgid "Indicator glow"
 msgstr "Záře kontrolek"
 

@@ -149,21 +149,23 @@ func _process(delta: float) -> void:
 
 
 ## The cab camera is rigidly mounted to the vehicle it rides in (player.gd places it from the same
-## VehicleServer.vehicle_get_transform() read here), so anchoring the sun's shadow cascades to that
-## vehicle's own position removes the travel term 0009's hysteresis margin could only buy time
-## against for as long as the cab is the camera (godot-patches/0010-local-directional-shadow-
-## cascade-anchor.patch) - every other camera mode (free, follow) keeps reading the plain camera
-## frustum centroid, as before 0010 existed.
-## camera_get_target() is PlayerCameraServer's FOLLOW target, not CABIN's - it is never set on
-## entering CABIN mode (PlayerCameraServer.cpp's camera_set_mode(), _on_player_vehicle_entered()),
-## so the driven vehicle is read from PlayerServer.player_get_vehicle() instead.
+## VehicleServer.vehicle_get_transform() read here), and the follow/tail camera stays close to its
+## own target the same way (player.gd's own catch-up, bounded by _follow_jump_distance): anchoring
+## the sun's shadow cascades to that vehicle's own position removes the travel term 0009's
+## hysteresis margin could only buy time against, for as long as either camera is on
+## (godot-patches/0010-local-directional-shadow-cascade-anchor.patch) - the free view keeps reading
+## the plain camera frustum centroid, as every view did before 0010 existed.
+## camera_get_target() is PlayerCameraServer's FOLLOW target only - it is never set on entering
+## CABIN mode (PlayerCameraServer.cpp's camera_set_mode(), _on_player_vehicle_entered()), so the
+## driven vehicle is read from PlayerServer.player_get_vehicle() there instead.
 func _update_shadow_cascade_anchor() -> void:
-    var vehicle: RID = PlayerServer.player_get_vehicle()
-    var cabin: bool = (
-        PlayerCameraServer.camera_get_mode() == PlayerCameraServer.CAMERA_MODE_CABIN
-        and vehicle.is_valid()
-    )
-    if cabin:
+    var mode := PlayerCameraServer.camera_get_mode()
+    var vehicle: RID = RID()
+    if mode == PlayerCameraServer.CAMERA_MODE_CABIN:
+        vehicle = PlayerServer.player_get_vehicle()
+    elif mode == PlayerCameraServer.CAMERA_MODE_FOLLOW:
+        vehicle = PlayerCameraServer.camera_get_target()
+    if vehicle.is_valid():
         set_shadow_cascade_anchor(sun_light, VehicleServer.vehicle_get_transform(vehicle).origin, true)
     else:
         set_shadow_cascade_anchor(sun_light, Vector3.ZERO, false)

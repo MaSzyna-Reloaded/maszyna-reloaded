@@ -141,6 +141,34 @@ func _on_vehicle_cabin_built(vehicle_rid: RID, cabin: Cabin3D) -> void:
     cabin.add_child(rain_exclusion)
 
 
+func _process(delta: float) -> void:
+    super(delta)
+    if Engine.is_editor_hint():
+        return
+    _update_shadow_cascade_anchor()
+
+
+## The cab camera is rigidly mounted to the vehicle it rides in (player.gd places it from the same
+## VehicleServer.vehicle_get_transform() read here), so anchoring the sun's shadow cascades to that
+## vehicle's own position removes the travel term 0009's hysteresis margin could only buy time
+## against for as long as the cab is the camera (godot-patches/0010-local-directional-shadow-
+## cascade-anchor.patch) - every other camera mode (free, follow) keeps reading the plain camera
+## frustum centroid, as before 0010 existed.
+## camera_get_target() is PlayerCameraServer's FOLLOW target, not CABIN's - it is never set on
+## entering CABIN mode (PlayerCameraServer.cpp's camera_set_mode(), _on_player_vehicle_entered()),
+## so the driven vehicle is read from PlayerServer.player_get_vehicle() instead.
+func _update_shadow_cascade_anchor() -> void:
+    var vehicle: RID = PlayerServer.player_get_vehicle()
+    var cabin: bool = (
+        PlayerCameraServer.camera_get_mode() == PlayerCameraServer.CAMERA_MODE_CABIN
+        and vehicle.is_valid()
+    )
+    if cabin:
+        set_shadow_cascade_anchor(sun_light, VehicleServer.vehicle_get_transform(vehicle).origin, true)
+    else:
+        set_shadow_cascade_anchor(sun_light, Vector3.ZERO, false)
+
+
 func pause_weather() -> void:
     weather.process_mode = Node.PROCESS_MODE_DISABLED
 
